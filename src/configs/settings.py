@@ -1,8 +1,9 @@
-from typing import List, Union
+import os
 
 from pydantic_settings import BaseSettings
 
-PATH_ENV = "/srv/dq/etc/.env_executor"
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+PATH_ENV = os.path.join(ROOT_DIR, '.env')
 
 
 class Setting(BaseSettings):
@@ -18,7 +19,6 @@ class Setting(BaseSettings):
     # для логирования
     # уровни CRITICAL(50)-ERROR(40)-WARNING(30)-INFO(20)-DEBUG(10)-NOTSET(0)
     LEVEL_LOGGER_HANDLER: int = 10
-
 
     class Config:
         env_file = PATH_ENV
