@@ -20,6 +20,16 @@ class Setting(BaseSettings):
     # уровни CRITICAL(50)-ERROR(40)-WARNING(30)-INFO(20)-DEBUG(10)-NOTSET(0)
     LEVEL_LOGGER_HANDLER: int = 10
 
+    # DB
+    DRIVER_NAME: str = ""
+    HOST_DB: str = ""
+    PORT_DB: int = 0
+    USERNAME_DB: str = ""
+    PASSWORD_DB: str = ""
+    DB_NAME: str = ""
+    SCHEME_NAME: str = ""
+    TABLE_NAME_MAIN: str = "main"
+
     class Config:
         env_file = PATH_ENV
         env_file_encoding = 'utf-8'
