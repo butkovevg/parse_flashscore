@@ -29,6 +29,7 @@ class Setting(BaseSettings):
     DB_NAME: str = ""
     SCHEME_NAME: str = ""
     TABLE_NAME_MAIN: str = "main"
+    TABLE_NAME_CURRENT: str = "current"
 
     class Config:
         env_file = PATH_ENV
