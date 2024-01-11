@@ -3,7 +3,6 @@ import time
 
 from bs4 import BeautifulSoup
 
-
 from sqlalchemy.exc import IntegrityError
 
 from src.model.tables import MainDBModel
@@ -14,14 +13,26 @@ from src.service.logger_handlers import get_logger
 
 logger = get_logger(__name__)
 
+# number_games2 = arr_row[2]
+# points2 = arr_row[8]
+# series2 = "".join(arr_row[9:]).replace("?", "")
+# number_of_teams_in_the_league = len(rows)
+
 dict_link = {
     "football": {
         "link": "https://www.flashscorekz.com/?rd=flashscore.ru",
         "delimiter": "g_1_",
+        "number_games": 2,
+        "points": 8,
+        "series": 9,
+
     },
     "volleyball": {
         "link": "https://www.flashscorekz.com/volleyball/",
         "delimiter": "g_12_",
+        "number_games": 2,
+        "points": 6,
+        "series": 7,
     },
 }
 
@@ -52,8 +63,6 @@ class MainPageService:
         except Exception as exc:
             logger.error(str(exc))
             return []
-
-
 
     def insert(self) -> None:
         """

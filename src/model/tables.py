@@ -75,9 +75,7 @@ class CurrentDBModel(Base):
     status = Column(Boolean, default=None)
 
     def __str__(self):
-        return f"MainDBModel(id={self.id}, link={self.link}, " \
-               f"status={self.status})"
-
+        return str(vars(self))
     def __repr__(self):
         return self.__str__()
 

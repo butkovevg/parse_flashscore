@@ -14,7 +14,7 @@ from src.service.database import get_session
 from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
-
+from src.service.main_page import dict_link
 logger = get_logger(__name__)
 
 
@@ -93,7 +93,7 @@ class CurrentPageService:
         """
         try:
 
-            self.session.add(CurrentDBModel(**model))
+            self.session.add(model)
             self.session.commit() 
             logger.info(f'insert record')
             return ResponseModel(status=StatusModel.SUCCESS)
@@ -179,23 +179,33 @@ class CurrentPageService:
             # 08 очки
             # 09 серия
             rows = browser.find_elements(By.CSS_SELECTOR, ".ui-table__row")
+
+            count = 0
             for i in rows:
+                count += 1
                 row = i.text
+
                 arr_row = row.split("\n")
-                team = arr_row[1]
                 logger.warning(f"{arr_row=}")
+                team = arr_row[1]
                 # ['4.', 'Лубе Чивитанова', '12', '8', '4', '26:20', '22', '?', 'B', 'П', 'B', 'B', 'П']
                 # ['2.', 'ЕС Сетиф',        '11', '6', '2', '3', '16:13', '3', '20', '?', 'B', 'B', 'B', 'Н', 'Н']
+                # ['6.', 'Атлетик (Б)',      '3', '0', '1', '2', '2:4', '-2', '1', '?', 'П', 'П', 'Н']
+                dct_parametrs = dict_link[self.data4parsing.sport_name]
                 if team == team1_name:
-                    pos1 = arr_row[0].strip(".")
-                    number_games1 = arr_row[2]
-                    points1 = arr_row[6]
-                    series1 = "".join(arr_row[8:]).replace("?", "")
+                    pos1 = int((arr_row[0].strip(".")))
+                    if pos1 != count:
+                        raise ValueError("Таблиц несколько")
+                    number_games1 = arr_row[dct_parametrs["number_games"]]
+                    points1 = arr_row[dct_parametrs["points"]]
+                    series1 = "".join(arr_row[dct_parametrs["series"]:]).replace("?", "")
                 elif team == team2_name:
-                    pos2 = arr_row[0].strip(".")
-                    number_games2 = arr_row[2]
-                    points2 = arr_row[6]
-                    series2 = "".join(arr_row[8:]).replace("?", "")
+                    pos2 = int(arr_row[0].strip("."))
+                    if pos2 != count:
+                        raise ValueError("Таблиц несколько")
+                    number_games2 = arr_row[dct_parametrs["number_games"]]
+                    points2 = arr_row[dct_parametrs["points"]]
+                    series2 = "".join(arr_row[dct_parametrs["series"]:]).replace("?", "")
             number_of_teams_in_the_league = len(rows)
             logger.debug(f"#06 ПОЗИЦИЯ {pos1}/{number_of_teams_in_the_league} {pos2}/{number_of_teams_in_the_league}")
             logger.debug(f"#07 КОЛИЧЕСТВО ИГР: {number_games1}, {number_games2}")
@@ -240,5 +250,5 @@ if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
     data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=0)
     data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=0)
-    parsing_service = CurrentPageService(data4parsing=data_for_parsing2)
+    parsing_service = CurrentPageService(data4parsing=data_for_parsing1)
     parsing_service.get_list_links_from_db()
