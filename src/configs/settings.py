@@ -31,6 +31,9 @@ class Setting(BaseSettings):
     TABLE_NAME_MAIN: str = "main"
     TABLE_NAME_CURRENT: str = "current"
 
+    SERVER_HOST: str = ""
+    SERVER_PORT: int
+
     class Config:
         env_file = PATH_ENV
         env_file_encoding = 'utf-8'

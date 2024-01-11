@@ -1,16 +1,17 @@
 import os
+
 from sqlalchemy import update
+
+from src.model.tables import CurrentDBModel
 from src.service.database import get_session
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
-from src.model.tables import CurrentDBModel
 
 logger = get_logger(__name__)
 
 
 class AnalysisService:
-    def __init__(self, data4parsing: InputDataForParsing):
-        self.data4parsing = data4parsing
+    def __init__(self):
         self.session = next(get_session())
 
     def is_match_leader_and_outsder(self, record: CurrentDBModel):
@@ -68,7 +69,7 @@ class AnalysisService:
 
     def get_list_from_db(self):
         try:
-
+            logger.warning(f"1")
             # запрос для всех записей для вида спорта по дате
             query_all_record = (
                 self.session
@@ -86,17 +87,39 @@ class AnalysisService:
             logger.debug(f"{len_unprocessed_record=}/{len_all_record=}")
 
             unprocessed_records = query_unprocessed_record.all()
+
             return unprocessed_records
         except Exception as exc:
-            logger.error(f"Ошибка при получении статуса для {self.data4parsing}")
             logger.error(f"Подробности ошибки {str(exc)}")
         finally:
             self.session.close()
 
 
+class InfoAnalysisDBService():
+    def __init__(self):
+        self.session = next(get_session())
+    def get_list_from_db(self):
+        # запрос для всех записей для вида спорта по дате
+
+        query_all_record = (
+            self.session
+            .query(CurrentDBModel)
+            .filter_by(match_date="11.01.2024")
+            .filter_by(status=True)
+            .order_by(CurrentDBModel.match_time)
+
+        )
+
+        matches = query_all_record.all()
+        return matches
+
+
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=0)
-    data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=0)
-    parsing_service = AnalysisService(data4parsing=data_for_parsing1)
-    parsing_service.main()
+    # data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=0)
+    # data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=0)
+    # parsing_service = AnalysisService()
+    # parsing_service.main()
+    infoanalysisdbservice= InfoAnalysisDBService()
+    infoanalysisdbservice.get_list_from_db()
+

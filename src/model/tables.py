@@ -74,10 +74,10 @@ class CurrentDBModel(Base):
     # 10 ПРОЧЕЕ:
     status = Column(Boolean, default=None)
 
-    def __str__(self):
-        return str(vars(self))
-    def __repr__(self):
-        return self.__str__()
+    # def __str__(self):
+    #     return str(vars(self))
+    # def __repr__(self):
+    #     return self.__str__()
 
 
 if __name__ == "__main__":
