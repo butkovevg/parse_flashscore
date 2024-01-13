@@ -5,14 +5,13 @@ button {
   border-radius: 10%;
   width: 100%;
   height: 100%;
-  background-color: #4CAF50; /* Green */
   border: none;
   color: white;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+  font-size: 24px;
   margin: 4px 2px;
   cursor: pointer;
 }
@@ -50,6 +49,7 @@ tr[data-sport_name='ФУТБОЛ'] {
       <th>Team 1</th>
       <th>Team 2</th>
       <th> </th>
+      <th> </th>
       <!-- Add other columns as needed -->
   </tr>
 {% for match in matches %}
@@ -57,8 +57,8 @@ tr[data-sport_name='ФУТБОЛ'] {
     <td>{{ match.match_time }}</td>
     <td>{{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})</td>
     <td>{{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})</td>
-    <td><button onclick="getValue({{ match.id }})">Получить</button></td>
-
+    <td><button onclick="getValue({{ match.id }}, this)">Получить</button></td>
+    <td><a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank"><button>Перейти</button></a></td>
 <!--   &lt;!&ndash; Add other cells as needed &ndash;&gt;-->
 <!--   {% if match.position_total == 16 %}-->
 <!--       <style>-->
@@ -79,11 +79,14 @@ tr[data-sport_name='ФУТБОЛ'] {
 <script>
 function getValue(id) {
    var xhr = new XMLHttpRequest();
-   xhr.open("GET", "/get_value/" + id, true);
+   xhr.open("GET", "/analysis/matches/" + id, true);
    xhr.onreadystatechange = function () {
-       if (xhr.readyState == 4 && xhr.status == 200)
-           alert(xhr.responseText);
-   }
-   xhr.send();
+      if (xhr.readyState == 4 && xhr.status == 200) {
+          btn.innerHTML = "Получено";
+          btn.style.backgroundColor = "green";
+          btn.style.color = "white";
+      }
+  }
+  xhr.send();
 }
 </script>

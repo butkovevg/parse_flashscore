@@ -74,7 +74,7 @@ class AnalysisService:
             query_all_record = (
                 self.session
                 .query(CurrentDBModel)
-                .filter_by(match_date="11.01.2024")
+                .filter_by(match_date="12.01.2024")
                 .filter(CurrentDBModel.position1 != 0)
             )
 
@@ -104,7 +104,7 @@ class InfoAnalysisDBService():
         query_all_record = (
             self.session
             .query(CurrentDBModel)
-            .filter_by(match_date="11.01.2024")
+            .filter_by(match_date="12.01.2024")
             .filter_by(status=True)
             .order_by(CurrentDBModel.match_time)
 
@@ -118,8 +118,9 @@ if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
     # data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=0)
     # data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=0)
-    # parsing_service = AnalysisService()
-    # parsing_service.main()
-    infoanalysisdbservice= InfoAnalysisDBService()
-    infoanalysisdbservice.get_list_from_db()
+    parsing_service = AnalysisService()
+    parsing_service.main()
+    # window.location.href = xhr.responseText;
+    # infoanalysisdbservice= InfoAnalysisDBService()
+    # infoanalysisdbservice.main()
 

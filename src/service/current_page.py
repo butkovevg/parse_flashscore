@@ -126,7 +126,7 @@ class CurrentPageService:
             browser = BrowserService.get_webdriver()
             browser.get(full_link)
             logger.debug(f"browser.get({full_link})")
-            time.sleep(randint(5, 20))
+            time.sleep(randint(5, 25))
 
             # 00 Блок о матче
             logger.debug("#00 Блок о матче")

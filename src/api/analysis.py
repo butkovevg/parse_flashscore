@@ -16,7 +16,7 @@ def get_info(service: InfoAnalysisDBService = Depends()):
     return service.get_list_from_db()
 
 
-@router.get("/get_value/{id}/")
+@router.get("/matches/{id}/")
 def get_value(id):
     return {"id": id}
 
@@ -34,4 +34,4 @@ def read_matches(request: Request):
 def index(request: Request):
     matches = {}
 
-    return templates.TemplateResponse("template1.html", {"request": request, "matches": matches})
+    return templates.TemplateResponse("tabs.html", {"request": request, "matches": matches})
