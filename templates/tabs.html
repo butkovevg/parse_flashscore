@@ -1,55 +1,31 @@
-<style>
-.tab {
- overflow: hidden;
- background-color: #f1f1f1;
-}
+<!DOCTYPE html>
+<html>
+<head>
+   <title>My Page</title>
+   <h1> {{ matches }}</h1>
+</head>
+<body>
+   <button id="myButton" onclick="handleClick()">СТАТУС</button>
 
-/* Стилизация кнопок вкладок */
-.tab button {
- background-color: inherit;
- float: left;
- border: none;
- outline: none;
- cursor: pointer;
- padding: 14px 16px;
- transition: 0.3s;
- font-size: 17px;
-}
+   <script>
+       async function handleClick() {
+           const btn = document.getElementById('myButton');
+           btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'; // Add a loading spinner
+           btn.disabled = true;
 
-/* Изменение цвета кнопки при наведении */
-.tab button:hover {
- background-color: #ddd;
-}
+           try {
+               const response = await fetch('/analysis/get_value', { method: 'GET' });
+               if (!response.ok) throw new Error();
 
-/* Содержимое вкладок */
-.tabcontent {
- display: none;
- padding: 6px 12px;
- border-top: none;
-}
-
-/* Стилизация активной вкладки */
-.tab button.active {
- background-color: #ccc;
-}
-</style>
-<div class="tab">
- <button class="tablinks" onclick="openCity(event, 'Yesterday')">Вчера</button>
- <button class="tablinks" onclick="openCity(event, 'Today')">Сегодня</button>
- <button class="tablinks" onclick="openCity(event, 'Tomorrow')">Завтра</button>
-</div>
-
-<div id="Yesterday" class="tabcontent">
- <h3>Вчера</h3>
- <p>Содержимое вкладки "Вчера".</p>
-</div>
-
-<div id="Today" class="tabcontent">
- <h3>Сегодня</h3>
- <p>Содержимое вкладки "Сегодня".</p>
-</div>
-
-<div id="Tomorrow" class="tabcontent">
- <h3>Завтра</h3>
- <p>Содержимое вкладки "Завтра".</p>
-</div>
+               setTimeout(() => {
+                  btn.innerHTML = 'ОТПРАВЛЕН';
+                  btn.disabled = false;
+               }, 5000);
+           } catch (err) {
+               btn.innerHTML = 'Error';
+               btn.disabled = false;
+           }
+       }
+   </script>
+</body>
+</html>

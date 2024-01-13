@@ -26,10 +26,13 @@ class MainDBModel(Base):
     match_date = Column(VARCHAR, nullable=False)
     status = Column(Boolean, default=None)
 
+    def __str__(self):
+        return f"ID: {self.id}, Link: {self.link}, Sport Name: {self.sport_name}, Match Date: {self.match_date}, Status: {self.status}"
     # def __str__(self):
     #     return f"{self.id=}, {self.link=}, {self.match_date=}, {self.sport_name=}, {self.status=}"
-    def __str__(self):
-        return f"MainDBModel"
+    # # def __str__(self):
+    # #     return f"MainDBModel"
+
 
 class CurrentDBModel(Base):
     __table_args__ = (
@@ -74,10 +77,8 @@ class CurrentDBModel(Base):
     # 10 ПРОЧЕЕ:
     status = Column(Boolean, default=None)
 
-    # def __str__(self):
-    #     return str(vars(self))
-    # def __repr__(self):
-    #     return self.__str__()
+    def __str__(self):
+        return f"ID: {self.id}, Link: {self.link}, Sport Name: {self.sport_name}, Match Date: {self.match_date}, Match Time: {self.match_time}, Country: {self.country}, Tournament: {self.tournament}, Tour: {self.tour}, Team1: {self.team1}, Team2: {self.team2}, Score1: {self.score1}, Score2: {self.score2}, Match Status: {self.match_status}, Position1: {self.position1}, Position2: {self.position2}, Position Total: {self.position_total}, Num Games1: {self.num_games1}, Num Games2: {self.num_games2}, Points1: {self.points1}, Points2: {self.points2}, Series1: {self.series1}, Series2: {self.series2}, Status: {self.status}"
 
 
 if __name__ == "__main__":

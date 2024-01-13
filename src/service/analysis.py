@@ -4,15 +4,16 @@ from sqlalchemy import update
 
 from src.model.tables import CurrentDBModel
 from src.service.database import get_session
-from src.service.input_data_for_parsing import InputDataForParsing
+from src.service.helper import HelperService
 from src.service.logger_handlers import get_logger
 
 logger = get_logger(__name__)
 
 
 class AnalysisService:
-    def __init__(self):
+    def __init__(self, shift_day: int = 0):
         self.session = next(get_session())
+        self.shift_day = shift_day
 
     def is_match_leader_and_outsder(self, record: CurrentDBModel):
         if record.position_total > 10:
@@ -69,12 +70,11 @@ class AnalysisService:
 
     def get_list_from_db(self):
         try:
-            logger.warning(f"1")
             # запрос для всех записей для вида спорта по дате
             query_all_record = (
                 self.session
                 .query(CurrentDBModel)
-                .filter_by(match_date="12.01.2024")
+                .filter_by(match_date=HelperService.get_date_with_point_between_day(self.shift_day))
                 .filter(CurrentDBModel.position1 != 0)
             )
 
@@ -95,16 +95,18 @@ class AnalysisService:
             self.session.close()
 
 
-class InfoAnalysisDBService():
-    def __init__(self):
+class InfoAnalysisDBService:
+    def __init__(self, shift_day: int = 0):
         self.session = next(get_session())
+        self.shift_day = shift_day
+
     def get_list_from_db(self):
         # запрос для всех записей для вида спорта по дате
 
         query_all_record = (
             self.session
             .query(CurrentDBModel)
-            .filter_by(match_date="12.01.2024")
+            .filter_by(match_date=HelperService.get_date_with_point_between_day(day=self.shift_day))
             .filter_by(status=True)
             .order_by(CurrentDBModel.match_time)
 
@@ -123,4 +125,3 @@ if __name__ == "__main__":
     # window.location.href = xhr.responseText;
     # infoanalysisdbservice= InfoAnalysisDBService()
     # infoanalysisdbservice.main()
-

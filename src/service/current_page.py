@@ -1,4 +1,5 @@
 import os
+
 import time
 from random import randint
 
@@ -15,6 +16,7 @@ from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
 from src.service.main_page import dict_link
+
 logger = get_logger(__name__)
 
 
@@ -71,12 +73,16 @@ class CurrentPageService:
                 unprocessed_records = query_unprocessed_record.all()
                 for index_record in range(len_unprocessed_record):
                     unprocessed_record = unprocessed_records[index_record]
+                    logger.warning(f"2 {unprocessed_record=}")
                     logger.warning(f"{unprocessed_record.id=}")
                     logger.info(f"process: {index_record + 1}/{len_unprocessed_record} {unprocessed_record}")
                     response = self.get_current_match(link=unprocessed_record.link)
                     if response.status == StatusModel.SUCCESS:
                         self.update(main_db_model=unprocessed_record, status=True)
                     elif response.status == StatusModel.ERROR:
+                        logger.warning(f"1 {unprocessed_record=}")
+                        logger.warning("3")
+
                         self.update(main_db_model=unprocessed_record, status=False)
                     else:
                         logger.error("an unhandled error")
@@ -94,7 +100,7 @@ class CurrentPageService:
         try:
 
             self.session.add(model)
-            self.session.commit() 
+            self.session.commit()
             logger.info(f'insert record')
             return ResponseModel(status=StatusModel.SUCCESS)
         except IntegrityError as exc:
@@ -111,14 +117,23 @@ class CurrentPageService:
         """
         :param status:
         :return:
+        ToDo:
         """
-        stmt = (
-            update(MainDBModel).
-            where(MainDBModel.id == main_db_model.id).
-            values(status=status)
-        )
-        self.session.execute(stmt)
-        self.session.commit()
+        try:
+            logger.warning("111")
+            stmt = (
+                update(MainDBModel).
+                where(MainDBModel.id == main_db_model.id).
+                values(status=status)
+            )
+            logger.warning("222")
+
+            self.session.execute(stmt)
+            self.session.commit()
+
+        except:
+            logger.error(main_db_model.link)
+            self.session.rollback()
 
     def get_current_match(self, link):
         full_link = f"https://www.flashscorekz.com/match/{link}/#/standings/table/overall"
@@ -126,7 +141,7 @@ class CurrentPageService:
             browser = BrowserService.get_webdriver()
             browser.get(full_link)
             logger.debug(f"browser.get({full_link})")
-            time.sleep(randint(5, 25))
+            time.sleep(randint(5, 15))
 
             # 00 Блок о матче
             logger.debug("#00 Блок о матче")
@@ -158,12 +173,13 @@ class CurrentPageService:
             logger.debug(f"#04 Команды: {team1_name} - {team2_name}".upper())
 
             # 05 счёт и статус
-            status = browser.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[3]/div/div[2]/span").text
             try:
+                status = browser.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[3]/div/div[2]/span").text
                 score1 = browser.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[3]/div/div[1]/span[1]").text
                 score2 = browser.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[3]/div/div[1]/span[3]").text
                 score = f"{score1}:{score2}"
             except NoSuchElementException:
+                status = "TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ."
                 score1 = ""
                 score2 = ""
                 score = "Нет данных" + score1 + score2
@@ -236,10 +252,14 @@ class CurrentPageService:
             )
             response_insert = self.insert(model=current_db_model)
             if response_insert.status == StatusModel.SUCCESS:
+                logger.warning("1")
                 return ResponseModel(status=StatusModel.SUCCESS, )
             else:
+                logger.warning("2")
+
                 return ResponseModel(status=StatusModel.ERROR, )
         except Exception as exc:
+            logger.error(f"ERROR {link=}")
             logger.error(str(exc))
             return ResponseModel(status=StatusModel.ERROR, )
         finally:
@@ -248,7 +268,9 @@ class CurrentPageService:
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=0)
-    data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=0)
+    day=1
+    data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
+    data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
+    data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
     parsing_service = CurrentPageService(data4parsing=data_for_parsing1)
     parsing_service.get_list_links_from_db()

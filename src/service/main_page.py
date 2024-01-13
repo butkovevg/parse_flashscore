@@ -34,6 +34,13 @@ dict_link = {
         "points": 6,
         "series": 7,
     },
+    "basketball": {
+        "link": "https://www.flashscorekz.com/basketball/",
+        "delimiter": "g_3_",
+        "number_games": 2,
+        "points": 6,
+        "series": 7,
+    },
 }
 
 
@@ -49,19 +56,18 @@ class MainPageService:
             browser = BrowserService.get_webdriver()
             browser.get(link)
             time.sleep(3)
+
             # Кликаем на следующий день, если day > 0
             while abs(self.data4parsing.shift_day) > 0:
                 button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Следующий день']")
-
-                if self.data4parsing.shift_day < 0: # Если отрицательное число
+                if self.data4parsing.shift_day < 0:  # Если отрицательное число
                     self.data4parsing.shift_day += 1
                     button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Предыдущий день']")
-                else: # Если положительное число
+                else:  # Если положительное число
                     self.data4parsing.shift_day -= 1
-                time.sleep(3)
                 button_move_day.click()
                 time.sleep(5)
-                # код клика
+
             page_source = browser.page_source
             soup = BeautifulSoup(page_source, 'html.parser')
             ids = [tag['id'] for tag in soup.select('div[id]')]
@@ -100,8 +106,9 @@ class MainPageService:
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=2)
-    data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=2)
-    parsing_service = MainPageService(data4parsing=data_for_parsing1)
+    data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=0)
+    data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=0)
+    data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=0)
+    parsing_service = MainPageService(data4parsing=data_for_parsing3)
     parsing_service.get_list_link_with_main_page()
     parsing_service.insert()
