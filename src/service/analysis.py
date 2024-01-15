@@ -115,13 +115,16 @@ class InfoAnalysisDBService:
         matches = query_all_record.all()
         return matches
 
+    def printer_link(self):
+        matches = self.get_list_from_db()
+        for match_index in range(len(matches)):
+            match = matches[match_index]
+            print(f"[{match_index} {match.match_time} {match.position_total}: {match.position1}-{match.position2} {match.country} {match.team1}: {match.team2}](https://www.flashscorekz.com/match/{match.link}/#/standings/table/overall)")
+            print()
+
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    # data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=0)
-    # data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=0)
     parsing_service = AnalysisService()
     parsing_service.main()
-    # window.location.href = xhr.responseText;
-    # infoanalysisdbservice= InfoAnalysisDBService()
-    # infoanalysisdbservice.main()
+    InfoAnalysisDBService().printer_link()
