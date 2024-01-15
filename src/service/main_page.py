@@ -41,6 +41,13 @@ dict_link = {
         "points": 6,
         "series": 7,
     },
+    "handball": {
+        "link": "https://www.flashscorekz.com/handball/",
+        "delimiter": "g_7_",
+        "number_games": 2,
+        "points": 6,
+        "series": 7,
+    },
 }
 
 
@@ -84,7 +91,7 @@ class MainPageService:
 
         """
         length_list_link = len(self.list_link)
-        logger.info(f"Получено ссылок {length_list_link}")
+        logger.warning(f" {self.data4parsing}: get_links({length_list_link})")
         for index_link in range(length_list_link):
             try:
                 link = self.list_link[index_link]
@@ -106,13 +113,15 @@ class MainPageService:
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    day = 0
+    day = 2
     data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
     data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
     data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
+    data_for_parsing4 = InputDataForParsing(sport_name="handball", shift_day=day)
     list_data_for_parsing = [data_for_parsing1,
                              data_for_parsing2,
-                             data_for_parsing3
+                             data_for_parsing3,
+                             data_for_parsing4,
                              ]
     for data_for_parsing in list_data_for_parsing:
         parsing_service = MainPageService(data4parsing=data_for_parsing)

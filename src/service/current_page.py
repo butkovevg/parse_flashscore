@@ -156,9 +156,11 @@ if __name__ == "__main__":
     data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
     data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
     data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
+    data_for_parsing4 = InputDataForParsing(sport_name="handball", shift_day=day)
     list_data_for_parsing = [data_for_parsing1,
                              data_for_parsing2,
-                             data_for_parsing3
+                             data_for_parsing3,
+                             data_for_parsing4,
                              ]
     for data_for_parsing in list_data_for_parsing:
         parsing_service = CurrentPageService(data4parsing=data_for_parsing)

@@ -8,7 +8,7 @@ class InputDataForParsing:
         self.match_date = HelperService.get_date_without_point_between_day(day=shift_day)
 
     def __str__(self):
-        return f"STR: {self.sport_name}({self.match_date})"
+        return f"{self.sport_name} на {self.match_date}"
 
     def __repr__(self):
-        return f"REPR: {self.sport_name}({self.match_date})"
+        return f"{self.sport_name}({self.match_date})"
