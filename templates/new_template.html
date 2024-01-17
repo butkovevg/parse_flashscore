@@ -1,12 +1,15 @@
 <style>
+* {
+  font-family: 'Roboto', sans-serif;
+}
 button {
-  background-color: #000000;
+  background-color: rgba(35,19,245, 0);
   border: 3px solid red;
   border-radius: 10%;
   width: 100%;
   height: 100%;
   border: none;
-  color: white;
+  color: back;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
@@ -14,45 +17,51 @@ button {
   font-size: 24px;
   margin: 4px 2px;
   cursor: pointer;
+  letter-spacing:2px
 }
 
 table {
    border-collapse: collapse;
    width: 100%;
 }
+
 th {
  position: sticky;
  top: 0;
  background-color: white;
 }
 th, td {
-   text-align: left;
-   padding: 8px;
-
+   text-align: center;
+   padding: 5px;
+   border: 1px solid black;
 }
 tr[data-sport_name='ВОЛЕЙБОЛ'] {
-   background-color: rgba(35,19,245, 0.3);
-   border: 4px solid black;
+   background-color: rgba(35,19,245, 0.5);
+   border: 1px solid black;
    border-radius: 99%;
 }
 tr[data-sport_name='БАСКЕТБОЛ'] {
-   background-color: rgba(255, 182, 13, 0.3);
-   border: 2px solid black;
-   border-radius: 50%;
+   background-color: rgba(255, 182, 13, 0.5);
+   border: 1px solid black;
+   border-radius: 10%;
 }
 tr[data-sport_name='ГАНДБОЛ'] {
-   background-color: rgba(194,194,194, 0.3);
-   border: 2px solid black;
+   background-color: rgba(194,194,194, 0.5);
+   border: 1px solid black;
    border-radius: 50%;
 }
 tr[data-sport_name='ФУТБОЛ'] {
-   background-color: rgba(2,253,38, 0.3);
-   border: 2px solid black;
+   background-color: rgba(2,253,38, 0.5);
+   border: 1px solid black;
    border-radius: 50%;
 }
-#favourites {
-  background-color: blue;
-  color: white;
+.star-button.yellow {
+   background-color: red;
+}
+
+.star-button.gray {
+   background-color: rgba(35,19,245, 0);
+}
 <!--tr:nth-child(even) {-->
 <!--  background-color: #81b57d;-->
 <!--}-->
@@ -63,9 +72,16 @@ tr[data-sport_name='ФУТБОЛ'] {
 </style>
 <table>
   <tr>
-      <th>Match Time</th>
-      <th>Team 1</th>
-      <th>Team 2</th>
+      <th>TIME</th>
+      <th>COUNTRY</th>
+      <th>TOURNAMENT</th>
+      <th>TEAM №1</th>
+      <th>TEAM №2</th>
+      <th>KF1</th>
+      <th>KF2</th>
+      <th>LEADER?</th>
+      <th>SERIES?</th>
+      <th style="width: 10%;"> FAVORITES? </th>
       <th> </th>
       <th> </th>
       <!-- Add other columns as needed -->
@@ -73,9 +89,42 @@ tr[data-sport_name='ФУТБОЛ'] {
 {% for match in matches %}
 <tr data-sport_name="{{ match.sport_name }}">
     <td>{{ match.match_time }}</td>
+    <td>{{ match.country }}</td>
+    <td>{{ match.tournament }} {{ match.tour }}</td>
     <td>{{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})</td>
     <td>{{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})</td>
-    <td><button id="favourites" onclick="getValue({{ match.id }}, this)">Получить</button></td>
+    <td>{{ match.kf1 }}</td>
+    <td>{{ match.kf2 }}</td>
+
+{% if match.is_match_leader_outsider == True %}
+ <td>✔️</td>
+{% else %}
+ <td>❌</td>
+{% endif %}
+
+{% if match.is_match_series == True %}
+ <td>✔️</td>
+{% else %}
+ <td>❌</td>
+{% endif %}
+
+
+
+    <td>
+        {% if match.is_favorites %}
+            <button id="myButton" style="display: block; width: 100%; height: 100%;" class="star-button yellow">
+                <img src="/static/heart.svg" alt="Image description" style="width: 50%; height: 50%;">
+            </button>
+        {% else %}
+            <button id="myButton" style="display: block; width: 100%; height: 100%;" class="star-button gray">
+                <img src="/static/heart.svg" alt="Image description" style="width: 50%; height: 50%;">
+            </button>
+        {% endif %}
+    </td>
+
+    <td>
+        <button id="favourites" onclick="getValue({{ match.id }}, this)">Получить</button>
+    </td>
     <td><a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank"><button>Перейти</button></a></td>
 <!--   &lt;!&ndash; Add other cells as needed &ndash;&gt;-->
 <!--   {% if match.position_total == 16 %}-->
@@ -107,4 +156,9 @@ function getValue(id) {
   }
   xhr.send();
 }
+
+document.getElementById('myButton').addEventListener('click', function() {
+   this.classList.toggle('yellow');
+   this.classList.toggle('gray');
+});
 </script>

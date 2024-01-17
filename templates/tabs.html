@@ -1,39 +1,51 @@
 <style>
-.star-button.yellow {
-   background-color: yellow;
-}
 
-.star-button.gray {
-   background-color: gray;
+button {
+  background-color: rgba(144,144,144, 50);
+  border: 3px solid red;
+  border-radius: 10%;
+  width: 10%;
+  height: 10%;
+  border: none;
+  color: back;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 24px;
+  margin: 4px 2px;
+  cursor: pointer;
 }
 
 </style>
-
+<!DOCTYPE html>
 <html>
 <head>
-   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
    <title>My Page</title>
-   <h1> matches1 </h1>
-    <td>
-        {% if status %}
-            <button id="myButton" class="star-button yellow">★</button>
-        {% else %}
-            <button id="myButton" class="star-button gray">★</button>
-        {% endif %}
-    </td>
+   <h1> {{ matches }}</h1>
 </head>
 <body>
-   <h1> matches2 </h1>
-   <div class="favorite-button">
-       <input type="checkbox" id="favorite-checkbox" />
-       <label for="favorite-checkbox" class="star"></label>
-   </div>
-   <h1> matches4 </h1>
+   <button id="myButton" onclick="handleClick()">СТАТУС</button>
+
+   <script>
+       async function handleClick() {
+           const btn = document.getElementById('myButton');
+           btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'; // Add a loading spinner
+           btn.disabled = true;
+
+           try {
+               const response = await fetch('/analysis/get_value', { method: 'GET' });
+               if (!response.ok) throw new Error();
+
+               setTimeout(() => {
+                  btn.innerHTML = 'ОТПРАВЛЕН';
+                  btn.disabled = false;
+               }, 5000);
+           } catch (err) {
+               btn.innerHTML = 'Error';
+               btn.disabled = false;
+           }
+       }
+   </script>
 </body>
 </html>
-<script>
-document.getElementById('myButton').addEventListener('click', function() {
-   this.classList.toggle('yellow');
-   this.classList.toggle('gray');
-});
-</script>

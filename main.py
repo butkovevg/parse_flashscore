@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from src.api import router
 from src.configs.settings import settings
@@ -44,7 +45,7 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     lifespan=lifespan,
 )
-
+app.mount("/static", StaticFiles(directory="templates"), name="static")
 app.include_router(router)
 
 

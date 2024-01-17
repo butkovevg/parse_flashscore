@@ -108,7 +108,6 @@ class AnalysisDBModel(Base):
     score2 = Column(INTEGER, default=0)
     who_win = Column(INTEGER, default=0)
     is_favorites = Column(Boolean, default=False)
-    status = Column(Boolean, default=None)
 
 
 if __name__ == "__main__":

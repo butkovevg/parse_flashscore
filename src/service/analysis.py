@@ -185,7 +185,6 @@ class InfoAnalysisDBService:
             .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
             .filter(CurrentDBModel.status == True)
             .order_by(CurrentDBModel.match_time)
-
         )
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
@@ -199,9 +198,10 @@ class InfoAnalysisDBService:
             for attr in dir(analysis):
                 if not attr.startswith("_"):
                     row_dict[attr] = getattr(analysis, attr)
+            row_dict.pop("metadata", None)
+            row_dict.pop("registry", None)
             results_dict.append(row_dict)
-        logger.warning(f"{results_dict[0]=}")
-        return results_dict[0]
+        return results_dict
 
 
 if __name__ == "__main__":
@@ -209,9 +209,12 @@ if __name__ == "__main__":
     # parsing_service = AnalysisService()
     # parsing_service.main()
     # InfoAnalysisDBService().printer_link()
+
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    parsing_service = InfoAnalysisDBService()
+    parsing_service = InfoAnalysisDBService(0)
     parsing_service.merge()
+
+    # parsing_service = InfoAnalysisDBService(-1)
     # analysis_model = AnalysisDBModel(
     #     id=1,
     #     link='vmVN9UCR',
@@ -224,6 +227,5 @@ if __name__ == "__main__":
     #     score2=9,
     #     who_win=1,
     #     is_favorites=True,
-    #     status=None
     # )
     # parsing_service.insert(model=analysis_model)
