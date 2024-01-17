@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
-from fastapi import  Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.templating import Jinja2Templates
+
 from src.service.analysis import InfoAnalysisDBService
+from src.service.authentication import AuthenticationService
 
 templates = Jinja2Templates(directory="templates")
 router = APIRouter(
@@ -18,22 +19,22 @@ def get_info(service: InfoAnalysisDBService = Depends()):
 
 
 @router.get("/matches/{day}/")
-def get_value( request: Request, day: int=0):
+def get_value(request: Request, day: int = 0):
     matches = InfoAnalysisDBService(day).get_list_from_db()
     return templates.TemplateResponse("template.html", {"request": request, "matches": matches})
-from src.service.logger_handlers import get_logger
 
 
-logger = get_logger(__name__)
 @router.get("/")
 async def index(request: Request):
-    matches = {"status": "success"}
+    matches = {"status": True}
     return templates.TemplateResponse("tabs.html", {"request": request, "matches": matches})
-from fastapi.responses import JSONResponse
+
+
 @router.get("/get_value")
 async def get_value():
-   # Here you would call your get_value() function
-   # For demonstration purposes, we'll just simulate a delay
-   import time
-   time.sleep(1)
-   return JSONResponse(content={"status": "success"})
+    a = 0
+    if a == 1:
+        service = InfoAnalysisDBService()
+        return service.merge()
+    else:
+        return {1: 1}

@@ -8,7 +8,6 @@ PATH_ENV = os.path.join(ROOT_DIR, '.env')
 
 class Setting(BaseSettings):
     """Класс работы с .env"""
-    #  Блок, который универсальный (не должен быть в .env)
     TITLE: str = "parse_flashscore"
     DESCRIPTION: str = ""
     VERSION: str = "v0.0.1"
@@ -30,6 +29,7 @@ class Setting(BaseSettings):
     SCHEME_NAME: str = ""
     TABLE_NAME_MAIN: str = "main"
     TABLE_NAME_CURRENT: str = "current"
+    TABLE_NAME_ANALYSIS: str = "analysis"
 
     SERVER_HOST: str = ""
     SERVER_PORT: int

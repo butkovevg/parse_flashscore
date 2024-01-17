@@ -4,5 +4,4 @@ from .analysis import router as analysis_router
 
 
 router = APIRouter()
-
 router.include_router(analysis_router)
