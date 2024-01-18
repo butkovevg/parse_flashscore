@@ -34,6 +34,8 @@ class Setting(BaseSettings):
     SERVER_HOST: str = ""
     SERVER_PORT: int
 
+    PAUSE_SEC: int = 10
+
     class Config:
         env_file = PATH_ENV
         env_file_encoding = 'utf-8'

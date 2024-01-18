@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.service.analysis import InfoAnalysisDBService
 from src.service.authentication import AuthenticationService
+from src.service.enrichment_statistic import EnrichmentStatisticService
 
 templates = Jinja2Templates(directory="templates")
 
@@ -30,16 +31,19 @@ def get_value(request: Request, day: int = 0):
 async def index(request: Request):
     matches = {"status": True}
     return templates.TemplateResponse("tabs.html", {"request": request, "matches": matches})
-@router.get("/test/")
-async def index(request: Request):
-    matches = {"status": True}
-    return templates.TemplateResponse("test_html.html", {"request": request, "matches": matches})
+@router.get("/get_coefficient/{link}")
+async def get_coefficient(request: Request, link: str):
+    return EnrichmentStatisticService.get_coefficient()
 
 @router.get("/get_value")
 async def get_value(request: Request):
-    service = InfoAnalysisDBService(-1)
+    service = InfoAnalysisDBService(0)
     matches = service.merge()
     return templates.TemplateResponse("new_template.html", {"request": request, "matches": matches})
+@router.get("/get_value1/{id}")
+async def get_value(id):
+    link = str(id)
+    return EnrichmentStatisticService().get_coefficient(link)
 
 
 from fastapi.responses import FileResponse

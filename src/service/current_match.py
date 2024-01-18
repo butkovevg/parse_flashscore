@@ -53,12 +53,12 @@ class CurrentMatchService:
         # 03 страна/турнир/тур
         tournament_header_country = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[3]/div/span[3]").text
         list_country_tournament_tour = tournament_header_country.split(": ")
-        country = str(HelperService.get_element_for_list(lst=list_country_tournament_tour, index=0, default_value="NO_INFO"))
+        country = str(HelperService.get_element_for_list(lst=list_country_tournament_tour, index=0, default_value=""))
         tournament_tour = str(HelperService.get_element_for_list(lst=list_country_tournament_tour, index=1,
-                                                             default_value="NO_INFO"))
+                                                             default_value=""))
         list_tournament_tour = tournament_tour.split(" - ")
-        tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="NO_INFO")
-        tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="NO_INFO")
+        tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="")
+        tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="")
         ValidationCurrentMatch.is_validate(text="#03 страна", input_value=country, input_type=str)
         ValidationCurrentMatch.is_validate(text="#03 турнир", input_value=tournament_tour, input_type=str)
         ValidationCurrentMatch.is_validate(text="#03 тур", input_value=tour, input_type=str)
@@ -87,7 +87,7 @@ class CurrentMatchService:
         pos1, pos2 = 0, 0
         number_games1, number_games2 = 0, 0
         points1, points2 = 0, 0
-        series1, series2 = "NO_INFO", "NO_INFO"
+        series1, series2 = "", ""
         # 06 позиции
         # 07 количество игр
         # 08 очки

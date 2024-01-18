@@ -7,6 +7,7 @@ from random import randint
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 
+from src.configs.settings import settings
 from src.model.response import ResponseModel, StatusModel
 from src.model.tables import MainDBModel, CurrentDBModel
 from src.service.browser import BrowserService
@@ -135,7 +136,7 @@ class CurrentPageService:
             browser = BrowserService.get_webdriver()
             browser.get(full_link)
             logger.warning(f"browser.get({full_link})")
-            time.sleep(randint(5, 15))
+            time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
             current_db_model = CurrentMatchService(browser, self.data4parsing).get_current_match_model(link)
             response_insert = self.insert(model=current_db_model)
             if response_insert.status == StatusModel.SUCCESS:
@@ -152,7 +153,7 @@ class CurrentPageService:
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    day = 0
+    day = 2
     data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
     data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
     data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)

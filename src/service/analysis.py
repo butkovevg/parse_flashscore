@@ -1,9 +1,11 @@
+import json
 import os
-
+from datetime import datetime, timedelta
 from sqlalchemy import update
-
+from datetime import datetime
 from src.model.tables import CurrentDBModel, AnalysisDBModel
 from src.service.database import get_session
+from src.service.enrichment_statistic import EnrichmentStatisticService
 from src.service.helper import HelperService
 from src.service.logger_handlers import get_logger
 
@@ -41,19 +43,54 @@ class AnalysisService:
             self.log_match_with_series(record)
 
     def log_match_with_series(self, record: CurrentDBModel):
-        self.update(current_db_model=record)
+        self.analysis_model.is_match_series = True
         logger.warning(f"update {record.team1}:{record.team2} {record.series1} {record.series2}")
 
     def log_match_leader_and_outsider(self, record):
-        self.update(current_db_model=record)
+        self.analysis_model.is_match_leader_outsider = True
         logger.warning(
             f"update {record.team1}:{record.team2} {record.position1}:{record.position2}==={record.position_total}")
 
     def main(self):
         unprocessed_records = self.get_list_from_db()
-        for record in unprocessed_records:
-            self.is_match_leader_and_outsider(record)
-            self.is_match_with_series(record)
+        counter = 0
+        for current_model in unprocessed_records:
+            self.analysis_model = AnalysisDBModel(
+                link=current_model.link,
+                is_match_leader_outsider=False,
+                is_match_series=False,
+                is_hz=False,
+                kf1=-1,
+                kf2=-1,
+                score1=-1,
+                score2=-1,
+                who_win=0,
+                is_favorites=False,
+            )
+            self.is_match_leader_and_outsider(current_model)
+            self.is_match_with_series(current_model)
+
+            if self.analysis_model.is_match_leader_outsider or self.analysis_model.is_match_series:
+                enrichment_statistic_service = EnrichmentStatisticService()
+                coeff_tuple = enrichment_statistic_service.open_page_with_coefficient(link=self.analysis_model.link)
+                self.analysis_model.kf1 = coeff_tuple[0]
+                self.analysis_model.kf2 = coeff_tuple[1]
+                self.insert(analysis_model=self.analysis_model)
+                counter += 1
+        logger.info(f"{counter=}")
+
+
+    def insert(self, analysis_model: AnalysisDBModel):
+        """
+        """
+        try:
+            self.session.add(analysis_model)
+            self.session.commit()
+            logger.info(f'insert record: {analysis_model}')
+        except Exception as exc:
+            description_error = f"ERROR: {str(exc)} for {analysis_model}"
+            logger.error(description_error)
+            self.session.rollback()
 
     def update(self, current_db_model: CurrentDBModel, status: bool = True):
         """
@@ -88,7 +125,7 @@ class AnalysisService:
 
             unprocessed_records = query_unprocessed_record.all()
 
-            return unprocessed_records
+            return query_all_record.all()
         except Exception as exc:
             logger.error(f"Подробности ошибки {str(exc)}")
         finally:
@@ -128,91 +165,64 @@ class InfoAnalysisDBService:
     def main(self):
         matches = self.get_list_from_db()
         for match_index in range(len(matches)):
-            match = matches[match_index]
-            logger.warning(f"{str(match)=}")
-            exit(-1)
-
-    def insert(self, model: AnalysisDBModel):
-        """
-        """
-        try:
-            self.session.add(model)
-            self.session.commit()
-            logger.info(f'insert record: {model}')
-        except Exception as exc:
-            description_error = f"ERROR: {str(exc)} for {model}"
-            logger.error(description_error)
+            record = matches[match_index]
+            logger.warning(f"{str(record)=}")
 
     def merge(self):
-        # from sqlalchemy import create_engine, MetaData, Table, select, and_, true
-        # from sqlalchemy.orm import sessionmaker
-        # from src.model.tables import DB_URL
-        #
-        # # Создание движка и сессии
-        # engine = create_engine(DB_URL)
-        # Session = sessionmaker(bind=engine)
-        # session = Session()
-        #
-        # # Определение таблиц
-        # metadata = MetaData()
-        # current = Table('current', metadata, autoload_with=engine, schema='flashscore_new')
-        # analysis = Table('analysis', metadata, autoload_with=engine, schema='flashscore_new')
-        #
-        # # Выполнение запроса
-        # stmt = (
-        #     select([current.c.id, current.c.link, analysis.c.is_match_leader_outsider, analysis.c.is_match_series])
-        #     .select_from(current.outerjoin(analysis, current.c.link == analysis.c.link))
-        #     .where(and_(
-        #         current.c.match_date == '16.01.2024',
-        #         current.c.status == true()
-        #     ))
-        #     .order_by(current.c.match_time)
-        # )
-        #
-        # result = session.execute(stmt)
-        # rows = result.fetchall()
 
-        # result = self.session.query(CurrentDBModel, AnalysisDBModel) \
-        #     .filter(CurrentDBModel.link == AnalysisDBModel.link) \
-        #     .first()
+
+        current_time = datetime.now()
+        new_time = current_time - timedelta(minutes=90)
+        time_filter = new_time.strftime('%H:%M')
 
         query_all_record = (
             self.session
-            .query(CurrentDBModel, AnalysisDBModel)
-            # .filter_by(match_date=HelperService.get_date_with_point_between_day(day=self.shift_day))
-            # .filter_by(status=True)
-            .outerjoin(AnalysisDBModel, CurrentDBModel.link == AnalysisDBModel.link)
+            .query(AnalysisDBModel, CurrentDBModel)
+            .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
             .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
-            .filter(CurrentDBModel.status == True)
+            .filter(CurrentDBModel.match_time > time_filter)
             .order_by(CurrentDBModel.match_time)
         )
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
 
-        results_dict = []
-        for current, analysis in result:
+        list_dct_2model = []
+        for analysis,current in result:
             row_dict = {}
             for attr in dir(current):
                 if not attr.startswith("_"):
                     row_dict[attr] = getattr(current, attr)
             for attr in dir(analysis):
                 if not attr.startswith("_"):
-                    row_dict[attr] = getattr(analysis, attr)
+                        if attr == "id":
+                            row_dict["analysis_id"] = getattr(analysis, attr)
+                        else:
+                            row_dict[attr] = getattr(analysis, attr)
+
             row_dict.pop("metadata", None)
             row_dict.pop("registry", None)
-            results_dict.append(row_dict)
-        return results_dict
+            list_dct_2model.append(row_dict)
+        return list_dct_2model
 
 
 if __name__ == "__main__":
-    # logger.info(f'Initializing test {os.path.basename(__file__)}')
-    # parsing_service = AnalysisService()
-    # parsing_service.main()
-    # InfoAnalysisDBService().printer_link()
-
+    #1: "Запись в БД после анализа",
+    #2: "",
+    choice = 3
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    parsing_service = InfoAnalysisDBService(0)
-    parsing_service.merge()
+
+    if choice == 1:
+        parsing_service = AnalysisService(shift_day=1)
+        parsing_service.main()
+    elif choice == 2:
+        InfoAnalysisDBService().printer_link()
+    elif choice == 3:
+        parsing_service = InfoAnalysisDBService(0)
+        list_analysis_dct = parsing_service.merge()
+
+        js = json.dumps(list_analysis_dct[0], indent=4, ensure_ascii=False)
+        print(js)
+
 
     # parsing_service = InfoAnalysisDBService(-1)
     # analysis_model = AnalysisDBModel(

@@ -40,7 +40,7 @@ th, td {
    border: 1px solid black;
 }
 tr[data-sport_name='ВОЛЕЙБОЛ'] {
-   background-color: rgba(35,19,245, 0.5);
+   background-color: rgba(0, 69, 255, 0.5);
    border: 1px solid black;
    border-radius: 99%;
 }
@@ -66,14 +66,8 @@ tr[data-sport_name='ФУТБОЛ'] {
 .star-button.gray {
    background-color: rgba(35,19,245, 0);
 }
-<!--tr:nth-child(even) {-->
-<!--  background-color: #81b57d;-->
-<!--}-->
-
-<!--tr:nth-child(odd) {-->
-<!--  background-color: #468741;-->
-}
 </style>
+
 <table>
   <tr>
       <th>TIME</th>
@@ -85,36 +79,33 @@ tr[data-sport_name='ФУТБОЛ'] {
       <th>KF2</th>
       <th>LEADER?</th>
       <th>SERIES?</th>
-      <th style="width: 10%;"> FAVORITES? </th>
+      <th style="width: 1%;"> FAVORITES? </th>
+<!--      <th> </th>-->
       <th> </th>
-      <th> </th>
-      <!-- Add other columns as needed -->
   </tr>
 {% for match in matches %}
 <tr data-sport_name="{{ match.sport_name }}">
     <td>{{ match.match_time }}</td>
     <td>{{ match.country }}</td>
-    <td>{{ match.tournament }} {{ match.tour }}</td>
+    <td>{{ match.tour }} {{ match.tournament }}</td>
     <td>{{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})</td>
     <td>{{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})</td>
     <td>{{ match.kf1 }}</td>
     <td>{{ match.kf2 }}</td>
 
-{% if match.is_match_leader_outsider == True %}
- <td>  ✔️</td>
-{% else %}
-<!-- <td>❌</td>-->
+    {% if match.is_match_leader_outsider == True %}
+    <td>  ✔️</td>
+    {% else %}
+    <!-- <td>❌</td>-->
     <td></td>
-{% endif %}
+    {% endif %}
 
-{% if match.is_match_series == True %}
- <td>  ✔️</td>
-<!--{% else %}-->
-<!-- <td>❌</td>-->
-        <td></td>
-{% endif %}
-
-
+    {% if match.is_match_series == True %}
+     <td>  ✔️</td>
+    {% else %}
+    <!-- <td>❌</td>-->
+    <td></td>
+    {% endif %}
 
     <td>
         {% if match.is_favorites %}
@@ -128,35 +119,21 @@ tr[data-sport_name='ФУТБОЛ'] {
         {% endif %}
     </td>
 
-    <td>
-        <button id="favourites" onclick="getValue({{ match.id }}, this)">Получить</button>
-    </td>
+<!--    <td>-->
+<!--        <button id="favourites" onclick="getValue({{ match.link }}, this)">Получить</button>-->
+<!--    </td>-->
     <td>
         <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank"><button>Перейти</button></a>
 
 
     </td>
-<!--   &lt;!&ndash; Add other cells as needed &ndash;&gt;-->
-<!--   {% if match.position_total == 16 %}-->
-<!--       <style>-->
-<!--           tr {-->
-<!--               background-color: red;-->
-<!--           }-->
-<!--       </style>-->
-<!--   {% else %}-->
-<!--       <style>-->
-<!--           tr {-->
-<!--               background-color: green;-->
-<!--           }-->
-<!--       </style>-->
-<!--   {% endif %}-->
 </tr>
 {% endfor %}
 </table>
 <script>
-function getValue(id) {
+function getValue(link) {
    var xhr = new XMLHttpRequest();
-   xhr.open("GET", "/analysis/get_value" , true);
+   xhr.open("GET", "/analysis/get_value1/" + link + "/" , true);
    xhr.onreadystatechange = function () {
       if (xhr.readyState == 4 && xhr.status == 200) {
           btn.innerHTML = "Получено";
