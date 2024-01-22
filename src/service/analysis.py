@@ -54,7 +54,9 @@ class AnalysisService:
     def main(self):
         unprocessed_records = self.get_list_from_db()
         counter = 0
-        for current_model in unprocessed_records:
+        length_unprocessed_records = len(unprocessed_records)
+        for index in range(length_unprocessed_records):
+            current_model = unprocessed_records[index]
             self.analysis_model = AnalysisDBModel(
                 link=current_model.link,
                 is_match_leader_outsider=False,
@@ -77,8 +79,7 @@ class AnalysisService:
                 self.analysis_model.kf2 = coeff_tuple[1]
                 self.insert(analysis_model=self.analysis_model)
                 counter += 1
-        logger.info(f"{counter=}")
-
+        logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
 
     def insert(self, analysis_model: AnalysisDBModel):
         """
@@ -169,8 +170,6 @@ class InfoAnalysisDBService:
             logger.warning(f"{str(record)=}")
 
     def merge(self):
-
-
         current_time = datetime.now()
         new_time = current_time - timedelta(minutes=90)
         time_filter = new_time.strftime('%H:%M')
@@ -180,35 +179,59 @@ class InfoAnalysisDBService:
             .query(AnalysisDBModel, CurrentDBModel)
             .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
             .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
-            .filter(CurrentDBModel.match_time > time_filter)
             .order_by(CurrentDBModel.match_time)
         )
+        if self.shift_day == 0:
+            query_all_record = query_all_record.filter(CurrentDBModel.match_time > time_filter)
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
 
         list_dct_2model = []
-        for analysis,current in result:
+        for analysis, current in result:
             row_dict = {}
             for attr in dir(current):
                 if not attr.startswith("_"):
                     row_dict[attr] = getattr(current, attr)
             for attr in dir(analysis):
                 if not attr.startswith("_"):
-                        if attr == "id":
-                            row_dict["analysis_id"] = getattr(analysis, attr)
-                        else:
-                            row_dict[attr] = getattr(analysis, attr)
+                    if attr == "id":
+                        row_dict["analysis_id"] = getattr(analysis, attr)
+                    else:
+                        row_dict[attr] = getattr(analysis, attr)
 
             row_dict.pop("metadata", None)
             row_dict.pop("registry", None)
             list_dct_2model.append(row_dict)
         return list_dct_2model
 
+    def update_favorites(self, analysis_id: int):
+        """
+        :param status:
+        :return:
+        """
+        query_link = (
+            self.session
+            .query(AnalysisDBModel)
+            .filter(AnalysisDBModel.id == analysis_id)
+        )
+        analysis_db_model = query_link.all()[0]
+        print(analysis_db_model)
+        logger.warning(f"{analysis_db_model=}")
+
+        stmt = (
+            update(AnalysisDBModel).
+            where(AnalysisDBModel.id == analysis_id).
+            values(is_favorites=not analysis_db_model.is_favorites)
+        )
+        self.session.execute(stmt)
+        self.session.commit()
+        logger.warning(f"ok")
+
 
 if __name__ == "__main__":
-    #1: "Запись в БД после анализа",
-    #2: "",
-    choice = 3
+    # 1: "Запись в БД после анализа",
+    # 2: "",
+    choice = 1
     logger.info(f'Initializing test {os.path.basename(__file__)}')
 
     if choice == 1:
@@ -222,7 +245,9 @@ if __name__ == "__main__":
 
         js = json.dumps(list_analysis_dct[0], indent=4, ensure_ascii=False)
         print(js)
-
+    elif choice == 4:
+        parsing_service = InfoAnalysisDBService(0)
+        parsing_service.update_favorities(link="l8camAxG")
 
     # parsing_service = InfoAnalysisDBService(-1)
     # analysis_model = AnalysisDBModel(

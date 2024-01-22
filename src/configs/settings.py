@@ -10,7 +10,7 @@ class Setting(BaseSettings):
     """Класс работы с .env"""
     TITLE: str = "parse_flashscore"
     DESCRIPTION: str = ""
-    VERSION: str = "v0.0.1"
+    VERSION: str = "v0.0.3"
     NAME: str = ""
     EMAIL: str = ""
     MSG_ERROR: str = f"please, contact the developer {EMAIL}"

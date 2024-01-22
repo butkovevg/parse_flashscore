@@ -28,7 +28,7 @@ tags_metadata = [
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info(f'Initializing API {settings.TITLE}: {settings.VERSION}')
-    EnvironmentPrinterService.logger_env_from_settings()
+    # EnvironmentPrinterService.logger_env_from_settings()
     yield
     logger.info(f'Shutting down API {settings.TITLE}: {settings.VERSION}')
 
