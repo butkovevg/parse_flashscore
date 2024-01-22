@@ -21,7 +21,7 @@ button {
     letter-spacing:2px
 }
 button:hover {
-  background-color: black; /* Green */
+  background-color: rgba(0, 189, 150, 1); /* Green */
   color: white;
 }
 table {
@@ -60,12 +60,27 @@ tr[data-sport_name='ФУТБОЛ'] {
    border-radius: 50%;
 }
 .green-button {
-   background-color: rgba(2,253,38, 0);
+   background-color: green;
 }
 
 .red-button {
    background-color: red;
 }
+/* Цвет ссылки по умолчанию */
+a:link {
+    color: black; /* Замените на желаемый цвет */
+}
+/* Цвет посещенной ссылки */
+a:visited {
+    color: black; /* Замените на желаемый цвет */
+}
+/* Цвет ссылки при наведении курсора */
+a:hover {
+    color: black; /* Замените на желаемый цвет */
+}
+/* Цвет активной ссылки */
+a:active {
+    color: black; /* Замените на желаемый цвет */
 </style>
 
 <table>
@@ -79,8 +94,7 @@ tr[data-sport_name='ФУТБОЛ'] {
       <th>KF2</th>
       <th>LEADER?</th>
       <th>SERIES?</th>
-      <th style="width: 1%;"> FAVORITES? </th>
-<!--      <th> </th>-->
+      <th style="width: 1%;"><a href="/analysis/favorites/{{ day }}/" > FAVORITES? </th>
       <th> </th>
   </tr>
 {% for match in matches %}
@@ -109,11 +123,11 @@ tr[data-sport_name='ФУТБОЛ'] {
 
     <td>
         {% if match.is_favorites %}
-            <button id="FavoritesButton" style="display: block; width: 100%; height: 100%;" class="red-button" onclick="toggleStatus({{ match.analysis_id }})">
+            <button id="FavoritesButton{{ match.analysis_id }}" style="display: block; width: 100%; height: 100%;" class="red-button" onclick="toggleStatus({{ match.analysis_id }})">
                 <img src="/static/heart.svg" alt="Image description" style="width: 50%; height: 50%;">
             </button>
         {% else %}
-            <button id="FavoritesButton" style="display: block; width: 100%; height: 100%;" class="green-button" onclick="toggleStatus({{ match.analysis_id }})">
+            <button id="FavoritesButton{{ match.analysis_id }}" style="display: block; width: 100%; height: 100%;" class="green-button" onclick="toggleStatus({{ match.analysis_id }})">
                 <img src="/static/heart.svg" alt="Image description" style="width: 50%; height: 50%;">
             </button>
         {% endif %}
@@ -147,7 +161,7 @@ function getValue(link) {
 <!--});-->
 
 function toggleStatus(id) {
-  var button = document.getElementById("FavoritesButton");
+  var button = document.getElementById("FavoritesButton" + id);
   if (button.className === "green-button") {
       button.className = "red-button";
       fetch(`/analysis/update_favorites/${id}`)
