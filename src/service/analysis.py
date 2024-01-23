@@ -181,8 +181,8 @@ class InfoAnalysisDBService:
             .filter(AnalysisDBModel.is_favorites == True)
             .order_by(CurrentDBModel.match_time)
         )
-        if self.shift_day == 0:
-            query_all_record = query_all_record.filter(CurrentDBModel.match_time > time_filter)
+        # if self.shift_day == 0:
+        #     query_all_record = query_all_record.filter(CurrentDBModel.match_time > time_filter)
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
 
@@ -215,8 +215,42 @@ class InfoAnalysisDBService:
             .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
             .order_by(CurrentDBModel.match_time)
         )
-        if self.shift_day == 0:
-            query_all_record = query_all_record.filter(CurrentDBModel.match_time > time_filter)
+        # if self.shift_day == 0:
+        #     query_all_record = query_all_record.filter(CurrentDBModel.match_time > time_filter)
+        result = query_all_record.all()
+        logger.warning(f"{len(result)=}")
+
+        list_dct_2model = []
+        for analysis, current in result:
+            row_dict = {}
+            for attr in dir(current):
+                if not attr.startswith("_"):
+                    row_dict[attr] = getattr(current, attr)
+            for attr in dir(analysis):
+                if not attr.startswith("_"):
+                    if attr == "id":
+                        row_dict["analysis_id"] = getattr(analysis, attr)
+                    else:
+                        row_dict[attr] = getattr(analysis, attr)
+
+            row_dict.pop("metadata", None)
+            row_dict.pop("registry", None)
+            list_dct_2model.append(row_dict)
+        return list_dct_2model
+    def get_match_today(self):
+        current_time = datetime.now()
+        new_time = current_time - timedelta(minutes=90)
+        time_filter = new_time.strftime('%H:%M')
+
+        query_all_record = (
+            self.session
+            .query(AnalysisDBModel, CurrentDBModel)
+            .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
+            .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
+            .filter(CurrentDBModel.match_time > time_filter)
+            .order_by(CurrentDBModel.match_time)
+
+        )
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
 

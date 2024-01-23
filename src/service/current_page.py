@@ -153,7 +153,7 @@ class CurrentPageService:
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    day = 2
+    day = 3
     data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
     data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
     data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)

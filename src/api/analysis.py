@@ -27,21 +27,22 @@ async def test(request: Request):
 
     }
     return templates.TemplateResponse("test_html.html", {"request": request, "matches": matches})
-@router.get("/favorites/{day}/")
-async def get_favorites(request: Request, day: int = 0):
-    service = InfoAnalysisDBService(day)
-    matches = service.get_favorites()
-    return templates.TemplateResponse("new_template.html", {"request": request, "matches": matches})
 
 @router.get("/update_favorites/{analysis_id}")
 async def update_favorites(analysis_id: int):
     parsing_service = InfoAnalysisDBService()
     return parsing_service.update_favorites(analysis_id=analysis_id)
 
+@router.get("/time/{day}/")
+async def get_value(request: Request, day: int):
+    service = InfoAnalysisDBService(day)
+    matches = service.get_match_today()
+    return templates.TemplateResponse("analysis.html", {"request": request, "matches": matches, "day": day})
+
 
 @router.get("/{day}/")
 async def get_value(request: Request, day: int = 0):
     service = InfoAnalysisDBService(day)
     matches = service.merge()
-    return templates.TemplateResponse("new_template.html", {"request": request, "matches": matches, "day": day})
+    return templates.TemplateResponse("analysis.html", {"request": request, "matches": matches, "day": day})
 
