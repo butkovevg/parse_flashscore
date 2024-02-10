@@ -1,12 +1,9 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 
 from src.service.analysis import InfoAnalysisDBService
-from src.service.authentication import AuthenticationService
-from src.service.enrichment_statistic import EnrichmentStatisticService
 
 templates = Jinja2Templates(directory="templates")
 
@@ -28,10 +25,12 @@ async def test(request: Request):
     }
     return templates.TemplateResponse("test_html.html", {"request": request, "matches": matches})
 
+
 @router.get("/update_favorites/{analysis_id}")
 async def update_favorites(analysis_id: int):
     parsing_service = InfoAnalysisDBService()
     return parsing_service.update_favorites(analysis_id=analysis_id)
+
 
 @router.get("/time/{day}/")
 async def get_value(request: Request, day: int):
@@ -45,4 +44,3 @@ async def get_value(request: Request, day: int = 0):
     service = InfoAnalysisDBService(day)
     matches = service.merge()
     return templates.TemplateResponse("analysis.html", {"request": request, "matches": matches, "day": day})
-

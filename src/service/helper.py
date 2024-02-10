@@ -1,9 +1,10 @@
 import datetime
 from typing import List, Any
 
+from src.service.logger_handlers import get_logger
 
+logger = get_logger(__name__)
 class HelperService:
-
     @staticmethod
     def get_new_date(day: int) -> datetime.date:
         """
@@ -13,6 +14,7 @@ class HelperService:
         """
         current_date = datetime.date.today()
         new_date = current_date + datetime.timedelta(days=day)
+        logger.debug(f"get_new_date({day=}): return {new_date}")
         return new_date
 
     @staticmethod

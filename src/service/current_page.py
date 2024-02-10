@@ -1,22 +1,18 @@
 import os
-
 import time
 from random import randint
-
 
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 
 from src.configs.settings import settings
 from src.model.response import ResponseModel, StatusModel
-from src.model.tables import MainDBModel, CurrentDBModel
+from src.model.tables import MainDBModel
 from src.service.browser import BrowserService
 from src.service.current_match import CurrentMatchService
 from src.service.database import get_session
-from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
-from src.service.main_page import dict_link
 
 logger = get_logger(__name__)
 
@@ -111,6 +107,7 @@ class CurrentPageService:
 
     def update(self, main_db_model, status=True):
         """
+        :param main_db_model:
         :param status:
         :return:
         ToDo: DELETED TRY/EXCEPT
@@ -122,11 +119,11 @@ class CurrentPageService:
                 values(status=status)
             )
 
-
             self.session.execute(stmt)
             self.session.commit()
 
-        except:
+        except Exception as exc:
+            logger.error(str(exc))
             logger.error(main_db_model.link)
             self.session.rollback()
 

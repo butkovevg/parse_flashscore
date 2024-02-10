@@ -26,12 +26,14 @@ class ValidationCurrentMatch:
                 output_value = int(input_value.split(".")[0])
                 return output_value
         except ValueError:
-            logger.error(f"ValueError no interger: {type(input_value)} {input_value}")
+            logger.error(f"ValueError no integer: {type(input_value)} {input_value}")
             return 0
         except Exception as exc:
             logger.error(str(exc))
-            logger.error(f"no interger: {type(input_value)} {input_value}")
+            logger.error(f"no integer: {type(input_value)} {input_value}")
             return 0
+
+
 class CurrentMatchService:
     def __init__(self, browser, data4parsing):
         self.driver = browser
@@ -55,7 +57,7 @@ class CurrentMatchService:
         list_country_tournament_tour = tournament_header_country.split(": ")
         country = str(HelperService.get_element_for_list(lst=list_country_tournament_tour, index=0, default_value=""))
         tournament_tour = str(HelperService.get_element_for_list(lst=list_country_tournament_tour, index=1,
-                                                             default_value=""))
+                                                                 default_value=""))
         list_tournament_tour = tournament_tour.split(" - ")
         tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="")
         tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="")
@@ -100,24 +102,21 @@ class CurrentMatchService:
             row = i.text
             arr_row = row.split("\n")
             team = arr_row[1]
-            # ['4.', 'Лубе Чивитанова', '12', '8', '4', '26:20', '22', '?', 'B', 'П', 'B', 'B', 'П']
-            # ['2.', 'ЕС Сетиф',        '11', '6', '2', '3', '16:13', '3', '20', '?', 'B', 'B', 'B', 'Н', 'Н']
-            # ['6.', 'Атлетик (Б)',      '3', '0', '1', '2', '2:4', '-2', '1', '?', 'П', 'П', 'Н']
-            dct_parametrs = dict_link[self.data4parsing.sport_name]
+            dct_parameters = dict_link[self.data4parsing.sport_name]
             if team == team1_name:
                 pos1 = int((arr_row[0].strip(".")))
                 if pos1 != count:
                     raise ValueError("Таблиц несколько")
-                number_games1 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parametrs["number_games"]])
-                points1 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parametrs["points"]])
-                series1 = "".join(arr_row[dct_parametrs["series"]:]).replace("?", "")
+                number_games1 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parameters["number_games"]])
+                points1 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parameters["points"]])
+                series1 = "".join(arr_row[dct_parameters["series"]:]).replace("?", "")
             elif team == team2_name:
                 pos2 = int(arr_row[0].strip("."))
                 if pos2 != count:
                     raise ValueError("Таблиц несколько")
-                number_games2 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parametrs["number_games"]])
-                points2 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parametrs["points"]])
-                series2 = "".join(arr_row[dct_parametrs["series"]:]).replace("?", "")
+                number_games2 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parameters["number_games"]])
+                points2 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parameters["points"]])
+                series2 = "".join(arr_row[dct_parameters["series"]:]).replace("?", "")
         number_of_teams_in_the_league = len(rows)
 
         ValidationCurrentMatch.is_validate(text="#06 ПОЗИЦИЯ_1", input_value=pos1, input_type=int)

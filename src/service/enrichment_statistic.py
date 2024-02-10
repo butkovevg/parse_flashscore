@@ -1,18 +1,15 @@
 import time
+
 from selenium.webdriver.common.by import By
+
 from src.configs.settings import settings
-from src.service.current_match import ValidationCurrentMatch
-from src.service.logger_handlers import get_logger
 from src.service.browser import BrowserService
+from src.service.logger_handlers import get_logger
 
 logger = get_logger(__name__)
 
 
 class EnrichmentStatisticService:
-    def get_coefficient(self, link: str = "NO"):
-        logger.warning(f"EnrichmentStatisticService1: {link=}")
-        return {}
-
     def open_page_with_coefficient(self, link: str) -> tuple:
         full_link = f"https://www.flashscorekz.com/match/{link}/#/odds-comparison/"
         try:
@@ -29,10 +26,10 @@ class EnrichmentStatisticService:
         finally:
             browser.quit()
 
-    def get_list_text_from_list_webelement(self, list_web_element: list) -> list:
+    def get_list_text_from_list_web_element(self, list_web_element: list) -> list:
         list_text = []
-        for webelement in list_web_element:
-            row_text = webelement.text
+        for web_element in list_web_element:
+            row_text = web_element.text
             arr_row_text = row_text.split("\n")
             list_text.append(arr_row_text)
         logger.debug(f"{list_text=}")
@@ -81,9 +78,9 @@ class EnrichmentStatisticService:
         try:
 
             rows_coefficients = browser.find_elements(By.CSS_SELECTOR, ".ui-table__row")
-            list_text_coefficients = self.get_list_text_from_list_webelement(list_web_element=rows_coefficients)
+            list_text_coefficients = self.get_list_text_from_list_web_element(list_web_element=rows_coefficients)
             header_coefficients = browser.find_elements(By.CSS_SELECTOR, ".ui-table__header")
-            list_text_header = self.get_list_text_from_list_webelement(list_web_element=header_coefficients)
+            list_text_header = self.get_list_text_from_list_web_element(list_web_element=header_coefficients)
 
             output_tuple = self.export_coefficient_from_list(list_text_coefficients, list_text_header)
             logger.info(f"{output_tuple=}")
@@ -99,33 +96,4 @@ class EnrichmentStatisticService:
 
 if __name__ == "__main__":
     service = EnrichmentStatisticService()
-    a = service.open_page_with_coefficient(link="viLatFGL")
-    logger.critical(f"{a=}")
-    service.open_page_with_coefficient(link="YLvr9jHa")
-    service.open_page_with_coefficient(link="AFmEcv5j")
-    service.open_page_with_coefficient(link="4SDknHSa")
-    service.open_page_with_coefficient(link="QyFomcDg")
-    service.open_page_with_coefficient(link="M38foyr6")
-    service.open_page_with_coefficient(link="CUUFhmQC")
-    service.open_page_with_coefficient(link="0f7bpecC")
-    service.open_page_with_coefficient(link="829ElZtK")
-    service.open_page_with_coefficient(link="fRuw7Hi6")
-    service.open_page_with_coefficient(link="v9Gdrrso")
-    service.open_page_with_coefficient(link="lQ0N1niE")
-    service.open_page_with_coefficient(link="CtioHgRc")
-    service.open_page_with_coefficient(link="bN4OSRkL")
-    service.open_page_with_coefficient(link="tnfTRo5R")
-    service.open_page_with_coefficient(link="Gl8CNfUp")
-    service.open_page_with_coefficient(link="lbbR4mJ4")
-    service.open_page_with_coefficient(link="vPxWKlyN")
-    service.open_page_with_coefficient(link="Awnj6Rdr")
-    service.open_page_with_coefficient(link="8h0lOICq")
-    service.open_page_with_coefficient(link="W0dY2Wit")
-    service.open_page_with_coefficient(link="f3FP17q2")
-    service.open_page_with_coefficient(link="CzbRe8Df")
-    service.open_page_with_coefficient(link="E9Fxpff0")
-    service.open_page_with_coefficient(link="6w39E1uJ")
-    service.open_page_with_coefficient(link="4rjPItDt")
-    service.open_page_with_coefficient(link="UkL7vshO")
-    service.open_page_with_coefficient(link="EDXHUYjE")
-    service.open_page_with_coefficient(link="O8t1nTPm")
+    service.open_page_with_coefficient(link="viLatFGL")

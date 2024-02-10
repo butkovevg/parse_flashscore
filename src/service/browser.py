@@ -12,3 +12,5 @@ class BrowserService:
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
         return webdriver.Chrome(options=options)
+
+

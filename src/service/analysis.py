@@ -1,8 +1,10 @@
 import json
 import os
-from datetime import datetime, timedelta
-from sqlalchemy import update
 from datetime import datetime
+from datetime import timedelta
+
+from sqlalchemy import update
+
 from src.model.tables import CurrentDBModel, AnalysisDBModel
 from src.service.database import get_session
 from src.service.enrichment_statistic import EnrichmentStatisticService
@@ -74,12 +76,13 @@ class AnalysisService:
 
             if self.analysis_model.is_match_leader_outsider or self.analysis_model.is_match_series:
                 enrichment_statistic_service = EnrichmentStatisticService()
-                coeff_tuple = enrichment_statistic_service.open_page_with_coefficient(link=self.analysis_model.link)
-                self.analysis_model.kf1 = coeff_tuple[0]
-                self.analysis_model.kf2 = coeff_tuple[1]
+                coefficient_tuple = enrichment_statistic_service.open_page_with_coefficient(
+                    link=self.analysis_model.link)
+                self.analysis_model.kf1 = coefficient_tuple[0]
+                self.analysis_model.kf2 = coefficient_tuple[1]
                 self.insert(analysis_model=self.analysis_model)
                 counter += 1
-        logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
+            logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
 
     def insert(self, analysis_model: AnalysisDBModel):
         """
@@ -137,6 +140,11 @@ class InfoAnalysisDBService:
     def __init__(self, shift_day: int = 0):
         self.session = next(get_session())
         self.shift_day = shift_day
+        self.query = (self.session
+                      .query(AnalysisDBModel, CurrentDBModel)
+                      .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
+                      .filter(
+            CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day)))
 
     def get_list_from_db(self):
         # запрос для всех записей для вида спорта по дате
@@ -168,93 +176,47 @@ class InfoAnalysisDBService:
         for match_index in range(len(matches)):
             record = matches[match_index]
             logger.warning(f"{str(record)=}")
+
     def get_favorites(self):
         current_time = datetime.now()
         new_time = current_time - timedelta(minutes=90)
-        time_filter = new_time.strftime('%H:%M')
 
         query_all_record = (
-            self.session
-            .query(AnalysisDBModel, CurrentDBModel)
-            .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
-            .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
+            self.query
             .filter(AnalysisDBModel.is_favorites == True)
             .order_by(CurrentDBModel.match_time)
         )
-        # if self.shift_day == 0:
-        #     query_all_record = query_all_record.filter(CurrentDBModel.match_time > time_filter)
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
 
-        list_dct_2model = []
-        for analysis, current in result:
-            row_dict = {}
-            for attr in dir(current):
-                if not attr.startswith("_"):
-                    row_dict[attr] = getattr(current, attr)
-            for attr in dir(analysis):
-                if not attr.startswith("_"):
-                    if attr == "id":
-                        row_dict["analysis_id"] = getattr(analysis, attr)
-                    else:
-                        row_dict[attr] = getattr(analysis, attr)
+        return self.get_list_dct_models_analysis_and_current(result)
 
-            row_dict.pop("metadata", None)
-            row_dict.pop("registry", None)
-            list_dct_2model.append(row_dict)
-        return list_dct_2model
     def merge(self):
         current_time = datetime.now()
         new_time = current_time - timedelta(minutes=90)
         time_filter = new_time.strftime('%H:%M')
-
         query_all_record = (
-            self.session
-            .query(AnalysisDBModel, CurrentDBModel)
-            .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
-            .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
+            self.query
             .order_by(CurrentDBModel.match_time)
         )
         # if self.shift_day == 0:
         #     query_all_record = query_all_record.filter(CurrentDBModel.match_time > time_filter)
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
+        return self.get_list_dct_models_analysis_and_current(result)
 
-        list_dct_2model = []
-        for analysis, current in result:
-            row_dict = {}
-            for attr in dir(current):
-                if not attr.startswith("_"):
-                    row_dict[attr] = getattr(current, attr)
-            for attr in dir(analysis):
-                if not attr.startswith("_"):
-                    if attr == "id":
-                        row_dict["analysis_id"] = getattr(analysis, attr)
-                    else:
-                        row_dict[attr] = getattr(analysis, attr)
-
-            row_dict.pop("metadata", None)
-            row_dict.pop("registry", None)
-            list_dct_2model.append(row_dict)
-        return list_dct_2model
     def get_match_today(self):
         current_time = datetime.now()
         new_time = current_time - timedelta(minutes=90)
         time_filter = new_time.strftime('%H:%M')
-
-        query_all_record = (
-            self.session
-            .query(AnalysisDBModel, CurrentDBModel)
-            .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
-            .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
-            .filter(CurrentDBModel.match_time > time_filter)
-            .order_by(CurrentDBModel.match_time)
-
-        )
+        query_all_record = self.query.filter(CurrentDBModel.match_time > time_filter)
+        query_all_record = query_all_record.order_by(CurrentDBModel.match_time)
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
+        return self.get_list_dct_models_analysis_and_current(result)
 
-        list_dct_2model = []
+    def get_list_dct_models_analysis_and_current(self, result):
+        output_list = []
         for analysis, current in result:
             row_dict = {}
             for attr in dir(current):
@@ -269,14 +231,10 @@ class InfoAnalysisDBService:
 
             row_dict.pop("metadata", None)
             row_dict.pop("registry", None)
-            list_dct_2model.append(row_dict)
-        return list_dct_2model
+            output_list.append(row_dict)
+        return output_list
 
     def update_favorites(self, analysis_id: int):
-        """
-        :param status:
-        :return:
-        """
         query_link = (
             self.session
             .query(AnalysisDBModel)
