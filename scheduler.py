@@ -10,30 +10,27 @@ from src.service.main_page import MainPageService
 logger = get_logger(__name__)
 if __name__ == "__main__":
     logger.info(f'Initializing scheduler {os.path.basename(__file__)} {settings.VERSION}')
-    list_day = [0]
+    list_day = [1,2,3]
     for day in list_day:
-        data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
-        data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
-        data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
-        data_for_parsing4 = InputDataForParsing(sport_name="handball", shift_day=day)
-        logger.warning(f"{day=}")
-        list_data_for_parsing = [
-                                    data_for_parsing1,
-                                    data_for_parsing2,
-                                    data_for_parsing3,
-                                    data_for_parsing4,
-                                 ]
+        logger.debug(f"{day=}")
+        list_sport_name_for_parsing = ["volleyball", "football", "basketball", "handball"]
 
-        # for data_for_parsing in list_data_for_parsing:
-        #     parsing_service = MainPageService(data4parsing=data_for_parsing)
-        #     logger.warning(f"MAIN {data_for_parsing}")
-        #     parsing_service.get_list_link_with_main_page()
-        #     parsing_service.insert()
+        # MAIN_PAGE
+        for sport_name in list_sport_name_for_parsing:
+            data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
+            parsing_service = MainPageService(data4parsing=data_for_parsing)
+            logger.debug(f"MAIN_PAGE {data_for_parsing}")
+            parsing_service.get_list_link_with_main_page()
+            parsing_service.insert()
 
-        for data_for_parsing in list_data_for_parsing:
-            logger.warning(f"CURRENT {data_for_parsing}")
+        # CURRENT_PAGE
+        for sport_name in list_sport_name_for_parsing:
+            data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
+            logger.debug(f"CURRENT_PAGE {data_for_parsing}")
             parsing_service = CurrentPageService(data4parsing=data_for_parsing)
             parsing_service.get_list_links_from_db()
-        logger.warning(f"AnalysisService {day=}")
+
+        # ANALYSIS
+        logger.debug(f"AnalysisService {day=}")
         parsing_service = AnalysisService(shift_day=day)
         parsing_service.main()

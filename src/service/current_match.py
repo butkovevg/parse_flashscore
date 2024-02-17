@@ -26,7 +26,7 @@ class ValidationCurrentMatch:
                 output_value = int(input_value.split(".")[0])
                 return output_value
         except ValueError:
-            logger.error(f"ValueError no integer: {type(input_value)} {input_value}")
+            logger.warning(f"ValueError no integer: {type(input_value)} {input_value}")
             return 0
         except Exception as exc:
             logger.error(str(exc))

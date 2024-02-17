@@ -15,7 +15,7 @@ class EnrichmentStatisticService:
         try:
             browser = BrowserService.get_webdriver()
             browser.get(full_link)
-            logger.info(f"COEFFICIENT: browser.get({full_link})")
+            logger.debug(f"COEFFICIENT: browser.get({full_link})")
             time.sleep(settings.PAUSE_SEC)
             return self.get_coefficient1(browser)
 
@@ -83,7 +83,7 @@ class EnrichmentStatisticService:
             list_text_header = self.get_list_text_from_list_web_element(list_web_element=header_coefficients)
 
             output_tuple = self.export_coefficient_from_list(list_text_coefficients, list_text_header)
-            logger.info(f"{output_tuple=}")
+            logger.debug(f"{output_tuple=}")
             return output_tuple
 
             # ValidationCurrentMatch.is_validate(text="#00 ссылка", input_value="link", input_type=str)

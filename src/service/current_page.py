@@ -93,7 +93,7 @@ class CurrentPageService:
         try:
             self.session.add(model)
             self.session.commit()
-            logger.info(f'insert record: {model}')
+            logger.debug(f'insert record: {model}')
             return ResponseModel(status=StatusModel.SUCCESS)
         except IntegrityError as exc:
             description_error = f"IntegrityError: {str(exc)} for {model}"
@@ -132,7 +132,7 @@ class CurrentPageService:
         try:
             browser = BrowserService.get_webdriver()
             browser.get(full_link)
-            logger.warning(f"browser.get({full_link})")
+            logger.debug(f"browser.get({full_link})")
             time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
             current_db_model = CurrentMatchService(browser, self.data4parsing).get_current_match_model(link)
             response_insert = self.insert(model=current_db_model)

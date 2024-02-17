@@ -46,11 +46,11 @@ class AnalysisService:
 
     def log_match_with_series(self, record: CurrentDBModel):
         self.analysis_model.is_match_series = True
-        logger.warning(f"update {record.team1}:{record.team2} {record.series1} {record.series2}")
+        logger.debug(f"update {record.team1}:{record.team2} {record.series1} {record.series2}")
 
     def log_match_leader_and_outsider(self, record):
         self.analysis_model.is_match_leader_outsider = True
-        logger.warning(
+        logger.debug(
             f"update {record.team1}:{record.team2} {record.position1}:{record.position2}==={record.position_total}")
 
     def main(self):
@@ -90,7 +90,7 @@ class AnalysisService:
         try:
             self.session.add(analysis_model)
             self.session.commit()
-            logger.info(f'insert record: {analysis_model}')
+            logger.debug(f'insert record: {analysis_model}')
         except Exception as exc:
             description_error = f"ERROR: {str(exc)} for {analysis_model}"
             logger.error(description_error)
@@ -210,6 +210,7 @@ class InfoAnalysisDBService:
         new_time = current_time - timedelta(minutes=90)
         time_filter = new_time.strftime('%H:%M')
         query_all_record = self.query.filter(CurrentDBModel.match_time > time_filter)
+        query_all_record = query_all_record.filter(AnalysisDBModel.is_match_leader_outsider == True)
         query_all_record = query_all_record.order_by(CurrentDBModel.match_time)
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
