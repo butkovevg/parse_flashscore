@@ -39,9 +39,9 @@ class AnalysisService:
                 dct_series2[letter] += 1
             else:
                 dct_series2[letter] = 1
-        if dct_series1.get("B", 0) > 2 and dct_series2.get("П", 0) > 2:
+        if dct_series1.get("B", 0) > 3 and dct_series2.get("П", 0) > 3:
             self.log_match_with_series(record)
-        elif dct_series1.get("B", 0) > 2 and dct_series2.get("П", 0) > 2:
+        elif dct_series1.get("B", 0) > 3 and dct_series2.get("П", 0) > 3:
             self.log_match_with_series(record)
 
     def log_match_with_series(self, record: CurrentDBModel):
@@ -210,7 +210,7 @@ class InfoAnalysisDBService:
         new_time = current_time - timedelta(minutes=90)
         time_filter = new_time.strftime('%H:%M')
         query_all_record = self.query.filter(CurrentDBModel.match_time > time_filter)
-        query_all_record = query_all_record.filter(AnalysisDBModel.is_match_leader_outsider == True)
+        # query_all_record = query_all_record.filter(AnalysisDBModel.is_match_leader_outsider == True)
         query_all_record = query_all_record.order_by(CurrentDBModel.match_time)
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")

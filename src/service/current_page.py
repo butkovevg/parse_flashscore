@@ -140,8 +140,12 @@ class CurrentPageService:
                 return ResponseModel(status=StatusModel.SUCCESS, )
             else:
                 return ResponseModel(status=StatusModel.ERROR, )
+        except ValueError as exc:
+            logger.warning(f"ERROR {full_link}")
+            logger.warning(str(exc))
+            return ResponseModel(status=StatusModel.ERROR, )
         except Exception as exc:
-            logger.error(f"ERROR {link=}")
+            logger.error(f"ERROR {full_link}")
             logger.error(str(exc))
             return ResponseModel(status=StatusModel.ERROR, )
         finally:

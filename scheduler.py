@@ -1,3 +1,4 @@
+import argparse
 import os
 from src.configs.settings import settings
 from src.service.analysis import AnalysisService
@@ -8,9 +9,15 @@ from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.main_page import MainPageService
 
 logger = get_logger(__name__)
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--day', type=int, default=4)
+args = parser.parse_args()
+day = args.day
+
 if __name__ == "__main__":
     logger.info(f'Initializing scheduler {os.path.basename(__file__)} {settings.VERSION}')
-    list_day = [1,2,3]
+    list_day = [day]
     for day in list_day:
         logger.debug(f"{day=}")
         list_sport_name_for_parsing = ["volleyball", "football", "basketball", "handball"]
