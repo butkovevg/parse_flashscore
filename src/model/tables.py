@@ -3,8 +3,8 @@ from sqlalchemy import create_engine, Column, UniqueConstraint
 from sqlalchemy.orm import declarative_base, sessionmaker
 from src.configs.settings import settings
 
-DB_URL = f"{settings.DRIVER_NAME}://{settings.USERNAME_DB}:{settings.PASSWORD_DB}@" \
-         f"{settings.HOST_DB}:{settings.PORT_DB}/{settings.DB_NAME}"
+DB_URL = f"{settings.DRIVER_NAME}://{settings.DB_USERNAME}:{settings.DB_PASSWORD}@" \
+         f"{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
 
 # Делаем модель для работы с данными из БД
 Base = declarative_base()
@@ -25,8 +25,7 @@ class MainDBModel(Base):
     status = Column(Boolean, default=None)
 
     def __str__(self):
-        return f"ID: {self.id}, Link: {self.link}, Sport Name: {self.sport_name}, Match Date: {self.match_date}" \
-               f", Status: {self.status}"
+        return f"{self.link}_{self.sport_name}"
     # def __str__(self):
     #     return f"{self.id=}, {self.link=}, {self.match_date=}, {self.sport_name=}, {self.status=}"
     # # def __str__(self):
@@ -77,14 +76,7 @@ class CurrentDBModel(Base):
     status = Column(Boolean, default=None)
 
     def __str__(self):
-        return f"ID: {self.id}, Link: {self.link}, Sport Name: {self.sport_name}, Match Date: {self.match_date}," \
-               f" Match Time: {self.match_time}, Country: {self.country}, Tournament: {self.tournament}, " \
-               f"Tour: {self.tour}, Team1: {self.team1}, Team2: {self.team2}, Score1: {self.score1}, " \
-               f"Score2: {self.score2}, Match Status: {self.match_status}, " \
-               f"Position1: {self.position1}, Position2: {self.position2}, Position Total: {self.position_total}, " \
-               f"Num Games1: {self.num_games1}, Num Games2: {self.num_games2}, " \
-               f"Points1: {self.points1}, Points2: {self.points2}, " \
-               f"Series1: {self.series1}, Series2: {self.series2}, Status: {self.status}"
+        return f"{self.link}_{self.sport_name}"
 
 
 class AnalysisDBModel(Base):

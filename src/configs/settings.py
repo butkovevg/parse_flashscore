@@ -20,16 +20,28 @@ class Setting(BaseSettings):
     LEVEL_LOGGER_HANDLER: int = 20
 
     # DB
-    DRIVER_NAME: str = ""
-    HOST_DB: str = ""
-    PORT_DB: int = 0
-    USERNAME_DB: str = ""
-    PASSWORD_DB: str = ""
-    DB_NAME: str = ""
-    SCHEME_NAME: str = ""
+    DRIVER_NAME: str
+    DB_HOST: str
+    DB_PORT: int
+    DB_USERNAME: str
+    DB_PASSWORD: str
+    DB_NAME: str
+    SCHEME_NAME: str
     TABLE_NAME_MAIN: str = "main"
     TABLE_NAME_CURRENT: str = "current"
     TABLE_NAME_ANALYSIS: str = "analysis"
+
+    @property
+    def DATABASE_URL_ASYNCPG(self):
+        """ToDo: вынести DRIVER_NAME"""
+        # DSN postgresql+asyncpg://postgres:postgres@localhost:5432/sa
+        return f"postgresql+asyncpg://{self.DB_USERNAME}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+    @property
+    def DATABASE_URL_PSYCOPG(self):
+        """ToDo: вынести DRIVER_NAME"""
+        # DSN postgresql+psycopg://postgres:postgres@localhost:5432/sa
+        return f"postgresql+psycopg://{self.DB_USERNAME}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     SERVER_HOST: str = ""
     SERVER_PORT: int

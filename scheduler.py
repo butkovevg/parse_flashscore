@@ -12,16 +12,16 @@ logger = get_logger(__name__)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--day', type=int, default=4)
+parser.add_argument('--start', type=str, default="current")
 args = parser.parse_args()
 day = args.day
+start = args.start.lower()
 
-if __name__ == "__main__":
-    logger.info(f'Initializing scheduler {os.path.basename(__file__)} {settings.VERSION}')
-    list_day = [day]
-    for day in list_day:
-        logger.debug(f"{day=}")
-        list_sport_name_for_parsing = ["volleyball", "football", "basketball", "handball"]
+def main():
+    logger.debug(f"{day=}")
+    list_sport_name_for_parsing = ["volleyball", "football", "basketball", "handball"]
 
+    if start in ["main"]:
         # MAIN_PAGE
         for sport_name in list_sport_name_for_parsing:
             data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
@@ -30,6 +30,7 @@ if __name__ == "__main__":
             parsing_service.get_list_link_with_main_page()
             parsing_service.insert()
 
+    if start in ["main", "current"]:
         # CURRENT_PAGE
         for sport_name in list_sport_name_for_parsing:
             data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
@@ -37,7 +38,11 @@ if __name__ == "__main__":
             parsing_service = CurrentPageService(data4parsing=data_for_parsing)
             parsing_service.get_list_links_from_db()
 
-        # ANALYSIS
-        logger.debug(f"AnalysisService {day=}")
-        parsing_service = AnalysisService(shift_day=day)
-        parsing_service.main()
+    # ANALYSIS
+    logger.debug(f"AnalysisService {day=}")
+    parsing_service = AnalysisService(shift_day=day)
+    parsing_service.main()
+
+if __name__ == "__main__":
+    logger.info(f'Initializing scheduler {os.path.basename(__file__)} {settings.VERSION}')
+    main()
