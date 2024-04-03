@@ -13,7 +13,7 @@ from src.service.current_match import CurrentMatchService
 from src.service.database import get_session
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
-
+from src.service.main_page import dict_link
 logger = get_logger(__name__)
 
 
@@ -24,13 +24,14 @@ class CurrentPageService:
 
     def get_list_links_from_db(self):
         try:
-
+            translate_sport_name = dict_link[self.data4parsing.sport_name]["sport_name"]
+            logger.warning(f"{translate_sport_name=}")
             # запрос для всех записей для вида спорта по дате
             query_all_record = (
                 self.session
                 .query(MainDBModel)
                 .filter_by(match_date=self.data4parsing.match_date)
-                .filter_by(sport_name=self.data4parsing.sport_name)
+                .filter_by(sport_name=translate_sport_name)
             )
 
             # Необработанных записей для вида спорта по дате
@@ -41,8 +42,7 @@ class CurrentPageService:
 
             logger.debug(f"{len_unprocessed_record=}/{len_all_record=}")
             if len_all_record == 0:
-                logger.info(f"Нет ссылок для       {self.data4parsing.sport_name} {self.data4parsing.match_date}")
-                logger.info(f"Запускаем парсер для общей станицы")
+                logger.info(f"NO LINK  {self.data4parsing.sport_name} {self.data4parsing.match_date}")
                 # # парсер общей странице
                 # parsing_service = ParsingService()
                 # link_list = parsing_service.get_list_link_with_main_page(sport=self.sport)
@@ -80,10 +80,10 @@ class CurrentPageService:
                     else:
                         logger.error("an unhandled error")
             else:
-                logger.info(f"Все ссылки обработаны для {self.data4parsing}")
+                logger.info(f"All link proccesed {self.data4parsing}")
         except Exception as exc:
-            logger.error(f"Ошибка при получении статуса для {self.data4parsing}")
-            logger.error(f"Подробности ошибки {str(exc)}")
+            logger.error(f"Error for {self.data4parsing}")
+            logger.error(f"Details: {str(exc)}")
         finally:
             self.session.close()
 
@@ -141,12 +141,12 @@ class CurrentPageService:
             else:
                 return ResponseModel(status=StatusModel.ERROR, )
         except ValueError as exc:
-            logger.warning(f"ERROR {full_link}")
+            logger.warning(f"ERROR_ValueError {full_link}")
             logger.warning(str(exc))
             return ResponseModel(status=StatusModel.ERROR, )
         except Exception as exc:
             logger.error(f"ERROR {full_link}")
-            logger.error(str(exc))
+            logger.error(repr(exc))
             return ResponseModel(status=StatusModel.ERROR, )
         finally:
             browser.quit()
@@ -159,14 +159,14 @@ if __name__ == "__main__":
     data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
     data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
     data_for_parsing4 = InputDataForParsing(sport_name="handball", shift_day=day)
-    list_data_for_parsing = [data_for_parsing1,
-                             data_for_parsing2,
-                             data_for_parsing3,
-                             data_for_parsing4,
-                             ]
-    for data_for_parsing in list_data_for_parsing:
-        parsing_service = CurrentPageService(data4parsing=data_for_parsing)
-        parsing_service.get_list_links_from_db()
+    # list_data_for_parsing = [data_for_parsing1,
+    #                          data_for_parsing2,
+    #                          data_for_parsing3,
+    #                          data_for_parsing4,
+    #                          ]
+    # for data_for_parsing in list_data_for_parsing:
+    #     parsing_service = CurrentPageService(data4parsing=data_for_parsing)
+    #     parsing_service.get_list_links_from_db()
 
-    # parsing_service = CurrentPageService(data4parsing=data_for_parsing3)
-    # parsing_service.get_current_match(link="lSB2WTpB")
+    parsing_service = CurrentPageService(data4parsing=data_for_parsing3)
+    parsing_service.get_current_match(link="bVWqo2wg")

@@ -25,7 +25,7 @@ dict_link = {
         "number_games": 2,
         "points": 8,
         "series": 9,
-
+        "sport_name": "ФУТБОЛ",
     },
     "volleyball": {
         "link": "https://www.flashscorekz.com/volleyball/",
@@ -33,6 +33,7 @@ dict_link = {
         "number_games": 2,
         "points": 6,
         "series": 7,
+        "sport_name": "ВОЛЕЙБОЛ",
     },
     "basketball": {
         "link": "https://www.flashscorekz.com/basketball/",
@@ -40,6 +41,7 @@ dict_link = {
         "number_games": 2,
         "points": 6,
         "series": 7,
+        "sport_name": "БАСКЕТБОЛ",
     },
     "handball": {
         "link": "https://www.flashscorekz.com/handball/",
@@ -47,6 +49,7 @@ dict_link = {
         "number_games": 2,
         "points": 6,
         "series": 7,
+        "sport_name": "ГАНДБОЛ",
     },
 }
 
@@ -97,7 +100,7 @@ class MainPageService:
                 link = self.list_link[index_link]
                 self.session.add(MainDBModel(
                     link=link,
-                    sport_name=self.data4parsing.sport_name,
+                    sport_name=dict_link[self.data4parsing.sport_name]["sport_name"],
                     match_date=self.data4parsing.match_date,
                 ))
                 self.session.commit()

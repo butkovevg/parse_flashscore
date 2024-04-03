@@ -1,3 +1,5 @@
+import os
+
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
@@ -106,14 +108,14 @@ class CurrentMatchService:
             if team == team1_name:
                 pos1 = int((arr_row[0].strip(".")))
                 if pos1 != count:
-                    raise ValueError("Таблиц несколько")
+                    raise ValueError("Tables > 1")
                 number_games1 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parameters["number_games"]])
                 points1 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parameters["points"]])
                 series1 = "".join(arr_row[dct_parameters["series"]:]).replace("?", "")
             elif team == team2_name:
                 pos2 = int(arr_row[0].strip("."))
                 if pos2 != count:
-                    raise ValueError("Таблиц несколько")
+                    raise ValueError("Tables > 1")
                 number_games2 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parameters["number_games"]])
                 points2 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parameters["points"]])
                 series2 = "".join(arr_row[dct_parameters["series"]:]).replace("?", "")
@@ -159,3 +161,7 @@ class CurrentMatchService:
         )
         logger.debug("*" * 88)
         return current_db_model
+
+if __name__ == "__main__":
+    logger.info(f'Initializing test {os.path.basename(__file__)}')
+    #2024-03-29 16:44:19,430 - [ERROR] - src.service.current_page - (current_page.py).get_current_match(148) - '▒▒▒▒▒▒'

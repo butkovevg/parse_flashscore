@@ -10,7 +10,7 @@ class Setting(BaseSettings):
     """Класс работы с .env"""
     TITLE: str = "parse_flashscore"
     DESCRIPTION: str = ""
-    VERSION: str = "v0.0.3"
+    VERSION: str = "v0.0.4"
     NAME: str = ""
     EMAIL: str = ""
     MSG_ERROR: str = f"please, contact the developer {EMAIL}"
@@ -30,6 +30,12 @@ class Setting(BaseSettings):
     TABLE_NAME_MAIN: str = "main"
     TABLE_NAME_CURRENT: str = "current"
     TABLE_NAME_ANALYSIS: str = "analysis"
+
+    @property
+    def DB_URL(self):
+        """DSN MAIN DB"""
+        return f"{self.DRIVER_NAME}://{self.DB_USERNAME}:{self.DB_PASSWORD}@" \
+               f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     @property
     def DATABASE_URL_ASYNCPG(self):
