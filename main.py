@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import multiprocessing
 from contextlib import asynccontextmanager
 
@@ -9,7 +12,6 @@ from fastapi.staticfiles import StaticFiles
 from src.api import router
 from src.configs.settings import settings
 from src.service.custom_handler_exception import MyCustomException
-from src.service.environment_printer import EnvironmentPrinterService
 from src.service.logger_handlers import get_logger
 
 logger = get_logger(__name__)
@@ -61,7 +63,6 @@ async def get_my_custom_exception(request: Request, exception: MyCustomException
 if __name__ == '__main__':
     multiprocessing.freeze_support()
     # uvicorn file:instance_API --reload
-    # uvicorn main:app --reload
     uvicorn.run(
         'main:app',
         host=settings.SERVER_HOST,

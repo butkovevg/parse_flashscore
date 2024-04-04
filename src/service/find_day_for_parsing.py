@@ -87,5 +87,5 @@ class FindDayForParsingService:
 if __name__ == '__main__':
     logger.info(f'Initializing FindDayForParsingService: {settings.VERSION}')
     service = FindDayForParsingService()
-    service.main(shift_day=1)
+    service.main(shift_day=2)
     # service.all()

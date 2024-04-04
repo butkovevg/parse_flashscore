@@ -25,7 +25,6 @@ class CurrentPageService:
     def get_list_links_from_db(self):
         try:
             translate_sport_name = dict_link[self.data4parsing.sport_name]["sport_name"]
-            logger.warning(f"{translate_sport_name=}")
             # запрос для всех записей для вида спорта по дате
             query_all_record = (
                 self.session
