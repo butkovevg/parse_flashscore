@@ -35,7 +35,7 @@ class JsonFormatter(logging.Formatter):
 
 
 string_formatter = logging.Formatter(
-    f"%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s")
+    f"%(asctime)s - [%(levelname)s] - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s")
 json_formatter = JsonFormatter()
 
 

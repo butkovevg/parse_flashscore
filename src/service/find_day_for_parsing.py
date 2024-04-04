@@ -15,10 +15,10 @@ class FindDayForParsingService:
         self.session = next(get_session())
         self.output_dict = {}
 
-    def add_to_dict(self, key: str, list_touple_sport_value:list):
-        self.output_dict[key]={}
-        for touple_sport_value in list_touple_sport_value:
-            sport, value = touple_sport_value
+    def add_to_dict(self, key: str, list_tuple_sport_value: list):
+        self.output_dict[key] = {}
+        for tuple_sport_value in list_tuple_sport_value:
+            sport, value = tuple_sport_value
             self.output_dict[key][sport] = value
 
     def all(self):
@@ -38,7 +38,8 @@ class FindDayForParsingService:
             b = self.output_dict.get(stage_proc).get('БАСКЕТБОЛ', 0)
             g = self.output_dict.get(stage_proc).get('ГАНДБОЛ', 0)
             print(f"{stage_proc:<10}   {v:<10}   {f:<10}   {b:<10}   {g:<10}")
-        print("_"*54)
+        print("_" * 54)
+
     def get_main(self, match_date):
         try:
             query = (
@@ -53,6 +54,7 @@ class FindDayForParsingService:
             logger.error(f"Подробности ошибки {str(exc)}")
         finally:
             self.session.close()
+
     def get_current(self, match_date):
         try:
             query = (
@@ -67,15 +69,16 @@ class FindDayForParsingService:
             logger.error(f"Подробности ошибки {str(exc)}")
         finally:
             self.session.close()
+
     def get_analysis(self, match_date):
         try:
             query = (
-                self.session.query(CurrentDBModel.sport_name, func.count(CurrentDBModel.sport_name)) \
-                .select_from(AnalysisDBModel) \
-                .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link) \
-                .filter(CurrentDBModel.match_date == match_date) \
-                .group_by(CurrentDBModel.sport_name) \
-                )
+                self.session.query(CurrentDBModel.sport_name, func.count(CurrentDBModel.sport_name))
+                .select_from(AnalysisDBModel)
+                .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
+                .filter(CurrentDBModel.match_date == match_date)
+                .group_by(CurrentDBModel.sport_name)
+            )
             results = query.all()
             return results
         except Exception as exc:

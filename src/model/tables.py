@@ -1,6 +1,7 @@
 from sqlalchemy import VARCHAR, INTEGER, Boolean, Float
 from sqlalchemy import create_engine, Column, UniqueConstraint
 from sqlalchemy.orm import declarative_base, sessionmaker
+
 from src.configs.settings import settings
 
 DB_URL = f"{settings.DRIVER_NAME}://{settings.DB_USERNAME}:{settings.DB_PASSWORD}@" \

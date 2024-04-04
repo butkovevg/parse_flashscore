@@ -140,11 +140,12 @@ class InfoAnalysisDBService:
     def __init__(self, shift_day: int = 0):
         self.session = next(get_session())
         self.shift_day = shift_day
-        self.query = (self.session
-                      .query(AnalysisDBModel, CurrentDBModel)
-                      .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
-                      .filter(
-            CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day)))
+        self.query = (
+            self.session
+            .query(AnalysisDBModel, CurrentDBModel)
+            .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
+            .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
+        )
 
     def get_list_from_db(self):
         # запрос для всех записей для вида спорта по дате

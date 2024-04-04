@@ -41,13 +41,15 @@ class Setting(BaseSettings):
     def DATABASE_URL_ASYNCPG(self):
         """ToDo: вынести DRIVER_NAME"""
         # DSN postgresql+asyncpg://postgres:postgres@localhost:5432/sa
-        return f"postgresql+asyncpg://{self.DB_USERNAME}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+asyncpg://{self.DB_USERNAME}:{self.DB_PASSWORD}@" \
+               f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     @property
     def DATABASE_URL_PSYCOPG(self):
         """ToDo: вынести DRIVER_NAME"""
         # DSN postgresql+psycopg://postgres:postgres@localhost:5432/sa
-        return f"postgresql+psycopg://{self.DB_USERNAME}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+psycopg://{self.DB_USERNAME}:{self.DB_PASSWORD}@" \
+               f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     SERVER_HOST: str = ""
     SERVER_PORT: int
