@@ -14,6 +14,7 @@ from src.service.database import get_session
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
 from src.service.main_page import dict_link
+
 logger = get_logger(__name__)
 
 
@@ -42,29 +43,9 @@ class CurrentPageService:
             logger.debug(f"{len_unprocessed_record=}/{len_all_record=}")
             if len_all_record == 0:
                 logger.info(f"NO LINK  {self.data4parsing.sport_name} {self.data4parsing.match_date}")
-                # # парсер общей странице
-                # parsing_service = ParsingService()
-                # link_list = parsing_service.get_list_link_with_main_page(sport=self.sport)
-                #
-                # # Заносим ссылки в таблицу расписания
-                # self.insert_schedule(input_list=link_list)
-                #
-                # # парсер конкретных матчей
-                # current_num = 1
-                # total___num = len(link_list)
-                # for link in link_list:
-                #     logger.info(f"process {current_num}/{total___num} ---{link}")
-                #     response = parsing_service.get_current_match(link=link)
-                #     if response.status.value == "success":
-                #         pass
-                #     elif response.status.value == "error":
-                #         pass
-                #     else:
-                #         logger.error(f"Неожиданная ошибка при обработке матча {link}")
-                #     current_num += 1
             elif len_unprocessed_record > 0:
-                logger.debug(f"Необработанные ссылки для {self.data4parsing}")
-                logger.debug(f"Осталось обработать {len_unprocessed_record}/{len_all_record}")
+                logger.debug(f"Raw links for {self.data4parsing}")
+                logger.debug(f"It remains to process {len_unprocessed_record}/{len_all_record}")
                 # парсер конкретных матчей
                 unprocessed_records = query_unprocessed_record.all()
                 for index_record in range(len_unprocessed_record):
@@ -79,7 +60,7 @@ class CurrentPageService:
                     else:
                         logger.error("an unhandled error")
             else:
-                logger.info(f"All link proccesed {self.data4parsing}")
+                logger.info(f"All link processed {self.data4parsing}")
         except Exception as exc:
             logger.error(f"Error for {self.data4parsing}")
             logger.error(f"Details: {str(exc)}")
@@ -114,7 +95,7 @@ class CurrentPageService:
         try:
             stmt = (
                 update(MainDBModel).
-                where(MainDBModel.id == main_db_model.id).
+                where(MainDBModel.id == main_db_model.id).  # type: ignore
                 values(status=status)
             )
 
@@ -128,8 +109,8 @@ class CurrentPageService:
 
     def get_current_match(self, link):
         full_link = f"https://www.flashscorekz.com/match/{link}/#/standings/table/overall"
+        browser = BrowserService.get_webdriver()
         try:
-            browser = BrowserService.get_webdriver()
             browser.get(full_link)
             logger.debug(f"browser.get({full_link})")
             time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))

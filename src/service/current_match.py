@@ -162,6 +162,6 @@ class CurrentMatchService:
         logger.debug("*" * 88)
         return current_db_model
 
+
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    #2024-03-29 16:44:19,430 - [ERROR] - src.service.current_page - (current_page.py).get_current_match(148) - '▒▒▒▒▒▒'

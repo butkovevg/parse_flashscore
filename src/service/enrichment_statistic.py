@@ -10,23 +10,25 @@ logger = get_logger(__name__)
 
 
 class EnrichmentStatisticService:
-    def open_page_with_coefficient(self, link: str) -> tuple:
+    @staticmethod
+    def open_page_with_coefficient(link: str) -> tuple:
         full_link = f"https://www.flashscorekz.com/match/{link}/#/odds-comparison/"
+        browser = BrowserService.get_webdriver()
         try:
-            browser = BrowserService.get_webdriver()
             browser.get(full_link)
             logger.debug(f"COEFFICIENT: browser.get({full_link})")
             time.sleep(settings.PAUSE_SEC)
-            return self.get_coefficient1(browser)
+            return EnrichmentStatisticService.get_coefficient(browser)
 
         except Exception as exc:
             logger.error(f"ERROR {link=}")
             logger.error(str(exc))
-            return (0, 0)
+            return 0, 0
         finally:
             browser.quit()
 
-    def get_list_text_from_list_web_element(self, list_web_element: list) -> list:
+    @staticmethod
+    def get_list_text_from_list_web_element(list_web_element: list) -> list:
         list_text = []
         for web_element in list_web_element:
             row_text = web_element.text
@@ -35,13 +37,16 @@ class EnrichmentStatisticService:
         logger.debug(f"{list_text=}")
         return list_text
 
-    def validate_coefficient(self, input_value) -> float:
+    @staticmethod
+    def validate_coefficient(input_value) -> float:
         if input_value == "-":
             return 0
         return float(input_value)
 
-    def export_coefficient_from_list(self, list_text_coefficients: list, list_text_header: list) -> tuple:
+    @staticmethod
+    def export_coefficient_from_list(list_text_coefficients: list, list_text_header: list) -> tuple:
         """
+        Parse coefficient from different list
         :param list_text_coefficients:  ['4.45', '1.17'] or ['1.19', '6.20', '21.00']
         :param list_text_header:  ['БУКМЕКЕР', '1', '2'] or ['БУКМЕКЕР', '1', 'X', '2']
         :return:
@@ -59,30 +64,34 @@ class EnrichmentStatisticService:
             kf1, kf2 = 0, 0
             list1_from_list_text_header = list_text_header[0]
             if len(list1_from_list_text_header) == 3:
-                kf1 = self.validate_coefficient(list_text_coefficients[0][0])
-                kf2 = self.validate_coefficient(list_text_coefficients[0][1])
+                kf1 = EnrichmentStatisticService.validate_coefficient(list_text_coefficients[0][0])
+                kf2 = EnrichmentStatisticService.validate_coefficient(list_text_coefficients[0][1])
             elif len(list1_from_list_text_header) == 4:
-                kf1 = self.validate_coefficient(list_text_coefficients[0][0])
-                kf2 = self.validate_coefficient(list_text_coefficients[0][2])
+                kf1 = EnrichmentStatisticService.validate_coefficient(list_text_coefficients[0][0])
+                kf2 = EnrichmentStatisticService.validate_coefficient(list_text_coefficients[0][2])
             else:
-                logger.error(f"НЕБРАБОТАННЫЕ СИТАУЦИИ1: {list_text_coefficients=}")
-                logger.error(f"НЕБРАБОТАННЫЕ СИТАУЦИИ2: {list_text_header=}")
+                logger.error(f"RAW_ERR1: {list_text_coefficients=}")
+                logger.error(f"RAW_ERR1: {list_text_header=}")
             output_tuple = (kf1, kf2)
         else:
-            logger.error(f"НЕБРАБОТАННЫЕ СИТАУЦИИ2: {list_text_coefficients=}")
-            logger.error(f"НЕБРАБОТАННЫЕ СИТАУЦИИ3: {list_text_header=}")
+            logger.error(f"RAW_ERR2: {list_text_coefficients=}")
+            logger.error(f"RAW_ERR2: {list_text_header=}")
         return output_tuple
 
-    def get_coefficient1(self, browser):
+    @staticmethod
+    def get_coefficient(browser):
         output_tuple = (0, 0)
         try:
 
             rows_coefficients = browser.find_elements(By.CSS_SELECTOR, ".ui-table__row")
-            list_text_coefficients = self.get_list_text_from_list_web_element(list_web_element=rows_coefficients)
+            list_text_coefficients = EnrichmentStatisticService.get_list_text_from_list_web_element(
+                list_web_element=rows_coefficients)
             header_coefficients = browser.find_elements(By.CSS_SELECTOR, ".ui-table__header")
-            list_text_header = self.get_list_text_from_list_web_element(list_web_element=header_coefficients)
+            list_text_header = EnrichmentStatisticService.get_list_text_from_list_web_element(
+                list_web_element=header_coefficients)
 
-            output_tuple = self.export_coefficient_from_list(list_text_coefficients, list_text_header)
+            output_tuple = EnrichmentStatisticService.export_coefficient_from_list(list_text_coefficients,
+                                                                                   list_text_header)
             logger.debug(f"{output_tuple=}")
             return output_tuple
 
@@ -95,5 +104,4 @@ class EnrichmentStatisticService:
 
 
 if __name__ == "__main__":
-    service = EnrichmentStatisticService()
-    service.open_page_with_coefficient(link="viLatFGL")
+    EnrichmentStatisticService.open_page_with_coefficient(link="viLatFGL")

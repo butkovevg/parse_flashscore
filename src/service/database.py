@@ -9,7 +9,7 @@ engine = create_engine(
     url=DB_URL,
     echo=False,  # log_to_console
     pool_size=5,  # number_connection
-    max_overflow=10, # over_connection
+    max_overflow=10,  # over_connection
 )
 
 Session = sessionmaker(
