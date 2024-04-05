@@ -2,9 +2,9 @@ import os
 import time
 
 from bs4 import BeautifulSoup
-
-from sqlalchemy.exc import IntegrityError
 from selenium.webdriver.common.by import By
+from sqlalchemy.exc import IntegrityError
+
 from src.model.tables import MainDBModel
 from src.service.browser import BrowserService
 from src.service.database import get_session
@@ -12,11 +12,6 @@ from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
 
 logger = get_logger(__name__)
-
-# number_games2 = arr_row[2]
-# points2 = arr_row[8]
-# series2 = "".join(arr_row[9:]).replace("?", "")
-# number_of_teams_in_the_league = len(rows)
 
 dict_link = {
     "football": {
@@ -58,6 +53,7 @@ class MainPageService:
     def __init__(self, data4parsing: InputDataForParsing):
         self.session = next(get_session())
         self.data4parsing = data4parsing
+        self.list_link = []
 
     def get_list_link_with_main_page(self):
         try:

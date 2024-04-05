@@ -28,9 +28,9 @@ class FindDayForParsingService:
     def main(self, shift_day):
         date_without_point_between_day = HelperService.get_date_without_point_between_day(day=shift_day)
         date_with_point_between_day = HelperService.get_date_with_point_between_day(day=shift_day)
-        self.add_to_dict(key="main", list_touple_sport_value=self.get_main(match_date=date_without_point_between_day))
-        self.add_to_dict(key="curr", list_touple_sport_value=self.get_current(match_date=date_with_point_between_day))
-        self.add_to_dict(key="anal", list_touple_sport_value=self.get_analysis(match_date=date_with_point_between_day))
+        self.add_to_dict(key="main", list_tuple_sport_value=self.get_main(match_date=date_without_point_between_day))
+        self.add_to_dict(key="curr", list_tuple_sport_value=self.get_current(match_date=date_with_point_between_day))
+        self.add_to_dict(key="anal", list_tuple_sport_value=self.get_analysis(match_date=date_with_point_between_day))
         print(f"{shift_day}_{date_with_point_between_day}_V____________F____________B____________G_")
         for stage_proc in ["main", "curr", "anal"]:
             v = self.output_dict.get(stage_proc).get('ВОЛЕЙБОЛ', 0)
@@ -90,5 +90,5 @@ class FindDayForParsingService:
 if __name__ == '__main__':
     logger.info(f'Initializing FindDayForParsingService: {settings.VERSION}')
     service = FindDayForParsingService()
-    service.main(shift_day=2)
-    # service.all()
+    service.main(shift_day=3)
+    # serkvice.all()

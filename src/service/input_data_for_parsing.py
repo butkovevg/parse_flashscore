@@ -2,7 +2,7 @@ from src.service.helper import HelperService
 
 
 class InputDataForParsing:
-    def __init__(self, sport_name: str = "football", shift_day: int = 0):
+    def __init__(self, sport_name: str, shift_day: int = 0):
         self.sport_name = sport_name
         self.shift_day = shift_day
         self.match_date = HelperService.get_date_without_point_between_day(day=shift_day)

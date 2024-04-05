@@ -4,6 +4,8 @@ from typing import List, Any
 from src.service.logger_handlers import get_logger
 
 logger = get_logger(__name__)
+
+
 class HelperService:
     @staticmethod
     def get_new_date(day: int) -> datetime.date:
@@ -43,7 +45,8 @@ class HelperService:
         Возвращает элемент списка по указанному индексу или значение по умолчанию, если такой элемент не существует.
         :param lst: List - Список, из которого нужно получить элемент.
         :param index: int - Индекс элемента в списке.
-        :param default_value: - Any Значение, которое будет возвращено, если элемента с указанным индексом не существует в списке.
+        :param default_value: - Any Значение, которое будет возвращено, если элемента с указанным индексом не существует
+        в списке.
         :return: datetime.date Новая дата в формате 'DD.MM.YYYY'.
         """
         try:
