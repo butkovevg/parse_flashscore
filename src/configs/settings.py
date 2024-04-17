@@ -12,7 +12,7 @@ class Setting(BaseSettings):
     DESCRIPTION: str = ""
     VERSION: str = "v0.0.4"
     NAME: str = ""
-    EMAIL: str = ""
+    EMAIL: str = "butkovevg@yandex.ru"
     MSG_ERROR: str = f"please, contact the developer {EMAIL}"
 
     # для логирования
