@@ -15,8 +15,8 @@ from src.service.main_page import MainPageService
 logger = get_logger(__name__)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--day', type=int, default=1)
-parser.add_argument('--start', type=str, default="current")
+parser.add_argument('--day', type=int, default=6)
+parser.add_argument('--start', type=str, default="main")
 args = parser.parse_args()
 day = args.day
 start = args.start.lower()
@@ -47,6 +47,7 @@ def main():
     logger.debug(f"AnalysisService {day=}")
     parsing_service = AnalysisService(shift_day=day)
     parsing_service.main()
+    logger.debug(f"FINISH {day=}")
 
 
 if __name__ == "__main__":
