@@ -8,8 +8,8 @@ DB_URL = f"{settings.DRIVER_NAME}://{settings.DB_USERNAME}:{settings.DB_PASSWORD
 engine = create_engine(
     url=DB_URL,
     echo=False,  # log_to_console
-    pool_size=5,  # number_connection
-    max_overflow=10,  # over_connection
+    pool_size=15,  # number_connection
+    max_overflow=30,  # over_connection
 )
 
 Session = sessionmaker(
