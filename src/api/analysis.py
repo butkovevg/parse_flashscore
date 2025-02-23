@@ -2,6 +2,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
+from starlette.background import BackgroundTasks
 
 from src.service.analysis import InfoAnalysisDBService
 
@@ -12,6 +13,22 @@ router = APIRouter(
     tags=['analysis'],
 )
 
+
+
+
+from src.service.background_tasks import run
+@router.get("/test_fone/")
+async def test_fone(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run, 11)
+    current_time = datetime.now()
+    time_filter = current_time.strftime('%H:%M:%S')
+    matches = {
+        "id": 123,
+        "status": False,
+        "dt": str(time_filter),
+
+    }
+    return matches
 
 @router.get("/test/")
 async def test(request: Request):

@@ -26,8 +26,11 @@ class CurrentPageService:
     def get_list_links_from_db(self):
         try:
             translate_sport_name = dict_link[self.data4parsing.sport_name]["sport_name"]
-            logger.warning(f"{translate_sport_name=}")
+            en_sport_name = self.data4parsing.sport_name
+            logger.warning(f"{en_sport_name}")
             # запрос для всех записей для вида спорта по дате
+            logger.warning(f"{self.data4parsing.match_date=}")
+            logger.warning(f"{translate_sport_name=}")
             query_all_record = (
                 self.session
                 .query(MainDBModel)
@@ -51,7 +54,7 @@ class CurrentPageService:
                 unprocessed_records = query_unprocessed_record.all()
                 for index_record in range(len_unprocessed_record):
                     unprocessed_record = unprocessed_records[index_record]
-                    logger.info(f"process: {index_record + 1}/{len_unprocessed_record} {unprocessed_record}")
+                    logger.info(f"process {unprocessed_record}({en_sport_name}): {index_record + 1}/{len_unprocessed_record} ")
                     response = self.get_current_match(link=unprocessed_record.link)
                     if response.status == StatusModel.SUCCESS:
                         self.update(main_db_model=unprocessed_record, status=True)
@@ -134,20 +137,25 @@ class CurrentPageService:
 
 
 if __name__ == "__main__":
+    import time
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    day = 3
+    day = 1
     data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
     data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
     data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
     data_for_parsing4 = InputDataForParsing(sport_name="handball", shift_day=day)
-    # list_data_for_parsing = [data_for_parsing1,
-    #                          data_for_parsing2,
-    #                          data_for_parsing3,
-    #                          data_for_parsing4,
-    #                          ]
-    # for data_for_parsing in list_data_for_parsing:
-    #     parsing_service = CurrentPageService(data4parsing=data_for_parsing)
-    #     parsing_service.get_list_links_from_db()
+    data_for_parsing5 = InputDataForParsing(sport_name="tennis", shift_day=day)
+    list_data_for_parsing = [data_for_parsing1,
+                             data_for_parsing2,
+                             data_for_parsing3,
+                             data_for_parsing4,
+                             data_for_parsing5,
+                             ]
 
-    parsing_service = CurrentPageService(data4parsing=data_for_parsing3)
-    parsing_service.get_current_match(link="bVWqo2wg")
+    list_data_for_parsing = [data_for_parsing5]
+    for data_for_parsing in list_data_for_parsing:
+        parsing_service = CurrentPageService(data4parsing=data_for_parsing)
+        parsing_service.get_list_links_from_db()
+        time.sleep(3)
+    # parsing_service = CurrentPageService(data4parsing=data_for_parsing3)
+    # parsing_service.get_current_match(link="bVWqo2wg")

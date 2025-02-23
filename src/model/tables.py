@@ -26,7 +26,7 @@ class MainDBModel(Base):
     status = Column(Boolean, default=None)
 
     def __str__(self):
-        return f"{self.link}_{self.sport_name}"
+        return f"{self.link}"
     # def __str__(self):
     #     return f"{self.id=}, {self.link=}, {self.match_date=}, {self.sport_name=}, {self.status=}"
     # # def __str__(self):

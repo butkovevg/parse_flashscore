@@ -75,11 +75,11 @@ class AnalysisService:
             self.is_match_with_series(current_model)
 
             if self.analysis_model.is_match_leader_outsider or self.analysis_model.is_match_series:
-                enrichment_statistic_service = EnrichmentStatisticService()
-                coefficient_tuple = enrichment_statistic_service.open_page_with_coefficient(
-                    link=self.analysis_model.link)
-                self.analysis_model.kf1 = coefficient_tuple[0]
-                self.analysis_model.kf2 = coefficient_tuple[1]
+                # enrichment_statistic_service = EnrichmentStatisticService()
+                # coefficient_tuple = enrichment_statistic_service.open_page_with_coefficient(
+                #     link=self.analysis_model.link)
+                # self.analysis_model.kf1 = coefficient_tuple[0]
+                # self.analysis_model.kf2 = coefficient_tuple[1]
                 self.insert(analysis_model=self.analysis_model)
                 counter += 1
             logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")

@@ -36,7 +36,3 @@ class EnrichmentStatisticService:
             list_text.append(arr_row_text)
         logger.debug(f"{list_text=}")
         return list_text
-
-
-if __name__ == "__main__":
-    EnrichmentStatisticService.open_page_with_coefficient(link="viLatFGL")
