@@ -26,9 +26,7 @@ class FindDayForParsingService:
         output_list = []
         for shift_day in range(7):
             v = self.main(shift_day)
-            print(shift_day, v)
             output_list.append(v)
-            print(shift_day,shift_day , output_list)
         return output_list
 
     def main(self, shift_day):

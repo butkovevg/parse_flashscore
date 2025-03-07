@@ -120,20 +120,28 @@ class MainPageService:
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    day = 1
-    data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
-    data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
-    data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
-    data_for_parsing4 = InputDataForParsing(sport_name="handball", shift_day=day)
-    data_for_parsing5 = InputDataForParsing(sport_name="tennis", shift_day=day)
-    list_data_for_parsing = [data_for_parsing1,
-                             data_for_parsing2,
-                             data_for_parsing3,
-                             data_for_parsing4,
-                             data_for_parsing5,
-                             ]
+    # day = 1
+    # data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
+    # data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
+    # data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
+    # data_for_parsing4 = InputDataForParsing(sport_name="handball", shift_day=day)
+    # data_for_parsing5 = InputDataForParsing(sport_name="tennis", shift_day=day)
+    # list_data_for_parsing = [data_for_parsing1,
+    #                          data_for_parsing2,
+    #                          data_for_parsing3,
+    #                          data_for_parsing4,
+    #                          data_for_parsing5,
+    #                          ]
+    #
+    # for data_for_parsing in list_data_for_parsing:
+    #     parsing_service = MainPageService(data4parsing=data_for_parsing)
+    #     parsing_service.get_list_link_with_main_page()
+    #     parsing_service.insert()
 
-    for data_for_parsing in list_data_for_parsing:
-        parsing_service = MainPageService(data4parsing=data_for_parsing)
-        parsing_service.get_list_link_with_main_page()
-        parsing_service.insert()
+    sport_name = "tennis"
+    day = 1
+    data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
+    parsing_service = MainPageService(data4parsing=data_for_parsing)
+    logger.debug(f"MAIN_PAGE {data_for_parsing}")
+    parsing_service.get_list_link_with_main_page()
+    parsing_service.insert()

@@ -89,6 +89,7 @@ a:active {
 </head>
 
 <table>
+<!--    ШАПКА   -->
     <tr>
         <th> # </th>
         <th>ДАТА</th>
@@ -96,8 +97,10 @@ a:active {
               {% for sport in sports %}
                         <th>{{ sport }}</th>
               {% endfor %}
-
+         <th>ИТОГО</th>
     </tr>
+
+    <!--    НАПОЛНЕНИЕ ТАБЛИЦЫ   -->
     {% for object_data in data %}
     <tr>
         <td> {{ object_data.shift_day }} </td>
@@ -105,6 +108,14 @@ a:active {
         {% for sport in sports %}
             <td data-sport_name={{ sport }}>{{ object_data.main[sport] }}/{{ object_data.curr[sport] }}/{{ object_data.anal[sport] }}</td>
         {% endfor %}
+        <!--    СЧИТАЮ МАТЧИ В АНАЛИЗЕ   -->
+        {% set total = [0] %} {# Оборачиваем в список #}
+        {% for sport in sports %}
+          {% set _ = total.append(total.pop() + object_data.anal.get(sport, 0)) %}
+        {% endfor %}
+        <td>{{ total[0] }}</td>
+
+
     </tr>
     {% endfor %}
 </table>

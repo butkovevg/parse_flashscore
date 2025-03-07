@@ -70,9 +70,7 @@ async def find_day(request: Request):
     data = service.all()
     list_sports = ['ВОЛЕЙБОЛ', 'ФУТБОЛ', 'БАСКЕТБОЛ', 'ГАНДБОЛ']
 
-    return templates.TemplateResponse("find.html", {"request": request, "data": data,
+    return templates.TemplateResponse("find.html", {"request": request,
+                                                    "data": data,
                                                     "sports": list_sports})
 
-    # service = InfoAnalysisDBService(day)
-    # matches = service.merge()
-    # return templates.TemplateResponse("analysis.html", {"request": request, "matches": matches, "day": day})

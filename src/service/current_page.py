@@ -54,8 +54,13 @@ class CurrentPageService:
                 unprocessed_records = query_unprocessed_record.all()
                 for index_record in range(len_unprocessed_record):
                     unprocessed_record = unprocessed_records[index_record]
-                    logger.info(f"process {unprocessed_record}({en_sport_name}): {index_record + 1}/{len_unprocessed_record} ")
-                    response = self.get_current_match(link=unprocessed_record.link)
+                    logger.info(
+                        f"process {unprocessed_record}({en_sport_name}): {index_record + 1}/{len_unprocessed_record} ")
+                    if self.data4parsing.sport_name == "tennis":
+                        response = self.get_tennis_match(link=unprocessed_record.link)
+                    else:
+                        response = self.get_current_match(link=unprocessed_record.link)
+
                     if response.status == StatusModel.SUCCESS:
                         self.update(main_db_model=unprocessed_record, status=True)
                     elif response.status == StatusModel.ERROR:
@@ -135,27 +140,53 @@ class CurrentPageService:
         finally:
             browser.quit()
 
+    def get_tennis_match(self, link):
+        full_link = f"https://www.flashscorekz.com/match/{link}/#/match-summary"
+        browser = BrowserService.get_webdriver()
+        try:
+            browser.get(full_link)
+            logger.debug(f"browser.get({full_link})")
+            time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
+            current_db_model = CurrentMatchService(browser, self.data4parsing).get_tennis_match_model(link)
+            response_insert = self.insert(model=current_db_model)
+            if response_insert.status == StatusModel.SUCCESS:
+                return ResponseModel(status=StatusModel.SUCCESS, )
+            else:
+                return ResponseModel(status=StatusModel.ERROR, )
+        except ValueError as exc:
+            logger.warning(f"ERROR_ValueError {full_link}")
+            logger.warning(str(exc))
+            return ResponseModel(status=StatusModel.ERROR, )
+        except Exception as exc:
+            logger.error(f"ERROR {full_link}")
+            logger.error(repr(exc))
+            return ResponseModel(status=StatusModel.ERROR, )
+        finally:
+            browser.quit()
+
 
 if __name__ == "__main__":
-    import time
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    day = 1
-    data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
-    data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
-    data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
-    data_for_parsing4 = InputDataForParsing(sport_name="handball", shift_day=day)
-    data_for_parsing5 = InputDataForParsing(sport_name="tennis", shift_day=day)
-    list_data_for_parsing = [data_for_parsing1,
-                             data_for_parsing2,
-                             data_for_parsing3,
-                             data_for_parsing4,
-                             data_for_parsing5,
-                             ]
-
-    list_data_for_parsing = [data_for_parsing5]
-    for data_for_parsing in list_data_for_parsing:
-        parsing_service = CurrentPageService(data4parsing=data_for_parsing)
-        parsing_service.get_list_links_from_db()
-        time.sleep(3)
-    # parsing_service = CurrentPageService(data4parsing=data_for_parsing3)
-    # parsing_service.get_current_match(link="bVWqo2wg")
+    # day = 1
+    # data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=day)
+    # data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=day)
+    # data_for_parsing3 = InputDataForParsing(sport_name="basketball", shift_day=day)
+    # data_for_parsing4 = InputDataForParsing(sport_name="handball", shift_day=day)
+    # data_for_parsing5 = InputDataForParsing(sport_name="tennis", shift_day=day)
+    # list_data_for_parsing = [data_for_parsing1,
+    #                          data_for_parsing2,
+    #                          data_for_parsing3,
+    #                          data_for_parsing4,
+    #                          data_for_parsing5,
+    #                          ]
+    # 
+    # list_data_for_parsing = [data_for_parsing5]
+    # for data_for_parsing in list_data_for_parsing:
+    #     parsing_service = CurrentPageService(data parsing=data_for_parsing)
+    #     parsing_service.get_list_links_from_db()
+    #     time.sleep(3)
+    sport_name = "tennis"
+    day = 0
+    data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
+    parsing_service = CurrentPageService(data4parsing=data_for_parsing)
+    parsing_service.get_list_links_from_db()
