@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.background import BackgroundTasks
 
 from src.service.analysis import InfoAnalysisDBService
+from src.service.find_day_for_parsing import FindDayForParsingService
 
 templates = Jinja2Templates(directory="templates")
 
@@ -13,10 +14,9 @@ router = APIRouter(
     tags=['analysis'],
 )
 
-
-
-
 from src.service.background_tasks import run
+
+
 @router.get("/test_fone/")
 async def test_fone(background_tasks: BackgroundTasks):
     background_tasks.add_task(run, 11)
@@ -29,6 +29,7 @@ async def test_fone(background_tasks: BackgroundTasks):
 
     }
     return matches
+
 
 @router.get("/test/")
 async def test(request: Request):
@@ -61,3 +62,17 @@ async def get_value(request: Request, day: int = 0):
     service = InfoAnalysisDBService(day)
     matches = service.merge()
     return templates.TemplateResponse("analysis.html", {"request": request, "matches": matches, "day": day})
+
+
+@router.get("/find_day")
+async def find_day(request: Request):
+    service = FindDayForParsingService()
+    data = service.all()
+    list_sports = ['ВОЛЕЙБОЛ', 'ФУТБОЛ', 'БАСКЕТБОЛ', 'ГАНДБОЛ']
+
+    return templates.TemplateResponse("find.html", {"request": request, "data": data,
+                                                    "sports": list_sports})
+
+    # service = InfoAnalysisDBService(day)
+    # matches = service.merge()
+    # return templates.TemplateResponse("analysis.html", {"request": request, "matches": matches, "day": day})

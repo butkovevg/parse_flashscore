@@ -1,6 +1,7 @@
 from sqlalchemy import func
-
+from copy import deepcopy
 from src.configs.settings import settings
+
 from src.model.tables import MainDBModel, CurrentDBModel, AnalysisDBModel
 from src.service.database import get_session
 from src.service.helper import HelperService
@@ -10,7 +11,7 @@ logger = get_logger(__name__)
 
 
 class FindDayForParsingService:
-
+    dct_types_of_sports = {'ВОЛЕЙБОЛ': 0, 'ФУТБОЛ': 0, 'БАСКЕТБОЛ': 0, 'ГАНДБОЛ': 0, }
     def __init__(self):
         self.session = next(get_session())
         self.output_dict = {}
@@ -22,23 +23,35 @@ class FindDayForParsingService:
             self.output_dict[key][sport] = value
 
     def all(self):
+        output_list = []
         for shift_day in range(7):
-            self.main(shift_day)
+            v = self.main(shift_day)
+            print(shift_day, v)
+            output_list.append(v)
+            print(shift_day,shift_day , output_list)
+        return output_list
 
     def main(self, shift_day):
         date_without_point_between_day = HelperService.get_date_without_point_between_day(day=shift_day)
         date_with_point_between_day = HelperService.get_date_with_point_between_day(day=shift_day)
+        output_dict = {
+            "dt": date_with_point_between_day,
+            "shift_day": shift_day,
+            "main": deepcopy(FindDayForParsingService.dct_types_of_sports),
+            "curr": deepcopy(FindDayForParsingService.dct_types_of_sports),
+            "anal": deepcopy(FindDayForParsingService.dct_types_of_sports),
+        }
+        # output_dict = deepcopy(pattern_output_dict)
         self.add_to_dict(key="main", list_tuple_sport_value=self.get_main(match_date=date_without_point_between_day))
         self.add_to_dict(key="curr", list_tuple_sport_value=self.get_current(match_date=date_with_point_between_day))
         self.add_to_dict(key="anal", list_tuple_sport_value=self.get_analysis(match_date=date_with_point_between_day))
-        print(f"{shift_day}_{date_with_point_between_day}_V____________F____________B____________G_")
-        for stage_proc in ["main", "curr", "anal"]:
-            v = self.output_dict.get(stage_proc).get('ВОЛЕЙБОЛ', 0)
-            f = self.output_dict.get(stage_proc).get('ФУТБОЛ', 0)
-            b = self.output_dict.get(stage_proc).get('БАСКЕТБОЛ', 0)
-            g = self.output_dict.get(stage_proc).get('ГАНДБОЛ', 0)
-            print(f"{stage_proc:<10}   {v:<10}   {f:<10}   {b:<10}   {g:<10}")
-        print("_" * 54)
+
+        for standing_data in ["main", "curr", "anal"]:
+            logger.warning(f"{standing_data=}")
+            for type_of_sports in FindDayForParsingService.dct_types_of_sports:
+                value = self.output_dict.get(standing_data).get(type_of_sports, 0)
+                output_dict[standing_data][type_of_sports] = value
+        return output_dict
 
     def get_main(self, match_date):
         try:
@@ -91,4 +104,4 @@ if __name__ == '__main__':
     logger.info(f'Initializing FindDayForParsingService: {settings.VERSION}')
     service = FindDayForParsingService()
     #service.main(shift_day=3)
-    service.all()
+    service.main(1)
