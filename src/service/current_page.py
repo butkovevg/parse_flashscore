@@ -186,7 +186,7 @@ if __name__ == "__main__":
     #     parsing_service.get_list_links_from_db()
     #     time.sleep(3)
     sport_name = "tennis"
-    day = 0
+    day = 1
     data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
     parsing_service = CurrentPageService(data4parsing=data_for_parsing)
     parsing_service.get_list_links_from_db()

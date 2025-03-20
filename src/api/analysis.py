@@ -68,7 +68,7 @@ async def get_value(request: Request, day: int = 0):
 async def find_day(request: Request):
     service = FindDayForParsingService()
     data = service.all()
-    list_sports = ['ВОЛЕЙБОЛ', 'ФУТБОЛ', 'БАСКЕТБОЛ', 'ГАНДБОЛ']
+    list_sports = ['ВОЛЕЙБОЛ', 'ФУТБОЛ', 'БАСКЕТБОЛ', 'ГАНДБОЛ', 'ТЕННИС']
 
     return templates.TemplateResponse("find.html", {"request": request,
                                                     "data": data,

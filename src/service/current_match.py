@@ -243,6 +243,7 @@ class CurrentMatchService:
         number_of_teams_in_the_league = len(rows)
 
         # В серию записываю КФ
+        pos1, pos2 = 1, 1
         try:
             series1 = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/section/div[1]/div[2]/div/div/div/div[2]/span/span[2]/span").text
             series2 = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/section/div[1]/div[2]/div/div/div/div[3]/span/span[2]/span").text

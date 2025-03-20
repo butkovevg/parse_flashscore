@@ -17,14 +17,26 @@ logger = get_logger(__name__)
 parser = argparse.ArgumentParser()
 parser.add_argument('--day', type=int, default=1)
 parser.add_argument('--start', type=str, default="main")
+parser.add_argument('--week', dest='week', action='store_true')
+parser.add_argument('--no-week', dest='week', action='store_false')
+parser.set_defaults(week=False)
+
 args = parser.parse_args()
 day = args.day
 start = args.start.lower()
+is_week = args.week
+
 
 
 def main():
     logger.debug(f"{day=}")
-    list_sport_name_for_parsing = ["volleyball", "football", "basketball", "handball"]
+    list_sport_name_for_parsing = [
+        # "volleyball",
+        # "basketball",
+        # "football",
+        # "handball",
+        "tennis",
+    ]
 
     if start in ["main"]:
         # MAIN_PAGE
@@ -51,7 +63,13 @@ def main():
 
 
 if __name__ == "__main__":
-    logger.info(f'Initializing scheduler {os.path.basename(__file__)} {settings.VERSION}')
-    FindDayForParsingService().main(shift_day=day)
+    logger.info(f'Initializing {os.path.basename(__file__)} {settings.VERSION}')
+    if is_week:
+        for day in range(1, 7):
+            logger.warning(f"WEEK_SCAN {day=}")
+            FindDayForParsingService().main(shift_day=day)
+            main()
 
-    main()
+    else:
+        FindDayForParsingService().main(shift_day=day)
+        main()

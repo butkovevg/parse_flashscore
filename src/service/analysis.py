@@ -83,7 +83,39 @@ class AnalysisService:
                 self.insert(analysis_model=self.analysis_model)
                 counter += 1
             logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
+    def get_tennis_main(self):
+        unprocessed_records = self.get_list_from_db()
+        counter = 0
+        length_unprocessed_records = len(unprocessed_records)
+        for index in range(length_unprocessed_records):
+            current_model = unprocessed_records[index]
 
+            if current_model.sport_name == "ТЕННИС":
+                logger.warning(f"{current_model.sport_name=} {current_model.series1} { current_model.series2} {current_model.link}")
+            # self.analysis_model = AnalysisDBModel(
+            #     link=current_model.link,
+            #     is_match_leader_outsider=False,
+            #     is_match_series=False,
+            #     is_hz=False,
+            #     kf1=-1,
+            #     kf2=-1,
+            #     score1=-1,
+            #     score2=-1,
+            #     who_win=0,
+            #     is_favorites=False,
+            # )
+            # self.is_match_leader_and_outsider(current_model)
+            # self.is_match_with_series(current_model)
+            #
+            # if self.analysis_model.is_match_leader_outsider or self.analysis_model.is_match_series:
+            #     # enrichment_statistic_service = EnrichmentStatisticService()
+            #     # coefficient_tuple = enrichment_statistic_service.open_page_with_coefficient(
+            #     #     link=self.analysis_model.link)
+            #     # self.analysis_model.kf1 = coefficient_tuple[0]
+            #     # self.analysis_model.kf2 = coefficient_tuple[1]
+            #     self.insert(analysis_model=self.analysis_model)
+            #     counter += 1
+            # logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
     def insert(self, analysis_model: AnalysisDBModel):
         """
         """
@@ -111,11 +143,13 @@ class AnalysisService:
 
     def get_list_from_db(self):
         try:
+            match_date = HelperService.get_date_with_point_between_day(self.shift_day)
+            logger.warning(f"111 {match_date=}")
             # запрос для всех записей для вида спорта по дате
             query_all_record = (
                 self.session
                 .query(CurrentDBModel)
-                .filter_by(match_date=HelperService.get_date_with_point_between_day(self.shift_day))
+                .filter_by(match_date=match_date)
                 .filter(CurrentDBModel.position1 != 0)
             )
 
@@ -127,7 +161,7 @@ class AnalysisService:
 
             logger.debug(f"{len_unprocessed_record=}/{len_all_record=}")
 
-            unprocessed_records = query_unprocessed_record.all()
+            # unprocessed_records = query_unprocessed_record.all()
 
             return query_all_record.all()
         except Exception as exc:
@@ -258,10 +292,9 @@ class InfoAnalysisDBService:
 
 if __name__ == "__main__":
     # 1: "Запись в БД после анализа",
-    # 2: "",
-    choice = 1
-    logger.info(f'Initializing test {os.path.basename(__file__)}')
 
+    choice = 5
+    logger.info(f'Initializing test {os.path.basename(__file__)}')
     if choice == 1:
         parsing_service = AnalysisService(shift_day=2)
         parsing_service.main()
@@ -270,25 +303,17 @@ if __name__ == "__main__":
     elif choice == 3:
         parsing_service = InfoAnalysisDBService(0)
         list_analysis_dct = parsing_service.merge()
-
         js = json.dumps(list_analysis_dct[0], indent=4, ensure_ascii=False)
         print(js)
     elif choice == 4:
         parsing_service = InfoAnalysisDBService(0)
         parsing_service.update_favorities(link="l8camAxG")
+    elif choice == 5:
+        # ANALYSIS
+        day = 1
+        logger.debug(f"AnalysisService {day=}")
+        parsing_service = AnalysisService(shift_day=day)
+        parsing_service.get_tennis_main()
+        logger.debug(f"FINISH {day=}")
 
-    # parsing_service = InfoAnalysisDBService(-1)
-    # analysis_model = AnalysisDBModel(
-    #     id=1,
-    #     link='vmVN9UCR',
-    #     is_match_leader_outsider=True,
-    #     is_match_series=False,
-    #     is_hz=False,
-    #     kf1=1.2,
-    #     kf2=1.3,
-    #     score1=8,
-    #     score2=9,
-    #     who_win=1,
-    #     is_favorites=True,
-    # )
-    # parsing_service.insert(model=analysis_model)
+

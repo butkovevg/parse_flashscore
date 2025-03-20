@@ -1,7 +1,8 @@
-from sqlalchemy import func
 from copy import deepcopy
-from src.configs.settings import settings
 
+from sqlalchemy import func
+
+from src.configs.settings import settings
 from src.model.tables import MainDBModel, CurrentDBModel, AnalysisDBModel
 from src.service.database import get_session
 from src.service.helper import HelperService
@@ -11,7 +12,8 @@ logger = get_logger(__name__)
 
 
 class FindDayForParsingService:
-    dct_types_of_sports = {'ВОЛЕЙБОЛ': 0, 'ФУТБОЛ': 0, 'БАСКЕТБОЛ': 0, 'ГАНДБОЛ': 0, }
+    dct_types_of_sports = {'ВОЛЕЙБОЛ': 0, 'ФУТБОЛ': 0, 'БАСКЕТБОЛ': 0, 'ГАНДБОЛ': 0, 'ТЕННИС': 0, }
+
     def __init__(self):
         self.session = next(get_session())
         self.output_dict = {}
@@ -49,6 +51,7 @@ class FindDayForParsingService:
             for type_of_sports in FindDayForParsingService.dct_types_of_sports:
                 value = self.output_dict.get(standing_data).get(type_of_sports, 0)
                 output_dict[standing_data][type_of_sports] = value
+        logger.info(output_dict)
         return output_dict
 
     def get_main(self, match_date):
@@ -101,5 +104,5 @@ class FindDayForParsingService:
 if __name__ == '__main__':
     logger.info(f'Initializing FindDayForParsingService: {settings.VERSION}')
     service = FindDayForParsingService()
-    #service.main(shift_day=3)
-    service.main(1)
+    # service.main(shift_day=3)
+    service.main(0)
