@@ -47,7 +47,6 @@ class FindDayForParsingService:
         self.add_to_dict(key="anal", list_tuple_sport_value=self.get_analysis(match_date=date_with_point_between_day))
 
         for standing_data in ["main", "curr", "anal"]:
-            logger.warning(f"{standing_data=}")
             for type_of_sports in FindDayForParsingService.dct_types_of_sports:
                 value = self.output_dict.get(standing_data).get(type_of_sports, 0)
                 output_dict[standing_data][type_of_sports] = value

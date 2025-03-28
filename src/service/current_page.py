@@ -84,8 +84,8 @@ class CurrentPageService:
             self.session.commit()
             logger.debug(f'insert record: {model}')
             return ResponseModel(status=StatusModel.SUCCESS)
-        except IntegrityError as exc:
-            description_error = f"IntegrityError: {str(exc)} for {model}"
+        except IntegrityError:
+            description_error = f"IntegrityError for {model}"
             logger.warning(description_error)
             self.session.rollback()
             return ResponseModel(status=StatusModel.SUCCESS)

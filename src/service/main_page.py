@@ -1,5 +1,7 @@
 import os
+
 import time
+from random import randint
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
@@ -10,6 +12,7 @@ from src.service.browser import BrowserService
 from src.service.database import get_session
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
+from src.configs.settings import settings
 
 logger = get_logger(__name__)
 
@@ -69,11 +72,12 @@ class MainPageService:
             delimiter = dict_link.get(self.data4parsing.sport_name).get("delimiter")
             browser = BrowserService.get_webdriver()
             browser.get(link)
-            time.sleep(3)
+            time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
 
             # Кликаем на следующий день, если day > 0
             while abs(self.data4parsing.shift_day) > 0:
                 button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Следующий день']")
+                # button_move_day = browser.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
                 if self.data4parsing.shift_day < 0:  # Если отрицательное число
                     self.data4parsing.shift_day += 1
                     button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Предыдущий день']")
@@ -109,9 +113,8 @@ class MainPageService:
                 ))
                 self.session.commit()
                 logger.info(f'insert record({index_link + 1}/{length_list_link}): {link}')
-            except IntegrityError as exc:
-                description_error = f"insert1: {str(exc)}"
-                logger.warning(description_error)
+            except IntegrityError:
+                logger.warning(f"psycopg2.errors.UniqueViolation: {link}")
                 self.session.rollback()
             except Exception as exc:
                 description_error = f"insert2: {str(exc)}"
@@ -138,10 +141,23 @@ if __name__ == "__main__":
     #     parsing_service.get_list_link_with_main_page()
     #     parsing_service.insert()
 
-    sport_name = "tennis"
-    day = 1
+    sport_name = "volleyball"
+    day = 5
     data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
     parsing_service = MainPageService(data4parsing=data_for_parsing)
-    logger.debug(f"MAIN_PAGE {data_for_parsing}")
-    parsing_service.get_list_link_with_main_page()
+    # logger.debug(f"MAIN_PAGE {data_for_parsing}")
+    # parsing_service.get_list_link_with_main_page()
+    # parsing_service.insert()
+    parsing_service.list_link = ["A1rHI0i5"]
     parsing_service.insert()
+    
+
+
+
+
+# 2025-03-25 12:36:52,597 - [WARNING] - (main_page.py).insert(114) - insert1: (psycopg2.errors.UniqueViolation) ОШИБКА:  повторяющееся значение ключа нарушает ограничение уникальности "main_link_key"
+# DETAIL:  Ключ "(link)=(A1rHI0i5)" уже существует.
+#
+# [SQL: INSERT INTO flashscore_new.main (link, sport_name, match_date, status) VALUES (%(link)s, %(sport_name)s, %(match_date)s, %(status)s) RETURNING flashscore_new.main.id]
+# [parameters: {'link': 'A1rHI0i5', 'sport_name': 'ВОЛЕЙБОЛ', 'match_date': '20250330', 'status': None}]
+# (Background on this error at: https://sqlalche.me/e/20/gkpj)

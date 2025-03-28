@@ -31,11 +31,11 @@ is_week = args.week
 def main():
     logger.debug(f"{day=}")
     list_sport_name_for_parsing = [
-        # "volleyball",
-        # "basketball",
-        # "football",
-        # "handball",
-        "tennis",
+        "volleyball",
+        "basketball",
+        "football",
+        "handball",
+        # "tennis",
     ]
 
     if start in ["main"]:

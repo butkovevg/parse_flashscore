@@ -83,39 +83,7 @@ class AnalysisService:
                 self.insert(analysis_model=self.analysis_model)
                 counter += 1
             logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
-    def get_tennis_main(self):
-        unprocessed_records = self.get_list_from_db()
-        counter = 0
-        length_unprocessed_records = len(unprocessed_records)
-        for index in range(length_unprocessed_records):
-            current_model = unprocessed_records[index]
 
-            if current_model.sport_name == "ТЕННИС":
-                logger.warning(f"{current_model.sport_name=} {current_model.series1} { current_model.series2} {current_model.link}")
-            # self.analysis_model = AnalysisDBModel(
-            #     link=current_model.link,
-            #     is_match_leader_outsider=False,
-            #     is_match_series=False,
-            #     is_hz=False,
-            #     kf1=-1,
-            #     kf2=-1,
-            #     score1=-1,
-            #     score2=-1,
-            #     who_win=0,
-            #     is_favorites=False,
-            # )
-            # self.is_match_leader_and_outsider(current_model)
-            # self.is_match_with_series(current_model)
-            #
-            # if self.analysis_model.is_match_leader_outsider or self.analysis_model.is_match_series:
-            #     # enrichment_statistic_service = EnrichmentStatisticService()
-            #     # coefficient_tuple = enrichment_statistic_service.open_page_with_coefficient(
-            #     #     link=self.analysis_model.link)
-            #     # self.analysis_model.kf1 = coefficient_tuple[0]
-            #     # self.analysis_model.kf2 = coefficient_tuple[1]
-            #     self.insert(analysis_model=self.analysis_model)
-            #     counter += 1
-            # logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
     def insert(self, analysis_model: AnalysisDBModel):
         """
         """
