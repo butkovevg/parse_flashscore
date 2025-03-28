@@ -84,7 +84,6 @@ class AnalysisDBModel(Base):
     """
     """
     __table_args__ = (
-
         UniqueConstraint('id', 'link'),
         {"schema": settings.SCHEME_NAME},
     )

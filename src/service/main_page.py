@@ -120,7 +120,137 @@ class MainPageService:
                 description_error = f"insert2: {str(exc)}"
                 logger.error(description_error)
 
+    def save_html_for_online(self, file_name_for_html: str):
+        try:
+            link = dict_link.get(self.data4parsing.sport_name).get("link")
+            browser = BrowserService.get_webdriver()
+            browser.get(link)
+            time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
+            page_source = browser.page_source
 
+
+            # 1. Сохранение HTML-кода в файл
+            with open(file_name_for_html, 'w', encoding='utf-8') as file:
+                file.write(page_source)
+
+            browser.quit()
+        except Exception as exc:
+            logger.error(str(exc))
+            return []
+
+    def open_html_for_online(self, file_name_for_html, list_links_aft_analysis):
+
+        with open(file_name_for_html, 'r', encoding='utf-8') as file:
+            saved_html = file.read()
+        soup = BeautifulSoup(saved_html, 'html.parser')
+        delimiter = dict_link.get(self.data4parsing.sport_name).get("delimiter")
+
+
+
+
+        # Поиск по CSS-селектору
+        css_selector = f'div.sportName.{self.data4parsing.sport_name}'
+        divs_sportname = soup.select(css_selector)
+        # print(type(divs_sportname))
+        # for div in divs_sportname:
+        #     print(type(div), div.select('div'))
+        #     print("*"*88)
+
+        # Список для дальнейшего UPDATE(link, status)
+        # Список для хранения результатов
+        # Список для хранения результатов
+        # Список для хранения результатов
+        output_list = []
+
+        # Перебираем каждый элемент в ResultSet
+        for div in divs_sportname:
+            # Находим все матчи внутри текущего блока
+            matches = div.find_all('div', class_='event__match')
+
+            for match in matches:
+                # Извлекаем id (если существует)
+                link = match.get('id', None)
+                if link is not None:
+                    link = link.replace(delimiter, "")
+                else:
+                    continue
+
+
+                # Извлекаем текст (если элементы существуют)
+                status = match.find('div', class_='event__stage--block')
+                status = status.text.strip() if status else None
+
+                if link in list_links_aft_analysis and status is not None:
+                    # Добавляем данные в список
+                    output_list.append({
+                        'link': link,
+                        'status': status,
+                    })
+                else:
+                    continue
+
+
+
+
+
+        # Выводим результаты
+        for result in output_list:
+            print(f"+++ {result}")
+
+
+
+
+
+
+
+        # events = soup.find_all('div', class_='event__title')
+        # print(type(events), events)
+        # # Перебираем каждый блок
+        # for event in events:
+        #     # # Ищем внутри блока элемент с классом "event__title"
+        #     # title = event.find('div', class_='event__title')
+        #     # if title:
+        #     #     print(title.text.strip())  # Выводим текст заголовка
+        #     print(event)
+        #     print()
+        #     exit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Предыдущий день']")
+        # # Перебор найденных элементов
+        # for idx, volleyball_div in enumerate(volleyball_divs, start=1):
+        #     logger.debug(f"Элемент {idx}:")
+        #     # print(volleyball_div.prettify())
+        #     # exit(0)
+
+        # ids_filtered = filter(lambda x: x.startswith(delimiter), ids)
+        # self.list_link = [link.replace(delimiter, "") for link in ids_filtered]
+        # print(self.list_link)  # Вывод тега <title>
+        # print(soup.p.text)  # Вывод текста внутри тега <p>
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
     # day = 1
@@ -141,7 +271,7 @@ if __name__ == "__main__":
     #     parsing_service.get_list_link_with_main_page()
     #     parsing_service.insert()
 
-    sport_name = "volleyball"
+    sport_name = "basketball"
     day = 5
     data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
     parsing_service = MainPageService(data4parsing=data_for_parsing)
