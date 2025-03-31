@@ -65,7 +65,7 @@ def main():
 if __name__ == "__main__":
     logger.info(f'Initializing {os.path.basename(__file__)} {settings.VERSION}')
     if is_week:
-        for day in range(3, 7):
+        for day in range(0, 7):
             logger.warning(f"WEEK_SCAN {day=}")
             FindDayForParsingService().main(shift_day=day)
             main()

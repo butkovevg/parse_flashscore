@@ -4,7 +4,9 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from src.model.tables import CurrentDBModel
+from src.service.browser import BrowserService
 from src.service.helper import HelperService
+from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
 from src.service.main_page import dict_link
 
@@ -45,39 +47,36 @@ class CurrentMatchService:
         logger.debug("*" * 88)
         ValidationCurrentMatch.is_validate(text="#00 ссылка", input_value=link, input_type=str)
         # 01 вид спорта
-        sport_name = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[3]/div/span[1]/a").text
+        sport_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[2]/nav/ol/li[1]/a/span").text
         ValidationCurrentMatch.is_validate(text="#01 вид спорта", input_value=sport_name, input_type=str)
 
         # 02 дата и время
-        dt = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[1]/div").text
+        dt = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[1]/div").text
         date_game, time_game = dt.split(" ")
         ValidationCurrentMatch.is_validate(text="#02 дата", input_value=date_game, input_type=str)
         ValidationCurrentMatch.is_validate(text="#02 время", input_value=time_game, input_type=str)
 
         # 03 страна/турнир/тур
-        tournament_header_country = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[3]/div/span[3]").text
-        list_country_tournament_tour = tournament_header_country.split(": ")
-        country = str(HelperService.get_element_for_list(lst=list_country_tournament_tour, index=0, default_value=""))
-        tournament_tour = str(HelperService.get_element_for_list(lst=list_country_tournament_tour, index=1,
-                                                                 default_value=""))
-        list_tournament_tour = tournament_tour.split(" - ")
-        tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="")
-        tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="")
+        country = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[2]/nav/ol/li[2]/a/span").text
         ValidationCurrentMatch.is_validate(text="#03 страна", input_value=country, input_type=str)
-        ValidationCurrentMatch.is_validate(text="#03 турнир", input_value=tournament_tour, input_type=str)
+        tournament_header = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[2]/nav/ol/li[3]/a/span").text
+        list_tournament_tour = tournament_header.split(" - ")
+        tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="")
+        tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="")
+        ValidationCurrentMatch.is_validate(text="#03 турнир", input_value=tournament, input_type=str)
         ValidationCurrentMatch.is_validate(text="#03 тур", input_value=tour, input_type=str)
 
         # 04 Команды
-        team1_name = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[2]/div[3]/div[2]/a").text
-        team2_name = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[4]/div[3]/div[1]/a").text
+        team1_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[2]/div[3]/div[2]/a").text
+        team2_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[4]/div[3]/div[1]/a").text
         ValidationCurrentMatch.is_validate(text="#04 команда№1", input_value=team1_name, input_type=str)
         ValidationCurrentMatch.is_validate(text="#04 команда№2", input_value=team2_name, input_type=str)
 
         # 05 счёт и статус
         try:
-            status = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[3]/div/div[2]/span").text
-            score1 = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[3]/div/div[1]/span[1]").text
-            score2 = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[3]/div/div[1]/span[3]").text
+            status = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[3]/div/div[2]/span").text
+            score1 = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[3]/div/div[1]/span[1]").text
+            score2 = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[3]/div/div[1]/span[3]").text
             score = f"{score1}:{score2}"
         except NoSuchElementException:
             status = "TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ."
@@ -294,3 +293,9 @@ class CurrentMatchService:
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
+    sport_name = "football"
+    day = 0
+    data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
+    browser = BrowserService.get_webdriver()
+    current_match_service = CurrentMatchService(browser=browser, data4parsing=data_for_parsing)
+    current_match_service.get_current_match_model(link="https://www.flashscorekz.com/match/football/Ic4jMGko/#/standings/live")
