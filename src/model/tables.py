@@ -73,8 +73,11 @@ class CurrentDBModel(Base):
     # 09 СЕРИЯ
     series1 = Column(VARCHAR, nullable=False)
     series2 = Column(VARCHAR, nullable=False)
-    # 10 ПРОЧЕЕ:
-    status = Column(Boolean, default=None)
+    # 10 Коф-ты:
+    kf1 = Column(Float, default=0)
+    kf2 = Column(Float, default=0)
+    # 11 ПРОЧЕЕ:
+    status = Column(VARCHAR, default=None)
 
     def __str__(self):
         return f"{self.link}_{self.sport_name}"

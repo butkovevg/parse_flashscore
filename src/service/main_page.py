@@ -202,44 +202,6 @@ class MainPageService:
 
 
 
-
-        # events = soup.find_all('div', class_='event__title')
-        # print(type(events), events)
-        # # Перебираем каждый блок
-        # for event in events:
-        #     # # Ищем внутри блока элемент с классом "event__title"
-        #     # title = event.find('div', class_='event__title')
-        #     # if title:
-        #     #     print(title.text.strip())  # Выводим текст заголовка
-        #     print(event)
-        #     print()
-        #     exit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         # button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Предыдущий день']")
         # # Перебор найденных элементов
         # for idx, volleyball_div in enumerate(volleyball_divs, start=1):
@@ -280,14 +242,3 @@ if __name__ == "__main__":
     # parsing_service.insert()
     parsing_service.list_link = ["A1rHI0i5"]
     parsing_service.insert()
-    
-
-
-
-
-# 2025-03-25 12:36:52,597 - [WARNING] - (main_page.py).insert(114) - insert1: (psycopg2.errors.UniqueViolation) ОШИБКА:  повторяющееся значение ключа нарушает ограничение уникальности "main_link_key"
-# DETAIL:  Ключ "(link)=(A1rHI0i5)" уже существует.
-#
-# [SQL: INSERT INTO flashscore_new.main (link, sport_name, match_date, status) VALUES (%(link)s, %(sport_name)s, %(match_date)s, %(status)s) RETURNING flashscore_new.main.id]
-# [parameters: {'link': 'A1rHI0i5', 'sport_name': 'ВОЛЕЙБОЛ', 'match_date': '20250330', 'status': None}]
-# (Background on this error at: https://sqlalche.me/e/20/gkpj)

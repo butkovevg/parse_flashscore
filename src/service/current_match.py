@@ -1,4 +1,5 @@
 import os
+import time
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -134,7 +135,7 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#09 СЕРИЯ", input_value=series1, input_type=str)
         ValidationCurrentMatch.is_validate(text="#09 СЕРИЯ", input_value=series2, input_type=str)
         logger.debug("*" * 88)
-
+        kf1, kf2 = self.get_coefficient(link)
         current_db_model = CurrentDBModel(
             link=link,
             sport_name=sport_name,
@@ -157,9 +158,41 @@ class CurrentMatchService:
             points2=points2,
             series1=series1,
             series2=series2,
+            kf1=kf1,
+            kf2=kf2,
         )
         logger.debug("*" * 88)
         return current_db_model
+    def get_coefficient(self,link):
+        full_link = f"https://www.flashscorekz.com/match/{self.data4parsing.sport_name}/{link}/#/match-summary/match-summary"
+        new_hash = "#/match-summary/match-summary"
+        self.driver.execute_script(f"window.location.hash = '{new_hash}'")
+        time.sleep(5)
+        logger.debug("Переключились на второй раздел.")
+
+        try:
+            logger.debug(f"COEFFICIENT: browser.get({full_link})")
+            # Поиск всех элементов <span class="cell">
+            cells = self.driver.find_elements("xpath", "//span[contains(@class, 'cell')]")
+
+            # Извлечение текста из первого и третьего элемента
+            if len(cells) >= 3:  # Убедитесь, что найдено достаточно элементов
+                first_value = cells[0].find_element("xpath", ".//span[@class='oddsValueInner']").text
+                third_value = cells[2].find_element("xpath", ".//span[@class='oddsValueInner']").text
+
+                logger.info(f"Первое значение: {first_value}")  # 2.00
+                logger.info(f"Третье значение: {third_value}")  # 3.90
+                return first_value, third_value
+            else:
+                logger.error("Не удалось найти все необходимые элементы.")
+                return 0, 0
+
+        except Exception as exc:
+            logger.error(f"ERROR {link=}")
+            logger.error(str(exc))
+            return 0, 0
+        finally:
+            self.driver.quit()
 
     def get_tennis_match_model(self, link):
         logger.debug("*" * 88)
@@ -264,6 +297,7 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#09 СЕРИЯ", input_value=series2, input_type=str)
         logger.debug("*" * 88)
 
+        kf1, kf2 = 0, 0
         current_db_model = CurrentDBModel(
             link=link,
             sport_name=sport_name,
@@ -286,6 +320,8 @@ class CurrentMatchService:
             points2=points2,
             series1=series1,
             series2=series2,
+            kf1=kf1,
+            kf2=kf2,
         )
         logger.debug("*" * 88)
         return current_db_model
@@ -293,9 +329,4 @@ class CurrentMatchService:
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    sport_name = "football"
-    day = 0
-    data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
-    browser = BrowserService.get_webdriver()
-    current_match_service = CurrentMatchService(browser=browser, data4parsing=data_for_parsing)
-    current_match_service.get_current_match_model(link="https://www.flashscorekz.com/match/football/Ic4jMGko/#/standings/live")
+

@@ -28,8 +28,8 @@ class Setting(BaseSettings):
     DB_NAME: str
     SCHEME_NAME: str
     TABLE_NAME_MAIN: str = "main"
-    TABLE_NAME_CURRENT: str = "current"
-    TABLE_NAME_ANALYSIS: str = "analysis"
+    TABLE_NAME_CURRENT: str = "current3"
+    TABLE_NAME_ANALYSIS: str = "analysis3"
     DB_ECHO: bool = True  # logging database
 
     @property
