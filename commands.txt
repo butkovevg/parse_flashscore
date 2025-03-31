@@ -1,0 +1,3 @@
+cd C:/Users/evgeniy.butkov/PycharmProjects/parse_flashscore ; rm -f  src/logs/
+source venv/Scripts/activate
+python scheduler.py --day 4 --start main

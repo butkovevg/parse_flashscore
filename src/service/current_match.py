@@ -135,7 +135,7 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#09 СЕРИЯ", input_value=series1, input_type=str)
         ValidationCurrentMatch.is_validate(text="#09 СЕРИЯ", input_value=series2, input_type=str)
         logger.debug("*" * 88)
-        kf1, kf2 = self.get_coefficient(link)
+        kf1, kf2 = self.get_coefficient()
         current_db_model = CurrentDBModel(
             link=link,
             sport_name=sport_name,
@@ -163,7 +163,7 @@ class CurrentMatchService:
         )
         logger.debug("*" * 88)
         return current_db_model
-    def get_coefficient(self,link):
+    def get_coefficient(self):
 
         new_fragment = "#/match-summary/match-summary"
         self.driver.execute_script(f"window.location.hash = '{new_fragment}'")

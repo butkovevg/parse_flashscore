@@ -32,8 +32,8 @@ def main():
     logger.debug(f"{day=}")
     list_sport_name_for_parsing = [
         "volleyball",
-        "basketball",
         "football",
+        "basketball",
         "handball",
         # "tennis",
     ]

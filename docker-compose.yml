@@ -1,0 +1,29 @@
+#version: '3.8'
+#
+#services:
+#  postgres:
+#    image: postgres:13
+#    environment:
+#      POSTGRES_USER: airflow
+#      POSTGRES_PASSWORD: airflow
+#      POSTGRES_DB: airflow
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#
+#  airflow:
+#    image: apache/airflow:2.2.3-python3.8
+#    environment:
+#      EXECUTOR: Local
+#      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+#      AIRFLOW__CORE__FERNET_KEY: "46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho="
+#      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+#    volumes:
+#      - ./dags:/usr/local/airflow/dags
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - postgres
+#    command: webserver
+#
+#volumes:
+#  postgres_data:
