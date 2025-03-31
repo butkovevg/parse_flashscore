@@ -98,8 +98,8 @@ a:active {
         <th style="width: 1%;"><a href="/favorites/{{ day }}/"> FAVORITES?</th>
         <th>KF1</th>
         <th>KF2</th>
-        <th>LEADER?</th>
-        <th>SERIES?</th>
+        <th>who win</th>
+        <th>kf,table,series</th>
 
         <th>
             <div style="display: flex; justify-content: center;">
@@ -130,22 +130,8 @@ a:active {
         </td>
         <td>{{ match.kf1 }}</td>
         <td>{{ match.kf2 }}</td>
-
-        {% if match.is_match_leader_outsider == True %}
-        <td> ✔️</td>
-        {% else %}
-        <!-- <td>❌</td>-->
-        <td></td>
-        {% endif %}
-
-        {% if match.is_match_series == True %}
-        <td> ✔️</td>
-        {% else %}
-        <!-- <td>❌</td>-->
-        <td></td>
-        {% endif %}
-
-
+        <td>{{ match.who_win }}</td>
+        <td>{{ match.by_coefficient }}/{{ match.by_position_table }}/{{ match.by_series }}</td>
 
         <td>
             <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
