@@ -2,12 +2,12 @@ import json
 import os
 from datetime import datetime
 from datetime import timedelta
+from typing import Optional
 
 from sqlalchemy import update
 
 from src.model.tables import CurrentDBModel, AnalysisDBModel
 from src.service.database import get_session
-from src.service.enrichment_statistic import EnrichmentStatisticService
 from src.service.helper import HelperService
 from src.service.logger_handlers import get_logger
 
@@ -16,17 +16,24 @@ logger = get_logger(__name__)
 
 class AnalysisService:
     def __init__(self, shift_day: int = 0):
+        self.analysis_model: Optional[AnalysisDBModel] = None
         self.session = next(get_session())
         self.shift_day = shift_day
 
-    def is_match_leader_and_outsider(self, record: CurrentDBModel):
+    def is_selection_by_position_table(self, record: CurrentDBModel):
         if record.position_total > 10 and record.num_games1 > 3 and record.num_games2 > 3:
-            if record.position1 < 4 and record.position_total - record.position2 < 4:
-                self.log_match_leader_and_outsider(record)
-            elif record.position2 < 4 and record.position_total - record.position1 < 4:
-                self.log_match_leader_and_outsider(record)
+            if record.position1 < 3 and record.position_total - record.position2 < 3:
+                self.analysis_model.by_position_table = 1
+                logger.debug(f"is_selection_by_position_table for {record.link}: {record.position1} {record.position2}")
+            elif record.position2 < 3 and record.position_total - record.position1 < 3:
+                if self.analysis_model.by_position_table == 0:
+                    self.analysis_model.by_position_table = 2
+                    logger.debug(
+                        f"is_selection_by_position_table for {record.link}: {record.position1} {record.position2}")
+                else:
+                    logger.error(f"Error for {record.link}: {record.position1} {record.position2}")
 
-    def is_match_with_series(self, record: CurrentDBModel):
+    def is_selection_match_with_series(self, record: CurrentDBModel):
         dct_series1 = {}
         dct_series2 = {}
         for letter in record.series1:
@@ -39,19 +46,35 @@ class AnalysisService:
                 dct_series2[letter] += 1
             else:
                 dct_series2[letter] = 1
-        if dct_series1.get("B", 0) > 3 and dct_series2.get("П", 0) > 3:
-            self.log_match_with_series(record)
-        elif dct_series1.get("B", 0) > 3 and dct_series2.get("П", 0) > 3:
-            self.log_match_with_series(record)
 
-    def log_match_with_series(self, record: CurrentDBModel):
-        self.analysis_model.is_match_series = True
-        logger.debug(f"update {record.team1}:{record.team2} {record.series1} {record.series2}")
+        if dct_series1.get("B", 0) > 4 and dct_series2.get("П", 0) > 4:
+            self.analysis_model.by_series = 1
+            logger.debug(
+                f"is_selection_match_with_series for {record.link}: {dct_series1.get('B', 0)} {dct_series2.get('П', 0)}")
 
-    def log_match_leader_and_outsider(self, record):
-        self.analysis_model.is_match_leader_outsider = True
-        logger.debug(
-            f"update {record.team1}:{record.team2} {record.position1}:{record.position2}==={record.position_total}")
+        elif dct_series2.get("B", 0) > 4 and dct_series1.get("П", 0) > 4:
+            if self.analysis_model.by_series == 0:
+                self.analysis_model.by_series = 2
+                logger.debug(
+                    f"is_selection_match_with_series for {record.link}: {dct_series1.get('П', 0)} {dct_series2.get('В', 0)}")
+            else:
+                logger.error(f"Error for {record.link}: {record.position1} {record.position2}")
+
+    def is_selection_by_coefficient(self, record: CurrentDBModel):
+        try:
+            msg = f"{record.sport_name} {record.team1}: {record.team2} {record.kf1}: {record.kf2}"
+            max_kf = 1.25
+            if 1.01 < float(record.kf1) < max_kf:
+                self.analysis_model.by_coefficient = 1
+                logger.info(msg)
+            if 1.01 < float(record.kf2) < max_kf:
+                if self.analysis_model.by_coefficient == 0:
+                    self.analysis_model.by_coefficient = 2
+                else:
+                    logger.error(f"Check low kf and {msg}")
+                logger.info(msg)
+        except Exception as exc:
+            logger.error(exc)
 
     def main(self):
         unprocessed_records = self.get_list_from_db()
@@ -61,28 +84,33 @@ class AnalysisService:
             current_model = unprocessed_records[index]
             self.analysis_model = AnalysisDBModel(
                 link=current_model.link,
-                is_match_leader_outsider=False,
-                is_match_series=False,
-                is_hz=False,
-                kf1=-1,
-                kf2=-1,
-                score1=-1,
-                score2=-1,
+                by_coefficient=0,
+                by_series=0,
+                by_position_table=0,
                 who_win=0,
-                is_favorites=False,
             )
-            self.is_match_leader_and_outsider(current_model)
-            self.is_match_with_series(current_model)
+            self.is_selection_by_coefficient(current_model)
+            self.is_selection_by_position_table(current_model)
+            self.is_selection_match_with_series(current_model)
 
-            if self.analysis_model.is_match_leader_outsider or self.analysis_model.is_match_series:
-                # enrichment_statistic_service = EnrichmentStatisticService()
-                # coefficient_tuple = enrichment_statistic_service.open_page_with_coefficient(
-                #     link=self.analysis_model.link)
-                # self.analysis_model.kf1 = coefficient_tuple[0]
-                # self.analysis_model.kf2 = coefficient_tuple[1]
+            if self.is_save():
                 self.insert(analysis_model=self.analysis_model)
                 counter += 1
             logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
+
+
+    def is_save(self):
+        set_who_win = {self.analysis_model.by_coefficient, self.analysis_model.by_series, self.analysis_model.by_position_table}
+        set_who_win.discard(0)
+        if len(set_who_win) == 0:
+            return False
+        elif len(set_who_win) == 1:
+            self.analysis_model.who_win = set_who_win.pop()
+        else:
+            self.analysis_model.who_win = 3
+            self.analysis_model.comment = "ERR different "
+            logger.error(f"{self.analysis_model.link}: different: {self.analysis_model.by_coefficient}/{self.analysis_model.by_series}/{self.analysis_model.by_position_table}")
+        return True
 
     def insert(self, analysis_model: AnalysisDBModel):
         """
@@ -261,10 +289,10 @@ class InfoAnalysisDBService:
 if __name__ == "__main__":
     # 1: "Запись в БД после анализа",
 
-    choice = 5
+    choice = 1
     logger.info(f'Initializing test {os.path.basename(__file__)}')
     if choice == 1:
-        parsing_service = AnalysisService(shift_day=2)
+        parsing_service = AnalysisService(shift_day=0)
         parsing_service.main()
     elif choice == 2:
         InfoAnalysisDBService().printer_link()
@@ -283,5 +311,3 @@ if __name__ == "__main__":
         parsing_service = AnalysisService(shift_day=day)
         parsing_service.get_tennis_main()
         logger.debug(f"FINISH {day=}")
-
-

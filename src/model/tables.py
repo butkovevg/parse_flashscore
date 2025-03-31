@@ -85,6 +85,10 @@ class CurrentDBModel(Base):
 
 class AnalysisDBModel(Base):
     """
+    0-нет инфы
+    1- первый матч выиграет
+    2- второй матч выиграет
+    3- личный просмотр матча
     """
     __table_args__ = (
         UniqueConstraint('id', 'link'),
@@ -94,15 +98,11 @@ class AnalysisDBModel(Base):
 
     id = Column(INTEGER, primary_key=True, nullable=False)
     link = Column(VARCHAR, unique=True, nullable=False)
-    is_match_leader_outsider = Column(Boolean, default=False)
-    is_match_series = Column(Boolean, default=False)
-    is_hz = Column(Boolean, default=False)
-    kf1 = Column(Float, default=0)
-    kf2 = Column(Float, default=0)
-    score1 = Column(INTEGER, default=0)
-    score2 = Column(INTEGER, default=0)
+    by_coefficient = Column(INTEGER, default=0)
+    by_series = Column(INTEGER, default=0)
+    by_position_table = Column(INTEGER, default=0)
     who_win = Column(INTEGER, default=0)
-    is_favorites = Column(Boolean, default=False)
+    comment = Column(VARCHAR, default=None)
 
 
 if __name__ == "__main__":

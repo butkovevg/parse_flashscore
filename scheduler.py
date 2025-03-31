@@ -55,11 +55,11 @@ def main():
             parsing_service = CurrentPageService(data4parsing=data_for_parsing)
             parsing_service.get_list_links_from_db()
 
-    # # ANALYSIS
-    # logger.debug(f"AnalysisService {day=}")
-    # parsing_service = AnalysisService(shift_day=day)
-    # parsing_service.main()
-    # logger.debug(f"FINISH {day=}")
+    # ANALYSIS
+    logger.debug(f"AnalysisService {day=}")
+    parsing_service = AnalysisService(shift_day=day)
+    parsing_service.main()
+    logger.debug(f"FINISH {day=}")
 
 
 if __name__ == "__main__":
