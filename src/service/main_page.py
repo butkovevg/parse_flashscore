@@ -1,5 +1,4 @@
 import os
-
 import time
 from random import randint
 
@@ -7,12 +6,12 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from sqlalchemy.exc import IntegrityError
 
+from src.configs.settings import settings
 from src.model.tables import MainDBModel
 from src.service.browser import BrowserService
 from src.service.database import get_session
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
-from src.configs.settings import settings
 
 logger = get_logger(__name__)
 
@@ -57,6 +56,13 @@ dict_link = {
         "series": 7,
         "sport_name": "ТЕННИС",
     },
+}
+dct_translate_sport_name_rus_eng = {
+    "ФУТБОЛ": "football",
+    "ВОЛЕЙБОЛ": "volleyball",
+    "БАСКЕТБОЛ": "basketball",
+    "ГАНДБОЛ": "handball",
+    "ТЕННИС": "tennis",
 }
 
 
@@ -120,82 +126,70 @@ class MainPageService:
                 description_error = f"insert2: {str(exc)}"
                 logger.error(description_error)
 
-    def save_html_for_online(self, file_name_for_html: str):
+    def get_list_for_update_analysis(self, list_links_aft_analysis: list):
         try:
             link = dict_link.get(self.data4parsing.sport_name).get("link")
             browser = BrowserService.get_webdriver()
             browser.get(link)
             time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
             page_source = browser.page_source
+            soup = BeautifulSoup(page_source, 'html.parser')
+            delimiter = dict_link.get(self.data4parsing.sport_name).get("delimiter")
+
+            # Поиск по CSS-селектору
+            css_selector = f'div.sportName.{self.data4parsing.sport_name}'
+            divs_sportname = soup.select(css_selector)
+            # print(type(divs_sportname))
+            # for div in divs_sportname:
+            #     print(type(div), div.select('div'))
+            #     print("*"*88)
+
+            # Список для дальнейшего UPDATE(link, status)
+            # Список для хранения результатов
+            # Список для хранения результатов
+            # Список для хранения результатов
+            output_list = []
+
+            # Перебираем каждый элемент в ResultSet
+            for div in divs_sportname:
+                # Находим все матчи внутри текущего блока
+                matches = div.find_all('div', class_='event__match')
+
+                for match in matches:
+                    # Извлекаем id (если существует)
+                    link = match.get('id', None)
+                    if link is not None:
+                        link = link.replace(delimiter, "")
+                    else:
+                        continue
+
+                    # Извлекаем текст (если элементы существуют)
+                    status = match.find('div', class_='event__stage--block')
+                    status = status.text.strip() if status else None
+
+                    if link in list_links_aft_analysis and status is not None:
 
 
-            # 1. Сохранение HTML-кода в файл
-            with open(file_name_for_html, 'w', encoding='utf-8') as file:
-                file.write(page_source)
 
+
+
+
+
+
+                        # Добавляем данные в список
+                        output_list.append({
+                            'link': link,
+                            'status': status,
+                        })
+                    else:
+                        continue
+            logger.debug(f"{len(output_list)} record(s) update")
             browser.quit()
+            return output_list
         except Exception as exc:
             logger.error(str(exc))
             return []
 
-    def open_html_for_online(self, file_name_for_html, list_links_aft_analysis):
-
-        with open(file_name_for_html, 'r', encoding='utf-8') as file:
-            saved_html = file.read()
-        soup = BeautifulSoup(saved_html, 'html.parser')
-        delimiter = dict_link.get(self.data4parsing.sport_name).get("delimiter")
-
-
-
-
-        # Поиск по CSS-селектору
-        css_selector = f'div.sportName.{self.data4parsing.sport_name}'
-        divs_sportname = soup.select(css_selector)
-        # print(type(divs_sportname))
-        # for div in divs_sportname:
-        #     print(type(div), div.select('div'))
-        #     print("*"*88)
-
-        # Список для дальнейшего UPDATE(link, status)
-        # Список для хранения результатов
-        # Список для хранения результатов
-        # Список для хранения результатов
-        output_list = []
-
-        # Перебираем каждый элемент в ResultSet
-        for div in divs_sportname:
-            # Находим все матчи внутри текущего блока
-            matches = div.find_all('div', class_='event__match')
-
-            for match in matches:
-                # Извлекаем id (если существует)
-                link = match.get('id', None)
-                if link is not None:
-                    link = link.replace(delimiter, "")
-                else:
-                    continue
-
-
-                # Извлекаем текст (если элементы существуют)
-                status = match.find('div', class_='event__stage--block')
-                status = status.text.strip() if status else None
-
-                if link in list_links_aft_analysis and status is not None:
-                    # Добавляем данные в список
-                    output_list.append({
-                        'link': link,
-                        'status': status,
-                    })
-                else:
-                    continue
-
-
-
-
-
-        # Выводим результаты
-        for result in output_list:
-            print(f"+++ {result}")
 
 
 
@@ -213,6 +207,12 @@ class MainPageService:
         # self.list_link = [link.replace(delimiter, "") for link in ids_filtered]
         # print(self.list_link)  # Вывод тега <title>
         # print(soup.p.text)  # Вывод текста внутри тега <p>
+
+            # # 1. Сохранение HTML-кода в файл
+            # with open(file_name_for_html, 'w', encoding='utf-8') as file:
+            #     file.write(page_source)
+            # with open(file_name_for_html, 'r', encoding='utf-8') as file:
+            #     saved_html = file.read()
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
     # day = 1

@@ -1,35 +1,59 @@
 import os
+import time
 
 from src.configs.settings import settings
 from src.model.tables import AnalysisDBModel, CurrentDBModel
+from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
-from src.service.main_page import MainPageService, dict_link
-from sqlalchemy import Table, MetaData, select
+from src.service.main_page import MainPageService, dct_translate_sport_name_rus_eng
+from sqlalchemy import Table, MetaData, select, distinct, table, column, and_
 from src.service.database import get_session
 
 logger = get_logger(__name__)
 
 
 class DataBaseOnlineService:
-    def __init__(self, data4parsing: InputDataForParsing):
-        self.data4parsing = data4parsing
+    def __init__(self):
         self.session = next(get_session())
 
-    def get_list_links_from_db(self):
+    def get_list_links_from_db(self, rus_sport_name, match_date):
         try:
             # Создание запроса
             query = (
                 select(AnalysisDBModel.link)
                 .join(CurrentDBModel, CurrentDBModel.link == AnalysisDBModel.link, isouter=True)  # LEFT JOIN
-                .where(CurrentDBModel.sport_name == 'БАСКЕТБОЛ')
-                .where(CurrentDBModel.match_date == '28.03.2025')
+                .where(CurrentDBModel.sport_name == rus_sport_name)
+                .where(CurrentDBModel.match_date == match_date)
             )
             # Выполнение запроса
             results = self.session.execute(query).scalars().all()
             return results
         except Exception as exc:
-            logger.error(f"Error for {self.data4parsing}")
+            logger.error(f"Error for {rus_sport_name}")
+            logger.error(f"Details: {str(exc)}")
+            return []
+        finally:
+            self.session.close()
+
+    def get_list_sport_name(self, match_date):
+        try:
+            # Создание запроса
+            query = (
+                select(distinct(CurrentDBModel.sport_name))
+                .select_from(AnalysisDBModel)  # Явное указание левой стороны JOIN
+                .join(CurrentDBModel, CurrentDBModel.link == AnalysisDBModel.link, isouter=True)  # LEFT JOIN
+                .where(and_(
+                    AnalysisDBModel.status.is_(None),
+                    CurrentDBModel.match_date == match_date
+                ))
+            )
+            # Выполнение запроса
+            results = self.session.execute(query).scalars().all()
+            return results
+
+        except Exception as exc:
+            logger.error(f"Error for {match_date}")
             logger.error(f"Details: {str(exc)}")
             return []
         finally:
@@ -81,25 +105,75 @@ class DataBaseOnlineService:
         #     else:
         #         logger.info(f"All link processed {self.data4parsing}")
 
+    def update_status_in_analysis_db(self, list_for_update_analysis):
+        try:
+            # # # Подготовка данных для массового обновления
+            # # update_data = []
+            # # for item in list_for_update_analysis:
+            # #     update_data.append({'link': item['link'], 'status': item['status']})
+            #
+            # # Массовое обновление
+            # self.session.bulk_update_mappings(AnalysisDBModel, list_for_update_analysis)
+            #
+            # # Фиксация изменений в базе данных
+            # self.session.commit()
+            # print("Массовое обновление завершено.")
+            for item in list_for_update_analysis:
+                link = item['link']
+                new_status = item['status']
+
+                # Обновление записи по полю link
+                self.session.query(AnalysisDBModel).filter_by(link=link).update({'status': new_status})
+
+            # Фиксация изменений
+            self.session.commit()
+            print("Обновление завершено.")
+
+        except Exception as e:
+            self.session.rollback()  # Откат изменений в случае ошибки
+            print(f"Ошибка: {e}")
+
+
 
 if __name__ == "__main__":
     logger.info(f' Initializing API {settings.TITLE}: {settings.VERSION}')
     logger.info(f' Visit endpoint: http://{settings.SERVER_HOST}:{settings.SERVER_PORT}/online/')
     logger.info(f'Initializing file {os.path.basename(__file__)}')
 
-
-    sport_name = "basketball"
     day = 0
+    data_for_parsing = InputDataForParsing(sport_name="__basketball", shift_day=day)
+
+    database_online_service = DataBaseOnlineService()
+    match_date_today = HelperService.get_date_with_point_between_day(day=0)
+
+    while True:
+        list_sport_name = database_online_service.get_list_sport_name(match_date_today)
+        if len(list_sport_name) == 0:
+            logger.info("list_sport_name is empty")
+
+        for rus_sport_name in list_sport_name:
+            # eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
+            # data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
+            #01 Список ссылок, которые нуждаются в обновлении по видам спорта
+            database_online_service = DataBaseOnlineService()
+            list_links_aft_analysis = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
+            logger.debug(f"For {rus_sport_name=} need update links: {list_links_aft_analysis=}")
+
+            # 02 Запрос по виду спорта для обновления
+            eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
+            data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
+            main_page_service = MainPageService(data4parsing=data_for_parsing)
+            # 02 Список, который можно обновить
+            list_for_update_analysis = main_page_service.get_list_for_update_analysis(list_links_aft_analysis=list_links_aft_analysis)
+
+            # 03 Обновляем и ждем
+            database_online_service.update_status_in_analysis_db(list_for_update_analysis)
+            logger.debug(f"Waiting {settings.PAUSE_SEC}")
+            time.sleep(settings.PAUSE_SEC)
 
 
-    data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
-    main_page_service = MainPageService(data4parsing=data_for_parsing)
-    list_links_aft_analysis = DataBaseOnlineService(data_for_parsing).get_list_links_from_db()
 
-    file_name_for_html = f"{sport_name}_{data_for_parsing.match_date}.html"
-    if not os.path.exists(file_name_for_html):
-        logger.info("Файл не найден!")
-        main_page_service.save_html_for_online(file_name_for_html)
-    print("*"*88)
-    main_page_service.open_html_for_online(file_name_for_html, list_links_aft_analysis)
+        list_sport_name = []
+        exit()
+
 

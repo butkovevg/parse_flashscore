@@ -103,6 +103,8 @@ class AnalysisDBModel(Base):
     by_position_table = Column(INTEGER, default=0)
     who_win = Column(INTEGER, default=0)
     comment = Column(VARCHAR, default=None)
+    status = Column(VARCHAR, default=None)
+    result = Column(VARCHAR, default=None)
 
 
 if __name__ == "__main__":

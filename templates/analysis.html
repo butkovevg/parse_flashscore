@@ -128,7 +128,7 @@ a:active {
     <tr data-sport_name="{{ match.sport_name }}">
         <td>{{ match.match_time }}</td>
         <td>{{ match.country }} <br>
-            ({{ match.tour }} {{ match.tournament }})</td>
+            ({{ match.tournament }} {{ match.tour }})</td>
 
 
         <!--        TEAM1-->
@@ -165,13 +165,10 @@ a:active {
         <td>{{ match.who_win }}</td>
         <td>
             <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
-                <button>LIVE/Не начался</button>
+                <button>{{ match.status }}</button>
             </a>
-
-
         </td>
-<!--        Будет результат-->
-        <td>{{ match.who_win }}</td>
+        <td>{{ match.result }}</td>
     </tr>
     {% endfor %}
 </table>
