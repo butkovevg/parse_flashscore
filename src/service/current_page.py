@@ -117,7 +117,7 @@ class CurrentPageService:
             self.session.rollback()
 
     def get_current_match(self, link):
-        full_link = f"https://www.flashscorekz.com/match/{link}/#/standings/table/overall"
+        full_link = f"https://www.flashscorekz.com/match/{self.data4parsing.sport_name}/{link}/#/standings/table/overall"
         browser = BrowserService.get_webdriver()
         try:
             browser.get(full_link)
@@ -171,5 +171,5 @@ if __name__ == "__main__":
     day = 0
     data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
     current_page_service = CurrentPageService(data4parsing=data_for_parsing)
-    current_page_service.get_current_match(link="Ic4jMGko")
+    current_page_service.get_current_match(link="23cc7O9t")
 

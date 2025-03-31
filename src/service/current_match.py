@@ -164,35 +164,26 @@ class CurrentMatchService:
         logger.debug("*" * 88)
         return current_db_model
     def get_coefficient(self,link):
-        full_link = f"https://www.flashscorekz.com/match/{self.data4parsing.sport_name}/{link}/#/match-summary/match-summary"
+
         new_hash = "#/match-summary/match-summary"
         self.driver.execute_script(f"window.location.hash = '{new_hash}'")
         time.sleep(5)
         logger.debug("Переключились на второй раздел.")
-
         try:
-            logger.debug(f"COEFFICIENT: browser.get({full_link})")
-            # Поиск всех элементов <span class="cell">
-            cells = self.driver.find_elements("xpath", "//span[contains(@class, 'cell')]")
-
-            # Извлечение текста из первого и третьего элемента
-            if len(cells) >= 3:  # Убедитесь, что найдено достаточно элементов
-                first_value = cells[0].find_element("xpath", ".//span[@class='oddsValueInner']").text
-                third_value = cells[2].find_element("xpath", ".//span[@class='oddsValueInner']").text
-
-                logger.info(f"Первое значение: {first_value}")  # 2.00
-                logger.info(f"Третье значение: {third_value}")  # 3.90
-                return first_value, third_value
-            else:
-                logger.error("Не удалось найти все необходимые элементы.")
-                return 0, 0
-
+            logger.debug(f"COEFFICIENT: browser.get({new_hash})")
+            # Поиск элемента с классом "cell o_1 noOdds" и извлечение текста "2.00"
+            first_element = self.driver.find_element("css selector", "span.cell.o_1.noOdds")
+            first_value = first_element.find_element("css selector", "span.oddsValueInner").text
+            # Поиск элемента с классом "cell o_2 noOdds" и извлечение текста "3.90"
+            third_element = self.driver.find_element("css selector", "span.cell.o_2.noOdds")
+            third_value = third_element.find_element("css selector", "span.oddsValueInner").text
+            logger.info(f"KF {first_value} {third_value}")  # 2.00
+            return first_value, third_value
         except Exception as exc:
             logger.error(f"ERROR {link=}")
             logger.error(str(exc))
             return 0, 0
-        finally:
-            self.driver.quit()
+
 
     def get_tennis_match_model(self, link):
         logger.debug("*" * 88)
