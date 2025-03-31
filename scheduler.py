@@ -15,8 +15,8 @@ from src.service.main_page import MainPageService
 logger = get_logger(__name__)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--day', type=int, default=1)
-parser.add_argument('--start', type=str, default="main")
+parser.add_argument('--day', type=int, default=0)
+parser.add_argument('--start', type=str, default="current")
 parser.add_argument('--week', dest='week', action='store_true')
 parser.add_argument('--no-week', dest='week', action='store_false')
 parser.set_defaults(week=False)
@@ -55,11 +55,11 @@ def main():
             parsing_service = CurrentPageService(data4parsing=data_for_parsing)
             parsing_service.get_list_links_from_db()
 
-    # ANALYSIS
-    logger.debug(f"AnalysisService {day=}")
-    parsing_service = AnalysisService(shift_day=day)
-    parsing_service.main()
-    logger.debug(f"FINISH {day=}")
+    # # ANALYSIS
+    # logger.debug(f"AnalysisService {day=}")
+    # parsing_service = AnalysisService(shift_day=day)
+    # parsing_service.main()
+    # logger.debug(f"FINISH {day=}")
 
 
 if __name__ == "__main__":

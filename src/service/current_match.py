@@ -165,12 +165,16 @@ class CurrentMatchService:
         return current_db_model
     def get_coefficient(self,link):
 
-        new_hash = "#/match-summary/match-summary"
-        self.driver.execute_script(f"window.location.hash = '{new_hash}'")
+        new_fragment = "#/match-summary/match-summary"
+        self.driver.execute_script(f"window.location.hash = '{new_fragment}'")
         time.sleep(5)
+
+        # DELETE
+        full_url = self.driver.current_url
         logger.debug("Переключились на второй раздел.")
+        logger.debug(f"Текущий URL: {full_url}")
+
         try:
-            logger.debug(f"COEFFICIENT: browser.get({new_hash})")
             # Поиск элемента с классом "cell o_1 noOdds" и извлечение текста "2.00"
             first_element = self.driver.find_element("css selector", "span.cell.o_1.noOdds")
             first_value = first_element.find_element("css selector", "span.oddsValueInner").text
@@ -179,8 +183,11 @@ class CurrentMatchService:
             third_value = third_element.find_element("css selector", "span.oddsValueInner").text
             logger.info(f"KF {first_value} {third_value}")  # 2.00
             return first_value, third_value
+        except NoSuchElementException as e:
+            logger.warning(f"NoSuchElementException {full_url=}")
+            return 0, 0
         except Exception as exc:
-            logger.error(f"ERROR {link=}")
+            logger.error(f"ERROR {full_url=}")
             logger.error(str(exc))
             return 0, 0
 
