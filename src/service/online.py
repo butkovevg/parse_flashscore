@@ -1,14 +1,15 @@
 import os
 import time
 
+from sqlalchemy import select, distinct, and_
+
 from src.configs.settings import settings
 from src.model.tables import AnalysisDBModel, CurrentDBModel
+from src.service.database import get_session
 from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
 from src.service.main_page import MainPageService, dct_translate_sport_name_rus_eng
-from sqlalchemy import Table, MetaData, select, distinct, table, column, and_
-from src.service.database import get_session
 
 logger = get_logger(__name__)
 
@@ -105,7 +106,7 @@ class DataBaseOnlineService:
         #     else:
         #         logger.info(f"All link processed {self.data4parsing}")
 
-    def update_status_in_analysis_db(self, list_for_update_analysis):
+    def update_status_in_analysis_db(self, list_for_update_analysis: list):
         try:
             # # # Подготовка данных для массового обновления
             # # update_data = []
@@ -121,9 +122,11 @@ class DataBaseOnlineService:
             for item in list_for_update_analysis:
                 link = item['link']
                 new_status = item['status']
+                result = item['result']
 
                 # Обновление записи по полю link
-                self.session.query(AnalysisDBModel).filter_by(link=link).update({'status': new_status})
+                self.session.query(AnalysisDBModel).filter_by(link=link).update(
+                    {'status': new_status, 'result': result})
 
             # Фиксация изменений
             self.session.commit()
@@ -132,7 +135,6 @@ class DataBaseOnlineService:
         except Exception as e:
             self.session.rollback()  # Откат изменений в случае ошибки
             print(f"Ошибка: {e}")
-
 
 
 if __name__ == "__main__":
@@ -154,7 +156,7 @@ if __name__ == "__main__":
         for rus_sport_name in list_sport_name:
             # eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
             # data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
-            #01 Список ссылок, которые нуждаются в обновлении по видам спорта
+            # 01 Список ссылок, которые нуждаются в обновлении по видам спорта
             database_online_service = DataBaseOnlineService()
             list_links_aft_analysis = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
             logger.debug(f"For {rus_sport_name=} need update links: {list_links_aft_analysis=}")
@@ -164,16 +166,13 @@ if __name__ == "__main__":
             data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
             main_page_service = MainPageService(data4parsing=data_for_parsing)
             # 02 Список, который можно обновить
-            list_for_update_analysis = main_page_service.get_list_for_update_analysis(list_links_aft_analysis=list_links_aft_analysis)
+            list_for_update_analysis = main_page_service.get_list_for_update_analysis(
+                list_links_aft_analysis=list_links_aft_analysis)
 
             # 03 Обновляем и ждем
             database_online_service.update_status_in_analysis_db(list_for_update_analysis)
             logger.debug(f"Waiting {settings.PAUSE_SEC}")
             time.sleep(settings.PAUSE_SEC)
 
-
-
         list_sport_name = []
         exit()
-
-

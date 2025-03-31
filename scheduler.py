@@ -15,8 +15,8 @@ from src.service.main_page import MainPageService
 logger = get_logger(__name__)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--day', type=int, default=0)
-parser.add_argument('--start', type=str, default="current")
+parser.add_argument('--day', type=int, default=1)
+parser.add_argument('--start', type=str, default="main")
 parser.add_argument('--week', dest='week', action='store_true')
 parser.add_argument('--no-week', dest='week', action='store_false')
 parser.set_defaults(week=False)
