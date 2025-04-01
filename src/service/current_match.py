@@ -171,8 +171,7 @@ class CurrentMatchService:
 
         # DELETE
         full_url = self.driver.current_url
-        logger.debug("Переключились на второй раздел.")
-        logger.debug(f"Текущий URL: {full_url}")
+        logger.debug(f"Switched to section: {full_url}")
 
         try:
             # Поиск элемента с классом "cell o_1 noOdds" и извлечение текста "2.00"
@@ -181,10 +180,10 @@ class CurrentMatchService:
             # Поиск элемента с классом "cell o_2 noOdds" и извлечение текста "3.90"
             third_element = self.driver.find_element("css selector", "span.cell.o_2.noOdds")
             third_value = third_element.find_element("css selector", "span.oddsValueInner").text
-            logger.info(f"KF {first_value} {third_value}")  # 2.00
+            logger.debug(f"KF {first_value} {third_value}")  # 2.00
             return first_value, third_value
         except NoSuchElementException as e:
-            logger.warning(f"NoSuchElementException {full_url=}")
+            logger.warning(f"NoSuchElementException for KF {full_url=}")
             return 0, 0
         except Exception as exc:
             logger.error(f"ERROR {full_url=}")

@@ -83,8 +83,8 @@ class MainPageService:
             # Кликаем на следующий день, если day > 0
             while abs(self.data4parsing.shift_day) > 0:
                 # button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Следующий день']")
-                # button_move_day = browser.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
                 button_move_day = browser.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
+                # button_move_day = browser.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
                 if self.data4parsing.shift_day < 0:  # Если отрицательное число
                     self.data4parsing.shift_day += 1
                     button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Предыдущий день']")
@@ -140,6 +140,14 @@ class MainPageService:
             # Поиск по CSS-селектору
             css_selector = f'div.sportName.{self.data4parsing.sport_name}'
             divs_sportname = soup.select(css_selector)
+
+            # # 1. Сохранение HTML-кода в файл
+            # with open("file_name_for_html.html", 'w', encoding='utf-8') as file:
+            #     file.write(page_source)
+            # with open(file_name_for_html, 'r', encoding='utf-8') as file:
+            #     saved_html = file.read()
+
+
             # print(type(divs_sportname))
             # for div in divs_sportname:
             #     print(type(div), div.select('div'))
@@ -168,38 +176,36 @@ class MainPageService:
                     status = match.find('div', class_='event__stage--block')
                     status = status.text.strip() if status else None
 
+                    # Извлечение счета команд
+                    home_score = soup.find('span', class_='event__score--home').text.strip()
+                    away_score = soup.find('span', class_='event__score--away').text.strip()
+                    print(home_score, away_score)
+
+
                     if link in list_links_aft_analysis and status is not None:
 
-
-
-                        #работает только с баскетболом
+                        # работает только с баскетболом
                         list_status = ["Завершен", "Послеовертайма"]
                         if status in list_status:
                             result = 1
-                        else: result = None
-
-
+                        else:
+                            result = None
 
                         # Добавляем данные в список
                         output_list.append({
                             'link': link,
                             'status': status,
-                            'result':result,
+                            'result': result,
                         })
                     else:
                         continue
             logger.debug(f"{len(output_list)} record(s) update")
+            logger.warning(f"{output_list=}")
             browser.quit()
             return output_list
         except Exception as exc:
             logger.error(str(exc))
             return []
-
-
-
-
-
-
 
         # button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Предыдущий день']")
         # # Перебор найденных элементов
@@ -213,11 +219,9 @@ class MainPageService:
         # print(self.list_link)  # Вывод тега <title>
         # print(soup.p.text)  # Вывод текста внутри тега <p>
 
-            # # 1. Сохранение HTML-кода в файл
-            # with open(file_name_for_html, 'w', encoding='utf-8') as file:
-            #     file.write(page_source)
-            # with open(file_name_for_html, 'r', encoding='utf-8') as file:
-            #     saved_html = file.read()
+
+
+
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
     # day = 1
@@ -242,8 +246,6 @@ if __name__ == "__main__":
     day = 5
     data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
     parsing_service = MainPageService(data4parsing=data_for_parsing)
-    # logger.debug(f"MAIN_PAGE {data_for_parsing}")
-    # parsing_service.get_list_link_with_main_page()
-    # parsing_service.insert()
-    parsing_service.list_link = ["A1rHI0i5"]
-    parsing_service.insert()
+
+    list_links_aft_analysis = ["b1wdKc75"]
+    parsing_service.get_list_for_update_analysis(list_links_aft_analysis)

@@ -150,6 +150,7 @@ if __name__ == "__main__":
 
     while True:
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
+        list_sport_name = ["БАСКЕТБОЛ"]
         if len(list_sport_name) == 0:
             logger.info("list_sport_name is empty")
 

@@ -55,7 +55,7 @@ class Setting(BaseSettings):
     SERVER_HOST: str = ""
     SERVER_PORT: int
 
-    PAUSE_SEC: int = 5
+    PAUSE_SEC: int = 10
 
     class Config:
         env_file = PATH_ENV
