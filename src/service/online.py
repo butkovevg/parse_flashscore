@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
     while True:
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
-        list_sport_name = ["БАСКЕТБОЛ"]
+        list_sport_name = ["БАСКЕТБОЛ"]  # ToDo: MOCK
         if len(list_sport_name) == 0:
             logger.info("list_sport_name is empty")
 
@@ -169,6 +169,9 @@ if __name__ == "__main__":
             # 02 Список, который можно обновить
             list_for_update_analysis = main_page_service.get_list_for_update_analysis(
                 list_links_aft_analysis=list_links_aft_analysis)
+            for dct_for_update_analysis in list_for_update_analysis:
+                logger.debug(f"{eng_sport_name}: {dct_for_update_analysis}")
+
 
             # 03 Обновляем и ждем
             database_online_service.update_status_in_analysis_db(list_for_update_analysis)

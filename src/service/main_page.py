@@ -83,7 +83,8 @@ class MainPageService:
             # Кликаем на следующий день, если day > 0
             while abs(self.data4parsing.shift_day) > 0:
                 # button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Следующий день']")
-                button_move_day = browser.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
+                button_move_day = browser.find_element(By.XPATH,
+                                                       "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
                 # button_move_day = browser.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
                 if self.data4parsing.shift_day < 0:  # Если отрицательное число
                     self.data4parsing.shift_day += 1
@@ -144,9 +145,10 @@ class MainPageService:
             # # 1. Сохранение HTML-кода в файл
             # with open("file_name_for_html.html", 'w', encoding='utf-8') as file:
             #     file.write(page_source)
+            #     logger.info("Save in file")
             # with open(file_name_for_html, 'r', encoding='utf-8') as file:
+            #     logger.info("Open file")
             #     saved_html = file.read()
-
 
             # print(type(divs_sportname))
             # for div in divs_sportname:
@@ -164,7 +166,8 @@ class MainPageService:
                 # Находим все матчи внутри текущего блока
                 matches = div.find_all('div', class_='event__match')
 
-                for match in matches:
+                for index in range(0, len(matches), 2):
+                    match = matches[index]
                     # Извлекаем id (если существует)
                     link = match.get('id', None)
                     if link is not None:
@@ -176,26 +179,31 @@ class MainPageService:
                     status = match.find('div', class_='event__stage--block')
                     status = status.text.strip() if status else None
 
-                    # Извлечение счета команд
-                    home_score = soup.find('span', class_='event__score--home').text.strip()
-                    away_score = soup.find('span', class_='event__score--away').text.strip()
-                    print(home_score, away_score)
+                    scores = soup.find_all('span', class_='event__score')
+                    try:
+                        res1 = scores[index].text.strip()
+                        res2 = scores[index + 1].text.strip()
+                        print(link, res1, res2)
+                        res = f"{res1}:{res2}"
+                    except Exception as exc:
+                        print("ERR", link, exc)
+                        res = "-:-"
 
 
-                    if link in list_links_aft_analysis and status is not None:
+                    if link in list_links_aft_analysis:
 
-                        # работает только с баскетболом
-                        list_status = ["Завершен", "Послеовертайма"]
-                        if status in list_status:
-                            result = 1
-                        else:
-                            result = None
+                        # # работает только с баскетболом
+                        # list_status = ["Завершен", "Послеовертайма"]
+                        # if status in list_status:
+                        #     result = 1
+                        # else:
+                        #     result = None
 
                         # Добавляем данные в список
                         output_list.append({
                             'link': link,
                             'status': status,
-                            'result': result,
+                            'result': res,
                         })
                     else:
                         continue
@@ -218,8 +226,6 @@ class MainPageService:
         # self.list_link = [link.replace(delimiter, "") for link in ids_filtered]
         # print(self.list_link)  # Вывод тега <title>
         # print(soup.p.text)  # Вывод текста внутри тега <p>
-
-
 
 
 if __name__ == "__main__":
