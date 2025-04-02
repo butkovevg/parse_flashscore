@@ -40,22 +40,27 @@ th, td {
    border: 1px solid black;
 }
 tr[data-sport_name='ВОЛЕЙБОЛ'] {
-   background-color: rgba(0, 69, 255, 0.5);
+   background-color: rgba(0, 69, 255, 0.4);
    border: 1px solid black;
    border-radius: 99%;
 }
 tr[data-sport_name='БАСКЕТБОЛ'] {
-   background-color: rgba(255, 182, 13, 0.5);
+   background-color: rgba(255, 182, 13, 0.4);
    border: 1px solid black;
    border-radius: 10%;
 }
 tr[data-sport_name='ГАНДБОЛ'] {
-   background-color: rgba(194,194,194, 0.5);
+   background-color: rgba(194,194,194, 0.4);
+   border: 1px solid black;
+   border-radius: 50%;
+}
+tr[data-sport_name='ТЕННИС'] {
+   background-color: rgba(93,227,187, 0.4);
    border: 1px solid black;
    border-radius: 50%;
 }
 tr[data-sport_name='ФУТБОЛ'] {
-   background-color: rgba(2,253,38, 0.5);
+   background-color: rgba(2,253,38, 0.4);
    border: 1px solid black;
    border-radius: 50%;
 }
@@ -130,27 +135,50 @@ a:active {
     {% for match in matches %}
     <tr data-sport_name="{{ match.sport_name }}">
         <td>{{ match.match_time }}</td>
-        <td>{{ match.country }} <br>
-            ({{ match.tournament }} {{ match.tour }})
+
+        <!--COUNTRY(TOURNAMENT)-->
+        <td>
+            <a href="https://betcity.ru/ru/live/" target="_blank" rel="noopener noreferrer">
+            {{ match.country }} <br>
+            ({{ match.tournament }} {{ match.tour }})</a>
         </td>
 
 
         <!--        TEAM1-->
         {% if match.who_must_win == 1 %}
-        <td>{{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})✔</td>
+        <td>
+            <a href="https://betcity.ru/ru/search?q={{ match.team1 }}" target="_blank" rel="noopener noreferrer">
+            {{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})✔</a>
+        </td>
         {% else %}
-        <td>{{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})❌</td>
+        <td>
+            <a href="https://betcity.ru/ru/search?q={{ match.team1 }}" target="_blank" rel="noopener noreferrer">
+            {{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})❌</a>
+        </td>
         {% endif %}
 
 
         <!--        TEAM2-->
         {% if match.who_must_win == 2 %}
-        <td>{{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})✔</td>
-        {% else %}
-        <td>{{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})❌</td>
+            <td>
+                <a href="https://betcity.ru/ru/search?q={{ match.team2 }}" target="_blank" rel="noopener noreferrer">
+                {{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})✔</a>
+            </td>
+            {% else %}
+            <td>
+                <a href="https://betcity.ru/ru/search?q={{ match.team2 }}" target="_blank" rel="noopener noreferrer">
+                {{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})❌</a>
+            </td>
         {% endif %}
-        <td>{{ match.kf1 }}</td>
-        <td>{{ match.kf2 }}</td>
+
+        <!--kf-->
+        <td>
+            <a href="https://betcity.ru/ru/search?q={{ match.team1[:4] }}" target="_blank" rel="noopener noreferrer">{{ match.kf1 }}</a>
+        </td>
+        <td>
+            <a href="https://betcity.ru/ru/search?q={{ match.team2[:4] }}" target="_blank" rel="noopener noreferrer">{{ match.kf2 }}</a>
+        </td>
+
         <td>{{ match.by_coefficient }}/{{ match.by_position_table }}/{{ match.by_series }}</td>
 
         <!--who_now_win-->
@@ -168,7 +196,7 @@ a:active {
         {% if match.who_now_win is none %}
         <td>
             <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
-                <button>{{ match.status }}({{ match.result }})</button>
+                <button>{{ match.status | default("") }}({{ match.result }})</button>
             </a>
         </td>
         {% elif match.who_now_win == match.who_must_win %}

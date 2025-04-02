@@ -1,37 +1,44 @@
 <style>
-    /* Базовые стили таблицы */
     table {
-        border-collapse: collapse;
         width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
     }
 
     th, td {
+        padding: 10px;
         text-align: center;
-        padding: 8px;
-        border: 1px solid black;
+        border: 1px solid #ddd;
     }
 
-    /* Стиль для "шахматных" ячеек */
-    .dark-cell {
-        background-color: lightgray;
-    }
-
-    /* Дополнительный стиль для заголовков */
     th {
-        background-color: white;
-        position: sticky;
-        top: 0;
+        background-color: #4CAF50; /* Зеленый фон для заголовков */
+        color: white;
     }
+
+    td {
+        background: linear-gradient(to bottom right, #f0f8ff, #e6e6fa); /* Градиент для ячеек */
+    }
+
 </style>
+
 <table>
     <tr>
-        <th>who_must_win {{ who_must_win }}</th>
-        <th>who_now_win {{ who_now_win }}</th>
+        <th>Игрок</th>
+        <th>Геймы</th>
+        <th>Эйсы</th>
+        <th>Двойные ошибки</th>
     </tr>
-    {% for row in range(10) %}
     <tr>
-        <td class="{% if row % 2 == 0 %}dark-cell{% endif %}">{{ who_now_win }}</td>
-        <td>{{ who_now_win }}</td>
+        <td>Игрок 1</td>
+        <td>6-4, 7-6</td>
+        <td>12</td>
+        <td>3</td>
     </tr>
-    {% endfor %}
+    <tr>
+        <td>Игрок 2</td>
+        <td>4-6, 6-7</td>
+        <td>8</td>
+        <td>5</td>
+    </tr>
 </table>

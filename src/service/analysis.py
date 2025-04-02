@@ -140,13 +140,13 @@ class AnalysisService:
     def get_list_from_db(self):
         try:
             match_date = HelperService.get_date_with_point_between_day(self.shift_day)
-            logger.warning(f"111 {match_date=}")
+            logger.debug(f"get_list_from_db {match_date=}")
             # запрос для всех записей для вида спорта по дате
             query_all_record = (
                 self.session
                 .query(CurrentDBModel)
                 .filter_by(match_date=match_date)
-                .filter(CurrentDBModel.position1 != 0)
+                # .filter(CurrentDBModel.position1 != 0)
             )
 
             # Необработанных записей для вида спорта по дате
