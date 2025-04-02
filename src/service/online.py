@@ -1,7 +1,6 @@
 import os
-import time
 
-from sqlalchemy import select, distinct, and_
+from sqlalchemy import select, distinct, and_, or_
 
 from src.configs.settings import settings
 from src.model.tables import AnalysisDBModel, CurrentDBModel
@@ -9,7 +8,7 @@ from src.service.database import get_session
 from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
-from src.service.main_page import MainPageService, dct_translate_sport_name_rus_eng
+from src.service.main_page import dct_translate_sport_name_rus_eng
 
 logger = get_logger(__name__)
 
@@ -26,6 +25,10 @@ class DataBaseOnlineService:
                 .join(CurrentDBModel, CurrentDBModel.link == AnalysisDBModel.link, isouter=True)  # LEFT JOIN
                 .where(CurrentDBModel.sport_name == rus_sport_name)
                 .where(CurrentDBModel.match_date == match_date)
+                .where(or_(
+                    AnalysisDBModel.status.is_(None),
+                    AnalysisDBModel.status.notin_(('Завершен', 'Будет доигран позже'))
+                ))
             )
             # Выполнение запроса
             results = self.session.execute(query).scalars().all()
@@ -158,7 +161,6 @@ if __name__ == "__main__":
             HelperService.pause_until_midnight()
             break
 
-
         for rus_sport_name in list_sport_name:
             eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
             database_online_service = DataBaseOnlineService()
@@ -181,4 +183,4 @@ if __name__ == "__main__":
         #     time.sleep(settings.PAUSE_SEC)
         #
         # list_sport_name = []
-        # exit()
+        exit()
