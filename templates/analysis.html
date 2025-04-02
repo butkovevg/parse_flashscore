@@ -92,7 +92,9 @@ a:active {
 
 <head>
     <link rel="icon" href="/static/ball.ico" type="image/x-icon">
-    <!-- Другие мета-теги и ссылки -->
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="60"> <!-- Обновление каждые 60 секунд -->
+    <title>Автоматическое обновление</title>
 </head>
 <table>
     <tr>
@@ -104,8 +106,7 @@ a:active {
         <th>KF2</th>
 
         <th>kf,table,series</th>
-        <th>who_must_win</th>
-        <th>who_now_win</th>
+        <th>who_must_win/<br>who_now_win</th>
         <th>
             <div style="display: flex; justify-content: center;">
                 <button id="prevButton" onclick="navigateToValue({{ day }}-1)" style="display: inline-block;"> <<<
@@ -151,15 +152,15 @@ a:active {
         <td>{{ match.kf1 }}</td>
         <td>{{ match.kf2 }}</td>
         <td>{{ match.by_coefficient }}/{{ match.by_position_table }}/{{ match.by_series }}</td>
-        <td>{{ match.who_must_win }}</td>
+
         <!--who_now_win-->
         {% if match.who_now_win is none %}
-        <td>{{ match.who_now_win }}</td>
+        <td>{{ match.who_must_win }}/{{ match.who_now_win }}</td>
         {% elif match.who_now_win == match.who_must_win %}
         <!--        <td class="green-cell">{{ match.who_now_win }}</td>-->
-        <td>{{ match.who_now_win }}</td>
+        <td>{{ match.who_must_win }}/{{ match.who_now_win }}</td>
         {% else %}
-        <td class="red-cell">{{ match.who_now_win }}</td>
+        <td class="red-cell">{{ match.who_must_win }}/{{ match.who_now_win }}</td>
         {% endif %}
 
 

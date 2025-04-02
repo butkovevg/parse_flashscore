@@ -136,11 +136,11 @@ class DataBaseOnlineService:
 
             # Фиксация изменений
             self.session.commit()
-            print("Обновление завершено.")
+            logger.debug("Обновление завершено.")
 
         except Exception as e:
             self.session.rollback()  # Откат изменений в случае ошибки
-            print(f"Ошибка: {e}")
+            logger.error(f"Ошибка: {e}")
 
 
 if __name__ == "__main__":
