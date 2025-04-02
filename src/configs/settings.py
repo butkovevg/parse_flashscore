@@ -29,7 +29,7 @@ class Setting(BaseSettings):
     SCHEME_NAME: str
     TABLE_NAME_MAIN: str = "main3"
     TABLE_NAME_CURRENT: str = "current3"
-    TABLE_NAME_ANALYSIS: str = "analysis7"
+    TABLE_NAME_ANALYSIS: str = "analysis9"
     DB_ECHO: bool = True  # logging database
 
     @property

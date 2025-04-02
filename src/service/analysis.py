@@ -87,7 +87,7 @@ class AnalysisService:
                 by_coefficient=0,
                 by_series=0,
                 by_position_table=0,
-                who_win=0,
+                who_must_win=0,
             )
             self.is_selection_by_coefficient(current_model)
             self.is_selection_by_position_table(current_model)
@@ -100,14 +100,14 @@ class AnalysisService:
 
 
     def is_save(self):
-        set_who_win = {self.analysis_model.by_coefficient, self.analysis_model.by_series, self.analysis_model.by_position_table}
-        set_who_win.discard(0)
-        if len(set_who_win) == 0:
+        set_who_must_win = {self.analysis_model.by_coefficient, self.analysis_model.by_series, self.analysis_model.by_position_table}
+        set_who_must_win.discard(0)
+        if len(set_who_must_win) == 0:
             return False
-        elif len(set_who_win) == 1:
-            self.analysis_model.who_win = set_who_win.pop()
+        elif len(set_who_must_win) == 1:
+            self.analysis_model.who_must_win = set_who_must_win.pop()
         else:
-            self.analysis_model.who_win = 3
+            self.analysis_model.who_must_win = 3
             self.analysis_model.comment = "ERR different "
             logger.error(f"{self.analysis_model.link}: different: {self.analysis_model.by_coefficient}/{self.analysis_model.by_series}/{self.analysis_model.by_position_table}")
         return True
