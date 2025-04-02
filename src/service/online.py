@@ -128,10 +128,11 @@ class DataBaseOnlineService:
                 link = item['link']
                 new_status = item['status']
                 result = item['result']
+                who_now_win = item['who_now_win']
 
                 # Обновление записи по полю link
                 self.session.query(AnalysisDBModel).filter_by(link=link).update(
-                    {'status': new_status, 'result': result})
+                    {'status': new_status, 'result': result, 'who_now_win': who_now_win})
 
             # Фиксация изменений
             self.session.commit()
@@ -156,7 +157,7 @@ if __name__ == "__main__":
     while True:
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
         list_sport_name = ["ФУТБОЛ"]  # ToDo: MOCK
-        # list_sport_name = ["БАСКЕТБОЛ"]  # ToDo: MOCK MXcYQT2d
+        list_sport_name = ["БАСКЕТБОЛ"]  # ToDo: MOCK MXcYQT2d
 
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
             logger.info("list_sport_name is empty")
@@ -183,5 +184,4 @@ if __name__ == "__main__":
             logger.debug(f"Waiting {settings.PAUSE_SEC}")
             time.sleep(settings.PAUSE_SEC)
 
-        list_sport_name = []
         exit()

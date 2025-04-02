@@ -67,3 +67,36 @@ class HelperService:
         logger.info(f"Приостановка программы на {sleep_duration:.0f} секунд до полуночи...")
         time.sleep(sleep_duration)
 
+    @staticmethod
+    def get_who_now_win(result: str):
+        """Логика описана в /model/tables/AnalysisDB"""
+        if "-:-" in result:
+            return None
+        try:
+            list_result = result.split(":")
+            if len(list_result) != 2:
+                logger.warning(f"No 2 result for {result}:{list_result}")
+            res_team1 = int(list_result[0])
+            res_team2 = int(list_result[1])
+            if res_team1 > res_team2:
+                return 1
+            elif res_team1 < res_team2:
+                return 2
+            elif res_team1 == res_team2:
+                return 3
+            else:  # Такого не может быть)))
+                logger.warning(f"Look case {result}")
+                return 4
+        except ValueError:
+            logger.error(f"result format INT:INT")
+        except Exception as exc:
+            logger.error(f"New err for {result}")
+            logger.error(exc)
+            return None
+
+
+if __name__ == "__main__":
+    import os
+
+    logger.info(f'Initializing test {os.path.basename(__file__)}')
+    logger.info(HelperService.get_who_now_win(result="19:"))

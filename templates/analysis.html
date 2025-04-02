@@ -95,12 +95,14 @@ a:active {
         <th>COUNTRY(TOURNAMENT)</th>
         <th>TEAM №1</th>
         <th>TEAM №2</th>
-        <th style="width: 1%;"><a href="/favorites/{{ day }}/"> FAVORITES?</th>
         <th>KF1</th>
         <th>KF2</th>
 
         <th>kf,table,series</th>
-        <th>who win</th>
+        <th>who_must_win</th>
+        <th>who_now_win</th>
+        <!--        RESULT-->
+        <th>RESULT</th>
 
         <th>
             <div style="display: flex; justify-content: center;">
@@ -119,8 +121,7 @@ a:active {
                 </button>
             </div>
         </th>
-<!--        RESULT-->
-        <th>RESULT</th>
+
 
 
     </tr>
@@ -132,7 +133,7 @@ a:active {
 
 
         <!--        TEAM1-->
-        {% if match.who_win == 1 %}
+        {% if match.who_must_win == 1 %}
         <td>{{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})✔</td>
         {% else %}
         <td>{{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})❌</td>
@@ -140,35 +141,23 @@ a:active {
 
 
         <!--        TEAM2-->
-        {% if match.who_win == 2 %}
+        {% if match.who_must_win == 2 %}
         <td>{{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})✔</td>
         {% else %}
         <td>{{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})❌</td>
         {% endif %}
-
-        <td>
-            {% if match.is_favorites %}
-            <button id="FavoritesButton{{ match.analysis_id }}" style="display: block; width: 100%; height: 100%;"
-                    class="red-button" onclick="toggleStatus({{ match.analysis_id }})">
-                <img src="/static/heart.svg" alt="Image description" style="width: 50%; height: 50%;">
-            </button>
-            {% else %}
-            <button id="FavoritesButton{{ match.analysis_id }}" style="display: block; width: 100%; height: 100%;"
-                    class="green-button" onclick="toggleStatus({{ match.analysis_id }})">
-                <img src="/static/heart.svg" alt="Image description" style="width: 50%; height: 50%;">
-            </button>
-            {% endif %}
-        </td>
         <td>{{ match.kf1 }}</td>
         <td>{{ match.kf2 }}</td>
         <td>{{ match.by_coefficient }}/{{ match.by_position_table }}/{{ match.by_series }}</td>
-        <td>{{ match.who_win }}</td>
+        <td>{{ match.who_must_win }}</td>
+        <td>{{ match.who_now_win }}</td>
+        <td>{{ match.result }}</td>
         <td>
             <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
                 <button>{{ match.status }}</button>
             </a>
         </td>
-        <td>{{ match.result }}</td>
+
     </tr>
     {% endfor %}
 </table>

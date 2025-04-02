@@ -10,6 +10,7 @@ from src.configs.settings import settings
 from src.model.tables import MainDBModel
 from src.service.browser import BrowserService
 from src.service.database import get_session
+from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
 
@@ -197,10 +198,13 @@ class MainPageService:
 
                     if link in list_links_aft_analysis:
                         # Добавляем данные в список
+                        who_now_win = HelperService.get_who_now_win(res)
+                        logger.debug(f"{who_now_win=}")
                         output_list.append({
                             'link': link,
                             'status': status,
                             'result': res,
+                            'who_now_win': who_now_win,
                         })
                         logger.info(f"{link} {status=} {res=}")
                     else:
