@@ -28,6 +28,7 @@ class CurrentPageService:
             translate_sport_name = dict_link[self.data4parsing.sport_name]["sport_name"]
             en_sport_name = self.data4parsing.sport_name
             logger.warning(f"{en_sport_name}")
+
             # запрос для всех записей для вида спорта по дате
             logger.warning(f"{self.data4parsing.match_date=}")
             logger.warning(f"{translate_sport_name=}")
@@ -40,11 +41,10 @@ class CurrentPageService:
 
             # Необработанных записей для вида спорта по дате
             query_unprocessed_record = query_all_record.filter_by(status=None)
-
             len_all_record = query_all_record.count()
             len_unprocessed_record = query_unprocessed_record.count()
-
             logger.debug(f"{len_unprocessed_record=}/{len_all_record=}")
+
             if len_all_record == 0:
                 logger.info(f"NO LINK  {self.data4parsing.sport_name} {self.data4parsing.match_date}")
             elif len_unprocessed_record > 0:
@@ -56,10 +56,8 @@ class CurrentPageService:
                     unprocessed_record = unprocessed_records[index_record]
                     logger.info(
                         f"process {unprocessed_record}({en_sport_name}): {index_record + 1}/{len_unprocessed_record} ")
-                    if self.data4parsing.sport_name == "tennis":
-                        response = self.get_tennis_match(link=unprocessed_record.link)
-                    else:
-                        response = self.get_current_match(link=unprocessed_record.link)
+
+                    response = self.get_current_match(link=unprocessed_record.link)
 
                     if response.status == StatusModel.SUCCESS:
                         self.update(main_db_model=unprocessed_record, status=True)
