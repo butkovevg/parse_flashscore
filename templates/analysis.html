@@ -81,10 +81,15 @@ a:hover {
 /* Цвет активной ссылки */
 a:active {
     color: black; /* Замените на желаемый цвет */
+}
 
+.red-cell {background-color: red;}
+.green-cell {background-color: green;}
 
 
 </style>
+
+
 <head>
     <link rel="icon" href="/static/ball.ico" type="image/x-icon">
     <!-- Другие мета-теги и ссылки -->
@@ -120,13 +125,13 @@ a:active {
         </th>
 
 
-
     </tr>
     {% for match in matches %}
     <tr data-sport_name="{{ match.sport_name }}">
         <td>{{ match.match_time }}</td>
         <td>{{ match.country }} <br>
-            ({{ match.tournament }} {{ match.tour }})</td>
+            ({{ match.tournament }} {{ match.tour }})
+        </td>
 
 
         <!--        TEAM1-->
@@ -147,13 +152,39 @@ a:active {
         <td>{{ match.kf2 }}</td>
         <td>{{ match.by_coefficient }}/{{ match.by_position_table }}/{{ match.by_series }}</td>
         <td>{{ match.who_must_win }}</td>
+        <!--who_now_win-->
+        {% if match.who_now_win is none %}
         <td>{{ match.who_now_win }}</td>
+        {% elif match.who_now_win == match.who_must_win %}
+        <!--        <td class="green-cell">{{ match.who_now_win }}</td>-->
+        <td>{{ match.who_now_win }}</td>
+        {% else %}
+        <td class="red-cell">{{ match.who_now_win }}</td>
+        {% endif %}
+
+
+        <!--STATUS(RESULT)-->
+        {% if match.who_now_win is none %}
         <td>
             <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
                 <button>{{ match.status }}({{ match.result }})</button>
             </a>
         </td>
+        {% elif match.who_now_win == match.who_must_win %}
+        <td>
+            <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
+                <button>{{ match.status }}({{ match.result }})</button>
+            </a>
+        </td>
+        {% else %}
+        <td class="red-cell">
+            <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
+                <button>{{ match.status }}({{ match.result }})</button>
+            </a>
+        </td>
 
+
+        {% endif %}
     </tr>
     {% endfor %}
 </table>
@@ -193,6 +224,8 @@ function toggleStatus(id) {
 function navigateToValue(offset) {
  window.location.href = `/analysis/${offset}/`;
 }
+
+
 
 
 </script>

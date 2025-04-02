@@ -1,0 +1,37 @@
+<style>
+    /* Базовые стили таблицы */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: center;
+        padding: 8px;
+        border: 1px solid black;
+    }
+
+    /* Стиль для "шахматных" ячеек */
+    .dark-cell {
+        background-color: lightgray;
+    }
+
+    /* Дополнительный стиль для заголовков */
+    th {
+        background-color: white;
+        position: sticky;
+        top: 0;
+    }
+</style>
+<table>
+    <tr>
+        <th>who_must_win {{ who_must_win }}</th>
+        <th>who_now_win {{ who_now_win }}</th>
+    </tr>
+    {% for row in range(10) %}
+    <tr>
+        <td class="{% if row % 2 == 0 %}dark-cell{% endif %}">{{ who_now_win }}</td>
+        <td>{{ who_now_win }}</td>
+    </tr>
+    {% endfor %}
+</table>

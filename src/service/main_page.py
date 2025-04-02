@@ -89,8 +89,7 @@ class MainPageService:
             # Кликаем на следующий день, если day > 0
             while abs(self.data4parsing.shift_day) > 0:
                 # button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Следующий день']")
-                button_move_day = browser.find_element(By.XPATH,
-                                                       "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
+                button_move_day = browser.find_element(By.XPATH,   "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
                 # button_move_day = browser.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
                 if self.data4parsing.shift_day < 0:  # Если отрицательное число
                     self.data4parsing.shift_day += 1
