@@ -101,9 +101,6 @@ a:active {
         <th>kf,table,series</th>
         <th>who_must_win</th>
         <th>who_now_win</th>
-        <!--        RESULT-->
-        <th>RESULT</th>
-
         <th>
             <div style="display: flex; justify-content: center;">
                 <button id="prevButton" onclick="navigateToValue({{ day }}-1)" style="display: inline-block;"> <<<
@@ -151,10 +148,9 @@ a:active {
         <td>{{ match.by_coefficient }}/{{ match.by_position_table }}/{{ match.by_series }}</td>
         <td>{{ match.who_must_win }}</td>
         <td>{{ match.who_now_win }}</td>
-        <td>{{ match.result }}</td>
         <td>
             <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
-                <button>{{ match.status }}</button>
+                <button>{{ match.status }}({{ match.result }})</button>
             </a>
         </td>
 
