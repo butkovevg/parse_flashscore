@@ -151,13 +151,11 @@ if __name__ == "__main__":
     while True:
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
         list_sport_name = ["БАСКЕТБОЛ"]  # ToDo: MOCK
+        list_sport_name = ["ФУТБОЛ"]  # ToDo: MOCK
         if len(list_sport_name) == 0:
             logger.info("list_sport_name is empty")
 
         for rus_sport_name in list_sport_name:
-            # eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
-            # data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
-            # 01 Список ссылок, которые нуждаются в обновлении по видам спорта
             database_online_service = DataBaseOnlineService()
             list_links_aft_analysis = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
             logger.debug(f"For {rus_sport_name=} need update links: {list_links_aft_analysis=}")

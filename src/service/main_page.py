@@ -165,8 +165,8 @@ class MainPageService:
             for div in divs_sportname:
                 # Находим все матчи внутри текущего блока
                 matches = div.find_all('div', class_='event__match')
-
-                for index in range(0, len(matches), 2):
+                # for match in matches:
+                for index in range(0, len(matches)):
                     match = matches[index]
                     # Извлекаем id (если существует)
                     link = match.get('id', None)
@@ -181,14 +181,13 @@ class MainPageService:
 
                     scores = soup.find_all('span', class_='event__score')
                     try:
-                        res1 = scores[index].text.strip()
-                        res2 = scores[index + 1].text.strip()
+                        res1 = scores[index * 2].text.strip()
+                        res2 = scores[index * 2 + 1].text.strip()
                         print(link, res1, res2)
                         res = f"{res1}:{res2}"
                     except Exception as exc:
                         print("ERR", link, exc)
                         res = "-:-"
-
 
                     if link in list_links_aft_analysis:
 
