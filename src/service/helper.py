@@ -1,4 +1,5 @@
 import datetime
+import time
 from typing import List, Any
 
 from src.service.logger_handlers import get_logger
@@ -16,7 +17,7 @@ class HelperService:
         """
         current_date = datetime.date.today()
         new_date = current_date + datetime.timedelta(days=day)
-        logger.debug(f"get_new_date({day=}): return {new_date}")
+        # logger.debug(f"get_new_date({day=}): return {new_date}")
         return new_date
 
     @staticmethod
@@ -53,3 +54,16 @@ class HelperService:
             return lst[index]
         except IndexError:
             return default_value
+
+    @staticmethod
+    def pause_until_midnight():
+        # Текущее время
+        now = datetime.now()
+        # Время полуночи следующего дня
+        midnight = (now + datetime.timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        # Разница между текущим временем и полуночью
+        sleep_duration = (midnight - now).total_seconds()
+        # Приостановка программы
+        logger.info(f"Приостановка программы на {sleep_duration:.0f} секунд до полуночи...")
+        time.sleep(sleep_duration)
+

@@ -51,6 +51,7 @@ class DataBaseOnlineService:
             )
             # Выполнение запроса
             results = self.session.execute(query).scalars().all()
+            logger.info(f"Online update sports: {results}")
             return results
 
         except Exception as exc:
@@ -150,31 +151,34 @@ if __name__ == "__main__":
 
     while True:
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
-        list_sport_name = ["БАСКЕТБОЛ"]  # ToDo: MOCK
         list_sport_name = ["ФУТБОЛ"]  # ToDo: MOCK
+        list_sport_name = ["БАСКЕТБОЛ"]  # ToDo: MOCK MXcYQT2d
         if len(list_sport_name) == 0:
             logger.info("list_sport_name is empty")
+            HelperService.pause_until_midnight()
+            break
+
 
         for rus_sport_name in list_sport_name:
+            eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
             database_online_service = DataBaseOnlineService()
             list_links_aft_analysis = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
-            logger.debug(f"For {rus_sport_name=} need update links: {list_links_aft_analysis=}")
+            logger.info(f"For {eng_sport_name} need update links: {list_links_aft_analysis}")
 
-            # 02 Запрос по виду спорта для обновления
-            eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
-            data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
-            main_page_service = MainPageService(data4parsing=data_for_parsing)
-            # 02 Список, который можно обновить
-            list_for_update_analysis = main_page_service.get_list_for_update_analysis(
-                list_links_aft_analysis=list_links_aft_analysis)
-            for dct_for_update_analysis in list_for_update_analysis:
-                logger.debug(f"{eng_sport_name}: {dct_for_update_analysis}")
-
-
-            # 03 Обновляем и ждем
-            database_online_service.update_status_in_analysis_db(list_for_update_analysis)
-            logger.debug(f"Waiting {settings.PAUSE_SEC}")
-            time.sleep(settings.PAUSE_SEC)
-
-        list_sport_name = []
-        exit()
+        #     # 02 Запрос по виду спорта для обновления
+        #     data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
+        #     main_page_service = MainPageService(data4parsing=data_for_parsing)
+        #     # 02 Список, который можно обновить
+        #     list_for_update_analysis = main_page_service.get_list_for_update_analysis(
+        #         list_links_aft_analysis=list_links_aft_analysis)
+        #     for dct_for_update_analysis in list_for_update_analysis:
+        #         logger.debug(f"{eng_sport_name}: {dct_for_update_analysis}")
+        #
+        #
+        #     # 03 Обновляем и ждем
+        #     database_online_service.update_status_in_analysis_db(list_for_update_analysis)
+        #     logger.debug(f"Waiting {settings.PAUSE_SEC}")
+        #     time.sleep(settings.PAUSE_SEC)
+        #
+        # list_sport_name = []
+        # exit()

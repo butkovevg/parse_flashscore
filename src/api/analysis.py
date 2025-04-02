@@ -54,9 +54,13 @@ async def update_favorites(analysis_id: int):
 async def get_value(request: Request, day: int):
     service = InfoAnalysisDBService(day)
     matches = service.get_match_today()
-    # return templates.TemplateResponse("analysis.html", {"request": request, "matches": matches, "day": day})
-    return matches
+    return templates.TemplateResponse("analysis.html", {"request": request, "matches": matches, "day": day})
 
+@router.get("/time/{day}/json")
+async def get_value(request: Request, day: int):
+    service = InfoAnalysisDBService(day)
+    matches = service.get_match_today()
+    return matches
 
 @router.get("/{day}/")
 async def get_value(request: Request, day: int = 0):

@@ -23,6 +23,7 @@ dict_link = {
         "points": 8,
         "series": 9,
         "sport_name": "ФУТБОЛ",
+        "sportName": "soccer",  # Для онлайн  счета и статуса матча
     },
     "volleyball": {
         "link": "https://www.flashscorekz.com/volleyball/",
@@ -31,6 +32,7 @@ dict_link = {
         "points": 6,
         "series": 7,
         "sport_name": "ВОЛЕЙБОЛ",
+        "sportName": "volleyball",  # Для онлайн  счета и статуса матча
     },
     "basketball": {
         "link": "https://www.flashscorekz.com/basketball/",
@@ -39,6 +41,7 @@ dict_link = {
         "points": 6,
         "series": 7,
         "sport_name": "БАСКЕТБОЛ",
+        "sportName": "basketball",  # Для онлайн  счета и статуса матча
     },
     "handball": {
         "link": "https://www.flashscorekz.com/handball/",
@@ -47,6 +50,7 @@ dict_link = {
         "points": 6,
         "series": 7,
         "sport_name": "ГАНДБОЛ",
+        "sportName": "handball",  # Для онлайн  счета и статуса матча
     },
     "tennis": {
         "link": "https://www.flashscorekz.com/tennis/",
@@ -55,6 +59,7 @@ dict_link = {
         "points": 6,
         "series": 7,
         "sport_name": "ТЕННИС",
+        "sportName": "tennis",  # Для онлайн  счета и статуса матча
     },
 }
 dct_translate_sport_name_rus_eng = {
@@ -139,7 +144,8 @@ class MainPageService:
             delimiter = dict_link.get(self.data4parsing.sport_name).get("delimiter")
 
             # Поиск по CSS-селектору
-            css_selector = f'div.sportName.{self.data4parsing.sport_name}'
+            sportName = dict_link[self.data4parsing.sport_name]['sportName']
+            css_selector = f'div.sportName.{sportName}'
             divs_sportname = soup.select(css_selector)
 
             # # 1. Сохранение HTML-кода в файл
@@ -183,31 +189,24 @@ class MainPageService:
                     try:
                         res1 = scores[index * 2].text.strip()
                         res2 = scores[index * 2 + 1].text.strip()
-                        print(link, res1, res2)
                         res = f"{res1}:{res2}"
                     except Exception as exc:
                         print("ERR", link, exc)
-                        res = "-:-"
+                        res = "Error -:-"
+
 
                     if link in list_links_aft_analysis:
-
-                        # # работает только с баскетболом
-                        # list_status = ["Завершен", "Послеовертайма"]
-                        # if status in list_status:
-                        #     result = 1
-                        # else:
-                        #     result = None
-
                         # Добавляем данные в список
                         output_list.append({
                             'link': link,
                             'status': status,
                             'result': res,
                         })
+                        logger.info(f"{link} {status=} {res=}")
                     else:
-                        continue
-            logger.debug(f"{len(output_list)} record(s) update")
-            logger.warning(f"{output_list=}")
+                        logger.debug(f"{link} {status=} {res=}")
+            logger.info(f"{len(output_list)} record(s) update")
+            logger.debug(f"{output_list=}")
             browser.quit()
             return output_list
         except Exception as exc:
