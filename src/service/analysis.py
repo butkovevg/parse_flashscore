@@ -75,12 +75,18 @@ class AnalysisService:
                 logger.info(msg)
         except Exception as exc:
             logger.error(exc)
+    def is_need_skip(self, current_model: CurrentDBModel):
+        if current_model.sport_name == "ТЕННИС":
+            if "ITF" in current_model.country:
+                return True
+        return False
 
     def main(self):
         unprocessed_records = self.get_list_from_db()
         counter = 0
         length_unprocessed_records = len(unprocessed_records)
         for index in range(length_unprocessed_records):
+
             current_model = unprocessed_records[index]
             self.analysis_model = AnalysisDBModel(
                 link=current_model.link,
@@ -94,8 +100,11 @@ class AnalysisService:
             self.is_selection_match_with_series(current_model)
 
             if self.is_save():
-                self.insert(analysis_model=self.analysis_model)
-                counter += 1
+                if self.is_need_skip(current_model):
+                    logger.debug(f"is_need_skip: {current_model.link}, {current_model.country}")
+                else:
+                    self.insert(analysis_model=self.analysis_model)
+                    counter += 1
             logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
 
 

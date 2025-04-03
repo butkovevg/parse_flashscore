@@ -183,9 +183,8 @@ a:active {
 
         <!--who_now_win-->
         {% if match.who_now_win is none %}
-        <td>{{ match.who_must_win }}/{{ match.who_now_win }}</td>
+        <td>{{ match.who_must_win }}/</td>
         {% elif match.who_now_win == match.who_must_win %}
-        <!--        <td class="green-cell">{{ match.who_now_win }}</td>-->
         <td>{{ match.who_must_win }}/{{ match.who_now_win }}</td>
         {% else %}
         <td class="red-cell">{{ match.who_must_win }}/{{ match.who_now_win }}</td>
@@ -196,19 +195,19 @@ a:active {
         {% if match.who_now_win is none %}
         <td>
             <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
-                <button>{{ match.status | default("") }}({{ match.result }})</button>
+                <button>{{ match.status or '' }}({{ match.result }})</button>
             </a>
         </td>
         {% elif match.who_now_win == match.who_must_win %}
         <td>
             <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
-                <button>{{ match.status }}({{ match.result }})</button>
+                <button>{{ match.status or '' }}({{ match.result }})</button>
             </a>
         </td>
         {% else %}
         <td class="red-cell">
             <a href="https://www.flashscorekz.com/match/{{ match.link }}/#/standings/table/overall" target="_blank">
-                <button>{{ match.status }}({{ match.result }})</button>
+                <button>{{ match.status or '' }}({{ match.result }})</button>
             </a>
         </td>
 

@@ -58,7 +58,7 @@ class HelperService:
     @staticmethod
     def pause_until_midnight():
         # Текущее время
-        now = datetime.now()
+        now = datetime.datetime.now()
         # Время полуночи следующего дня
         midnight = (now + datetime.timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
         # Разница между текущим временем и полуночью

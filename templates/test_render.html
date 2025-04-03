@@ -20,25 +20,24 @@
         background: linear-gradient(to bottom right, #f0f8ff, #e6e6fa); /* Градиент для ячеек */
     }
 
+
 </style>
 
 <table>
     <tr>
-        <th>Игрок</th>
-        <th>Геймы</th>
-        <th>Эйсы</th>
-        <th>Двойные ошибки</th>
+        <th>t</th>
+
     </tr>
     <tr>
-        <td>Игрок 1</td>
-        <td>6-4, 7-6</td>
-        <td>12</td>
-        <td>3</td>
+        <td>
+            {% if who_now_win is not none %}
+            1 {{ variable }}
+            {% else %}
+            1 else
+            {% endif %}
+        </td>
     </tr>
     <tr>
-        <td>Игрок 2</td>
-        <td>4-6, 6-7</td>
-        <td>8</td>
-        <td>5</td>
+        <td>2 {{ who_now_win | d('') }}</td>
     </tr>
 </table>

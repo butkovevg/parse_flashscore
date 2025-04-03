@@ -156,8 +156,8 @@ if __name__ == "__main__":
 
     while True:
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
-        list_sport_name = ["ФУТБОЛ"]  # ToDo: MOCK
-        list_sport_name = ["БАСКЕТБОЛ"]  # ToDo: MOCK MXcYQT2d
+        # list_sport_name = ["ФУТБОЛ"]  # ToDo: MOCK
+        # list_sport_name = ["БАСКЕТБОЛ"]  # ToDo: MOCK MXcYQT2d
 
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
             logger.info("list_sport_name is empty")
@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
             # 03 Обновляем и ждем
             database_online_service.update_status_in_analysis_db(list_for_update_analysis)
-            logger.debug(f"Waiting {settings.PAUSE_SEC*5}")
-            time.sleep(settings.PAUSE_SEC*5)
+            logger.debug(f"Waiting {settings.PAUSE_SEC}")
+            time.sleep(settings.PAUSE_SEC)
 
 
