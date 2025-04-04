@@ -28,7 +28,7 @@ class DataBaseOnlineService:
                 .where(CurrentDBModel.match_date == match_date)
                 .where(or_(
                     AnalysisDBModel.status.is_(None),
-                    AnalysisDBModel.status.notin_(('Завершен', 'Будет доигран позже'))
+                    AnalysisDBModel.status.notin_(('Завершен', 'Будет доигран позже', 'Неявка'))
                 ))
             )
             # Выполнение запроса
