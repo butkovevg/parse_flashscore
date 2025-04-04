@@ -6,12 +6,14 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.api import router
 from src.configs.settings import settings
-from src.service.custom_handler_exception import MyCustomException
+from src.model.custom_exception import CustomExceptionModel
+from src.service.custom_handler_exception import CustomException
 from src.service.environment_printer import EnvironmentPrinterService
 from src.service.logger_handlers import get_logger
 
@@ -53,15 +55,26 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="templates"), name="static")
 app.include_router(router)
 
+# Обработчик пользовательских исключений, который "ловит" все необработанные исключения
+@app.exception_handler(CustomException)
+async def get_custom_exception(request: Request, exc: CustomException):
+    logger.error(f"custom_exception {exc.status_code}: {exc.detail}")
+    error = jsonable_encoder(CustomExceptionModel(status_code=exc.status_code, er_message=exc.message, er_details=exc.detail))
+    return JSONResponse(status_code=exc.status_code, content=error)
 
-@app.exception_handler(MyCustomException)
-async def get_my_custom_exception(request: Request, exception: MyCustomException):
-    return JSONResponse(status_code=exception.status_code, content={
-        "status": exception.status,
-        "data": exception.data,
-        "details": exception.details
-    })
+# Обработчик глобальных исключений, который "ловит" все необработанные исключения
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    if settings.LEVEL_LOGGER_HANDLER == 10:  # DEBUG
+        description_error = str(exc)
 
+    else:
+        description_error = "Internal server error"
+    logger.warning("Traceback:", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"error": description_error}
+    )
 
 if __name__ == '__main__':
     multiprocessing.freeze_support()
