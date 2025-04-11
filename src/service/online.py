@@ -156,9 +156,7 @@ if __name__ == "__main__":
 
     while True:
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
-        # list_sport_name = ["ФУТБОЛ"]  # ToDo: MOCK
-        # list_sport_name = ["БАСКЕТБОЛ"]  # ToDo: MOCK MXcYQT2d
-
+        # list_sport_name=["ТЕННИС"]
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
             logger.info("list_sport_name is empty")
             HelperService.pause_until_midnight()
@@ -184,4 +182,4 @@ if __name__ == "__main__":
             logger.debug(f"Waiting {settings.PAUSE_SEC}")
             time.sleep(settings.PAUSE_SEC)
 
-
+        exit()

@@ -27,9 +27,9 @@ class Setting(BaseSettings):
     DB_PASSWORD: str
     DB_NAME: str
     SCHEME_NAME: str
-    TABLE_NAME_MAIN: str = "main3"
-    TABLE_NAME_CURRENT: str = "current3"
-    TABLE_NAME_ANALYSIS: str = "analysis14"
+    TABLE_NAME_MAIN: str = "main"
+    TABLE_NAME_CURRENT: str = "current"
+    TABLE_NAME_ANALYSIS: str = "analysis"
     DB_ECHO: bool = True  # logging database
 
     @property

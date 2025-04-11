@@ -15,7 +15,7 @@ from src.service.main_page import MainPageService
 logger = get_logger(__name__)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--day', type=int, default=2)
+parser.add_argument('--day', type=int, default=0)
 parser.add_argument('--start', type=str, default="main")
 parser.add_argument('--week', dest='week', action='store_true')
 parser.add_argument('--no-week', dest='week', action='store_false')
@@ -65,7 +65,7 @@ def main():
 if __name__ == "__main__":
     logger.info(f'Initializing {os.path.basename(__file__)} {settings.VERSION}')
     if is_week:
-        for day in range(0, 7):
+        for day in range(1, 7):
             logger.warning(f"WEEK_SCAN {day=}")
             FindDayForParsingService().main(shift_day=day)
             main()
