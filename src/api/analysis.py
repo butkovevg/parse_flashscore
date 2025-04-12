@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
@@ -86,8 +87,8 @@ async def find_day(request: Request):
                                                     "sports": list_sports})
 
 @router.patch("/update_comment/{link}")
-async def update_comment(request: Request, link: str):
-    comment: str = str(datetime.now())
+async def update_comment(request: Request, link: str, comment: Optional[str] = None):
+    comment = f"{comment} {str(datetime.now())}"
     database_online_service = DataBaseOnlineService()
     database_online_service.update_comment(link, comment)
     return {"message": "Comment updated successfully", "link": link, "new_comment": comment}

@@ -107,7 +107,7 @@
 
 
 <head>
-    <link rel="icon" href="/static/ball.ico" type="image/x-icon">
+    <link rel="icon" href="/static/flashscore.svg" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <meta charset="UTF-8">
     <meta http-equiv="refresh" content="60"> <!-- Обновление каждые 60 секунд -->
@@ -200,7 +200,7 @@
         <!--            <button class="hide-button" data-link="{{ match.link }}">DEL</button>-->
         <!--        </td>-->
         <td>
-            <button class="hide-button" data-link="{{ match.link }}">
+            <button class="hide-button" data-link="{{ match.link }}" data-comment="HIDE_FROM_HTML">
                 {{ match.by_coefficient }}/{{ match.by_position_table }}/{{ match.by_series }}
                 <i class="fas fa-eye-slash"></i>
             </button>
@@ -252,10 +252,11 @@
             button.addEventListener('click', async function () {
                 // Получаем значение атрибута data-link
                 const link = this.getAttribute('data-link');
+                const comment = this.getAttribute('data-comment');
 
                 try {
                     // Отправляем PATCH-запрос на endpoint
-                    const response = await fetch(`/analysis/update_comment/${link}`, {
+                    const response = await fetch(`/analysis/update_comment/${link}?comment=${comment}`, {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json'

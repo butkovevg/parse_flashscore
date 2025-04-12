@@ -124,9 +124,8 @@ class DataBaseOnlineService:
              "comment": comment,
              },
         ]
-        logger.warning(f"update_comment {list_for_update_analysis}")
+        logger.info(f"update_comment {list_for_update_analysis}")
         self.update_analysis_db(list_for_update_analysis)
-        logger.debug(f"update_comment OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     def update_analysis_db(self, list_for_update_analysis: list):
         try:
