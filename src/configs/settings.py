@@ -17,7 +17,7 @@ class Setting(BaseSettings):
 
     # для логирования
     # уровни CRITICAL(50)-ERROR(40)-WARNING(30)-INFO(20)-DEBUG(10)-NOTSET(0)
-    LEVEL_LOGGER_HANDLER: int = 10
+    LEVEL_LOGGER_HANDLER: int = 20
 
     # DB
     DRIVER_NAME: str

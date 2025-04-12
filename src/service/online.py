@@ -15,6 +15,7 @@ logger = get_logger(__name__)
 
 
 class DataBaseOnlineService:
+    finished_status = ('Завершен', 'Будет доигран позже', 'Неявка', 'Послеовертайма', 'Перенесен')
     def __init__(self):
         self.session = next(get_session())
 
@@ -26,9 +27,10 @@ class DataBaseOnlineService:
                 .join(CurrentDBModel, CurrentDBModel.link == AnalysisDBModel.link, isouter=True)  # LEFT JOIN
                 .where(CurrentDBModel.sport_name == rus_sport_name)
                 .where(CurrentDBModel.match_date == match_date)
+                .where(AnalysisDBModel.comment.is_(None))
                 .where(or_(
                     AnalysisDBModel.status.is_(None),
-                    AnalysisDBModel.status.notin_(('Завершен', 'Будет доигран позже', 'Неявка'))
+                    AnalysisDBModel.status.notin_(DataBaseOnlineService.finished_status)
                 ))
             )
             # Выполнение запроса
@@ -49,8 +51,12 @@ class DataBaseOnlineService:
                 .select_from(AnalysisDBModel)  # Явное указание левой стороны JOIN
                 .join(CurrentDBModel, CurrentDBModel.link == AnalysisDBModel.link, isouter=True)  # LEFT JOIN
                 .where(and_(
-                    AnalysisDBModel.status.is_(None),
-                    CurrentDBModel.match_date == match_date
+                            or_(
+                                AnalysisDBModel.status.is_(None),
+                                AnalysisDBModel.status.notin_(DataBaseOnlineService.finished_status)),
+                    CurrentDBModel.match_date == match_date,
+                    AnalysisDBModel.comment.is_(None)
+
                 ))
             )
             # Выполнение запроса
@@ -156,7 +162,6 @@ if __name__ == "__main__":
 
     while True:
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
-        # list_sport_name=["ТЕННИС"]
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
             logger.info("list_sport_name is empty")
             HelperService.pause_until_midnight()
