@@ -1,104 +1,116 @@
 <style>
-* {
-  font-family: 'Roboto', sans-serif;
-}
-button {
-    transition-duration: 0.4s;
-    background-color: rgba(35,19,245, 0);
-    border: 3px solid red;
-    border-radius: 10%;
-    width: 100%;
-    height: 100%;
-    border: none;
-    color: back;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 24px;
-    margin: 4px 2px;
-    cursor: pointer;
-    letter-spacing:2px
-}
-button:hover {
-  background-color: rgba(0, 189, 150, 1); /* Green */
-  color: white;
-}
-table {
-   border-collapse: collapse;
-   width: 100%;
+    * {
+      font-family: 'Roboto', sans-serif;
+    }
+    button {
+        transition-duration: 0.4s;
+        background-color: rgba(35,19,245, 0);
+        border: 3px solid red;
+        border-radius: 10%;
+        width: 100%;
+        height: 100%;
+        border: none;
+        color: back;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 24px;
+        margin: 4px 2px;
+        cursor: pointer;
+        letter-spacing:2px
+    }
+    button:hover {
+      background-color: rgba(0, 189, 150, 1); /* Green */
+      color: white;
+    }
+    table {
+       border-collapse: collapse;
+       width: 100%;
+    }
+
+    th {
+     position: sticky;
+     top: 0;
+     background-color: white;
+    }
+    th, td {
+       text-align: center;
+       padding: 5px;
+       border: 1px solid black;
+    }
+    tr[data-sport_name='ВОЛЕЙБОЛ'] {
+       background-color: rgba(0, 69, 255, 0.7);
+       border: 1px solid black;
+       border-radius: 99%;
+    }
+    tr[data-sport_name='БАСКЕТБОЛ'] {
+       background-color: rgba(255, 182, 13, 0.6);
+       border: 1px solid black;
+       border-radius: 10%;
+    }
+    tr[data-sport_name='ГАНДБОЛ'] {
+       background-color: rgba(194,194,194, 0.4);
+       border: 1px solid black;
+       border-radius: 50%;
+    }
+    tr[data-sport_name='ТЕННИС'] {
+       background-color: rgba(255,164,54, 0.2);
+       border: 1px solid black;
+       border-radius: 50%;
+    }
+    tr[data-sport_name='ФУТБОЛ'] {
+       background-color: rgba(2,253,38, 0.4);
+       border: 1px solid black;
+       border-radius: 50%;
+    }
+    .green-button {
+       background-color: green;
+    }
+
+    .red-button {
+       background-color: red;
+    }
+    /* Цвет ссылки по умолчанию */
+    a:link {
+        color: black; /* Замените на желаемый цвет */
+    }
+    /* Цвет посещенной ссылки */
+    a:visited {
+        color: black; /* Замените на желаемый цвет */
+    }
+    /* Цвет ссылки при наведении курсора */
+    a:hover {
+        color: black; /* Замените на желаемый цвет */
+    }
+    /* Цвет активной ссылки */
+    a:active {
+        color: black; /* Замените на желаемый цвет */
+    }
+
+    .red-cell {background-color: red;}
+    .green-cell {background-color: green;}
+.hide-button {
+    background: none; /* Убираем фон */
+    border: none; /* Убираем границу */
+    cursor: pointer; /* Добавляем указатель мыши */
+    font-size: 20px; /* Размер иконки */
+    color: #000c1a; /* Цвет иконки */
+    padding: 5px; /* Отступы */
 }
 
-th {
- position: sticky;
- top: 0;
- background-color: white;
+.hide-button:hover {
+    color: #b30300; /* Цвет при наведении */
 }
-th, td {
-   text-align: center;
-   padding: 5px;
-   border: 1px solid black;
-}
-tr[data-sport_name='ВОЛЕЙБОЛ'] {
-   background-color: rgba(0, 69, 255, 0.7);
-   border: 1px solid black;
-   border-radius: 99%;
-}
-tr[data-sport_name='БАСКЕТБОЛ'] {
-   background-color: rgba(255, 182, 13, 0.6);
-   border: 1px solid black;
-   border-radius: 10%;
-}
-tr[data-sport_name='ГАНДБОЛ'] {
-   background-color: rgba(194,194,194, 0.4);
-   border: 1px solid black;
-   border-radius: 50%;
-}
-tr[data-sport_name='ТЕННИС'] {
-   background-color: rgba(255,164,54, 0.2);
-   border: 1px solid black;
-   border-radius: 50%;
-}
-tr[data-sport_name='ФУТБОЛ'] {
-   background-color: rgba(2,253,38, 0.4);
-   border: 1px solid black;
-   border-radius: 50%;
-}
-.green-button {
-   background-color: green;
-}
-
-.red-button {
-   background-color: red;
-}
-/* Цвет ссылки по умолчанию */
-a:link {
-    color: black; /* Замените на желаемый цвет */
-}
-/* Цвет посещенной ссылки */
-a:visited {
-    color: black; /* Замените на желаемый цвет */
-}
-/* Цвет ссылки при наведении курсора */
-a:hover {
-    color: black; /* Замените на желаемый цвет */
-}
-/* Цвет активной ссылки */
-a:active {
-    color: black; /* Замените на желаемый цвет */
-}
-
-.red-cell {background-color: red;}
-.green-cell {background-color: green;}
-
 
 </style>
 
 
 <head>
     <link rel="icon" href="/static/ball.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <meta charset="UTF-8">
-<!--    <meta http-equiv="refresh" content="60"> &lt;!&ndash; Обновление каждые 60 секунд &ndash;&gt;-->
+    <meta http-equiv="refresh" content="60"> <!-- Обновление каждые 60 секунд -->
     <title>Автоматическое</title>
 </head>
 <table>
@@ -139,8 +151,8 @@ a:active {
         <!--COUNTRY(TOURNAMENT)-->
         <td>
             <a href="https://betcity.ru/ru/live/" target="_blank" rel="noopener noreferrer">
-            {{ match.country }} <br>
-            ({{ match.tournament }} {{ match.tour }})</a>
+                {{ match.country }} <br>
+                ({{ match.tournament }} {{ match.tour }})</a>
         </td>
 
 
@@ -148,38 +160,52 @@ a:active {
         {% if match.who_must_win == 1 %}
         <td>
             <a href="https://betcity.ru/ru/search?q={{ match.team1 }}" target="_blank" rel="noopener noreferrer">
-            {{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})✔</a>
+                {{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})✔</a>
         </td>
         {% else %}
         <td>
             <a href="https://betcity.ru/ru/search?q={{ match.team1 }}" target="_blank" rel="noopener noreferrer">
-            {{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})❌</a>
+                {{ match.team1 }} ({{ match.position1 }}/{{match.position_total}})❌</a>
         </td>
         {% endif %}
 
 
         <!--        TEAM2-->
         {% if match.who_must_win == 2 %}
-            <td>
-                <a href="https://betcity.ru/ru/search?q={{ match.team2 }}" target="_blank" rel="noopener noreferrer">
+        <td>
+            <a href="https://betcity.ru/ru/search?q={{ match.team2 }}" target="_blank" rel="noopener noreferrer">
                 {{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})✔</a>
-            </td>
-            {% else %}
-            <td>
-                <a href="https://betcity.ru/ru/search?q={{ match.team2 }}" target="_blank" rel="noopener noreferrer">
+        </td>
+        {% else %}
+        <td>
+            <a href="https://betcity.ru/ru/search?q={{ match.team2 }}" target="_blank" rel="noopener noreferrer">
                 {{ match.team2 }} ({{ match.position2 }}/{{match.position_total}})❌</a>
-            </td>
+        </td>
         {% endif %}
 
         <!--kf-->
         <td>
-            <a href="https://betcity.ru/ru/search?q={{ match.team1[:4] }}" target="_blank" rel="noopener noreferrer">{{ match.kf1 }}</a>
+            <a href="https://betcity.ru/ru/search?q={{ match.team1[:4] }}" target="_blank" rel="noopener noreferrer">{{
+                match.kf1 }}</a>
         </td>
         <td>
-            <a href="https://betcity.ru/ru/search?q={{ match.team2[:4] }}" target="_blank" rel="noopener noreferrer">{{ match.kf2 }}</a>
+            <a href="https://betcity.ru/ru/search?q={{ match.team2[:4] }}" target="_blank" rel="noopener noreferrer">{{
+                match.kf2 }}</a>
         </td>
 
-        <td>{{ match.by_coefficient }}/{{ match.by_position_table }}/{{ match.by_series }}</td>
+
+        <!--kf,table,series        -->
+        <!--HIDE-->
+        <!--        <td>-->
+        <!--            <button class="hide-button" data-link="{{ match.link }}">DEL</button>-->
+        <!--        </td>-->
+        <td>
+            <button class="hide-button" data-link="{{ match.link }}">
+                {{ match.by_coefficient }}/{{ match.by_position_table }}/{{ match.by_series }}
+                <i class="fas fa-eye-slash"></i>
+            </button>
+        </td>
+
 
         <!--who_now_win-->
         {% if match.who_now_win is none %}
@@ -217,43 +243,79 @@ a:active {
     {% endfor %}
 </table>
 <script>
-function getValue(link) {
-   var xhr = new XMLHttpRequest();
-   xhr.open("GET", "/analysis/get_value1/" + link + "/" , true);
-   xhr.onreadystatechange = function () {
-      if (xhr.readyState == 4 && xhr.status == 200) {
-          btn.innerHTML = "Получено";
-          btn.style.backgroundColor = "green";
-          btn.style.color = "white";
+    document.addEventListener('DOMContentLoaded', function () {
+        // Находим все кнопки с классом 'hide-button'
+        const buttons = document.querySelectorAll('.hide-button');
+
+        // Для каждой кнопки добавляем обработчик клика
+        buttons.forEach(button => {
+            button.addEventListener('click', async function () {
+                // Получаем значение атрибута data-link
+                const link = this.getAttribute('data-link');
+
+                try {
+                    // Отправляем PATCH-запрос на endpoint
+                    const response = await fetch(`/analysis/update_comment/${link}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ comment: "SCRIPT222" }) // Новый комментарий
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log(data.message); // "Comment updated successfully"
+
+                        // Меняем текст кнопки или удаляем строку
+                        this.textContent = 'Hidden';
+                        this.disabled = true; // Делаем кнопку неактивной
+                    } else {
+                        console.error('Ошибка при обновлении комментария');
+                    }
+                } catch (error) {
+                    console.error('Произошла ошибка:', error);
+                }
+            });
+        });
+    });
+
+
+    function getValue(link) {
+       var xhr = new XMLHttpRequest();
+       xhr.open("GET", "/analysis/get_value1/" + link + "/" , true);
+       xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+              btn.innerHTML = "Получено";
+              btn.style.backgroundColor = "green";
+              btn.style.color = "white";
+          }
       }
-  }
-  xhr.send();
-}
+      xhr.send();
+    }
 
-<!--document.getElementById('FavoritesButton').addEventListener('click', function() {-->
-<!--   this.classList.toggle('yellow');-->
-<!--   this.classList.toggle('gray');-->
-<!--});-->
+    <!--document.getElementById('FavoritesButton').addEventListener('click', function() {-->
+    <!--   this.classList.toggle('yellow');-->
+    <!--   this.classList.toggle('gray');-->
+    <!--});-->
 
-function toggleStatus(id) {
-  var button = document.getElementById("FavoritesButton" + id);
-  if (button.className === "green-button") {
-      button.className = "red-button";
-      fetch(`/analysis/update_favorites/${id}`)
-           .then(response => response.json())
-           .then(data => console.log(data));
-  } else {
-      button.className = "green-button";
-      fetch(`/analysis/update_favorites/${id}`)
-           .then(response => response.json())
-           .then(data => console.log(data));
-  }
-}
-function navigateToValue(offset) {
- window.location.href = `/analysis/${offset}/`;
-}
-
-
+    function toggleStatus(id) {
+      var button = document.getElementById("FavoritesButton" + id);
+      if (button.className === "green-button") {
+          button.className = "red-button";
+          fetch(`/analysis/update_favorites/${id}`)
+               .then(response => response.json())
+               .then(data => console.log(data));
+      } else {
+          button.className = "green-button";
+          fetch(`/analysis/update_favorites/${id}`)
+               .then(response => response.json())
+               .then(data => console.log(data));
+      }
+    }
+    function navigateToValue(offset) {
+     window.location.href = `/analysis/${offset}/`;
+    }
 
 
 </script>

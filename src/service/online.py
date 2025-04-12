@@ -16,6 +16,7 @@ logger = get_logger(__name__)
 
 class DataBaseOnlineService:
     finished_status = ('Завершен', 'Будет доигран позже', 'Неявка', 'Послеовертайма', 'Перенесен')
+
     def __init__(self):
         self.session = next(get_session())
 
@@ -51,9 +52,9 @@ class DataBaseOnlineService:
                 .select_from(AnalysisDBModel)  # Явное указание левой стороны JOIN
                 .join(CurrentDBModel, CurrentDBModel.link == AnalysisDBModel.link, isouter=True)  # LEFT JOIN
                 .where(and_(
-                            or_(
-                                AnalysisDBModel.status.is_(None),
-                                AnalysisDBModel.status.notin_(DataBaseOnlineService.finished_status)),
+                    or_(
+                        AnalysisDBModel.status.is_(None),
+                        AnalysisDBModel.status.notin_(DataBaseOnlineService.finished_status)),
                     CurrentDBModel.match_date == match_date,
                     AnalysisDBModel.comment.is_(None)
 
@@ -117,6 +118,16 @@ class DataBaseOnlineService:
         #     else:
         #         logger.info(f"All link processed {self.data4parsing}")
 
+    def update_comment(self, link: str, comment: str):
+        list_for_update_analysis = [
+            {"link": link,
+             "comment": comment,
+             },
+        ]
+        logger.warning(f"update_comment {list_for_update_analysis}")
+        self.update_analysis_db(list_for_update_analysis)
+        logger.debug(f"update_comment OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
     def update_analysis_db(self, list_for_update_analysis: list):
         try:
             # # # Подготовка данных для массового обновления
@@ -169,7 +180,8 @@ if __name__ == "__main__":
             database_online_service = DataBaseOnlineService()
             list_links_aft_analysis = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
             logger.warning(f"________________________{eng_sport_name.upper()}________________________")
-            logger.info(f"for {eng_sport_name.upper()} need update links({len(list_links_aft_analysis)}): {list_links_aft_analysis}")
+            logger.info(
+                f"for {eng_sport_name.upper()} need update links({len(list_links_aft_analysis)}): {list_links_aft_analysis}")
 
             # 02 Запрос по виду спорта для обновления
             data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)

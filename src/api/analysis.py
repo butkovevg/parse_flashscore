@@ -6,6 +6,7 @@ from starlette.background import BackgroundTasks
 
 from src.service.analysis import InfoAnalysisDBService
 from src.service.find_day_for_parsing import FindDayForParsingService
+from src.service.online import DataBaseOnlineService
 
 templates = Jinja2Templates(directory="templates")
 
@@ -84,3 +85,9 @@ async def find_day(request: Request):
                                                     "data": data,
                                                     "sports": list_sports})
 
+@router.patch("/update_comment/{link}")
+async def update_comment(request: Request, link: str):
+    comment: str = str(datetime.now())
+    database_online_service = DataBaseOnlineService()
+    database_online_service.update_comment(link, comment)
+    return {"message": "Comment updated successfully", "link": link, "new_comment": comment}
