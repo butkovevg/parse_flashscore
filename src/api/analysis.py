@@ -55,9 +55,12 @@ async def get_value(request: Request, day: int):
     service = InfoAnalysisDBService(day)
     matches = service.get_match_today()
     return templates.TemplateResponse("analysis.html", {"request": request, "matches": matches, "day": day})
+
 @router.get("/render/")
 async def test_render(request: Request):
     return templates.TemplateResponse("test_render.html", {"request": request, "who_now_win": None, "who_must_win": 0})
+
+
 @router.get("/time/{day}/json")
 async def get_value(request: Request, day: int):
     service = InfoAnalysisDBService(day)

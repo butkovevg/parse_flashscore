@@ -61,7 +61,7 @@ class DataBaseOnlineService:
             )
             # Выполнение запроса
             results = self.session.execute(query).scalars().all()
-            logger.info(f"Online update sports: {results}")
+            logger.info(f"Online update sports({len(results)}): {results}")
             return results
 
         except Exception as exc:
@@ -117,7 +117,7 @@ class DataBaseOnlineService:
         #     else:
         #         logger.info(f"All link processed {self.data4parsing}")
 
-    def update_status_in_analysis_db(self, list_for_update_analysis: list):
+    def update_analysis_db(self, list_for_update_analysis: list):
         try:
             # # # Подготовка данных для массового обновления
             # # update_data = []
@@ -130,15 +130,12 @@ class DataBaseOnlineService:
             # # Фиксация изменений в базе данных
             # self.session.commit()
             # print("Массовое обновление завершено.")
-            for item in list_for_update_analysis:
-                link = item['link']
-                new_status = item['status']
-                result = item['result']
-                who_now_win = item['who_now_win']
+            for dct_for_update_analysis in list_for_update_analysis:
+                link = dct_for_update_analysis['link']
+                dct_for_update_analysis.pop('link')
 
                 # Обновление записи по полю link
-                self.session.query(AnalysisDBModel).filter_by(link=link).update(
-                    {'status': new_status, 'result': result, 'who_now_win': who_now_win})
+                self.session.query(AnalysisDBModel).filter_by(link=link).update(dct_for_update_analysis)
 
             # Фиксация изменений
             self.session.commit()
@@ -171,7 +168,8 @@ if __name__ == "__main__":
             eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
             database_online_service = DataBaseOnlineService()
             list_links_aft_analysis = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
-            logger.info(f"For {eng_sport_name} need update links: {list_links_aft_analysis}")
+            logger.warning(f"________________________{eng_sport_name.upper()}________________________")
+            logger.info(f"for {eng_sport_name.upper()} need update links({len(list_links_aft_analysis)}): {list_links_aft_analysis}")
 
             # 02 Запрос по виду спорта для обновления
             data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
@@ -183,7 +181,7 @@ if __name__ == "__main__":
                 logger.debug(f"{eng_sport_name}: {dct_for_update_analysis}")
 
             # 03 Обновляем и ждем
-            database_online_service.update_status_in_analysis_db(list_for_update_analysis)
+            database_online_service.update_analysis_db(list_for_update_analysis)
             logger.debug(f"Waiting {settings.PAUSE_SEC}")
             time.sleep(settings.PAUSE_SEC)
 

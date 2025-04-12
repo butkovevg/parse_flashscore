@@ -174,6 +174,7 @@ class MainPageService:
             # Список для хранения результатов
             # Список для хранения результатов
             output_list = []
+            list_for_logger = []
 
             # Перебираем каждый элемент в ResultSet
             for div in divs_sportname:
@@ -213,10 +214,11 @@ class MainPageService:
                             'result': res,
                             'who_now_win': who_now_win,
                         })
-                        logger.info(f"{link} {status=} {res=}")
+                        logger.info(f"for {link=} {status=} {res=}")
+                        list_for_logger.append(link)
                     else:
                         logger.debug(f"{link} {status=} {res=}")
-            logger.info(f"{len(output_list)} record(s) update")
+            logger.info(f"{len(output_list)} record(s) update: {list_for_logger}")
             logger.debug(f"{output_list=}")
             browser.quit()
             return output_list

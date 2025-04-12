@@ -177,8 +177,10 @@ class AnalysisService:
 
 class InfoAnalysisDBService:
     def __init__(self, shift_day: int = 0):
-        self.session = next(get_session())
+
         self.shift_day = shift_day
+        self.session = next(get_session())
+        self.current_time = datetime.now()
         self.query = (
             self.session
             .query(AnalysisDBModel, CurrentDBModel)
@@ -218,8 +220,8 @@ class InfoAnalysisDBService:
             logger.warning(f"{str(record)=}")
 
     def get_favorites(self):
-        current_time = datetime.now()
-        new_time = current_time - timedelta(minutes=90)
+
+        new_time = self.current_time - timedelta(minutes=90)
 
         query_all_record = (
             self.query
@@ -232,28 +234,28 @@ class InfoAnalysisDBService:
         return self.get_list_dct_models_analysis_and_current(result)
 
     def merge(self):
-        current_time = datetime.now()
-        new_time = current_time - timedelta(minutes=90)
-        time_filter = new_time.strftime('%H:%M')
+        # new_time = self.current_time - timedelta(minutes=90)
+        # time_filter = new_time.strftime('%H:%M')
         query_all_record = (
             self.query
             .order_by(CurrentDBModel.match_time)
         )
-        # if self.shift_day == 0:
-        #     query_all_record = query_all_record.filter(CurrentDBModel.match_time > time_filter)
+        query_all_record = query_all_record.filter(AnalysisDBModel.comment.is_(None))
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
         return self.get_list_dct_models_analysis_and_current(result)
 
     def get_match_today(self):
-        current_time = datetime.now()
-        new_time = current_time - timedelta(minutes=90)
+        new_time = self.current_time - timedelta(minutes=90)
         time_filter = new_time.strftime('%H:%M')
         query_all_record = self.query.filter(CurrentDBModel.match_time > time_filter)
-        # query_all_record = query_all_record.filter(AnalysisDBModel.is_match_leader_outsider == True)
+        # query_all_record = self.query.filter(AnalysisDBModel.comment.is_(None))
+        logger.warning(f"{query_all_record=}")
         query_all_record = query_all_record.order_by(CurrentDBModel.match_time)
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
+        for i in result:
+            logger.info(i)
         return self.get_list_dct_models_analysis_and_current(result)
 
     def get_list_dct_models_analysis_and_current(self, result):
