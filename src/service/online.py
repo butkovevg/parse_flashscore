@@ -1,7 +1,8 @@
 import os
 import time
+from datetime import datetime
 
-from sqlalchemy import select, distinct, and_, or_
+from sqlalchemy import select, distinct, and_, or_,  cast, Time
 
 from src.configs.settings import settings
 from src.model.tables import AnalysisDBModel, CurrentDBModel
@@ -47,10 +48,12 @@ class DataBaseOnlineService:
     def get_list_sport_name(self, match_date):
         try:
             # Создание запроса
+            time_now = datetime.now().strftime("%H:%M")
             query = (
                 select(distinct(CurrentDBModel.sport_name))
                 .select_from(AnalysisDBModel)  # Явное указание левой стороны JOIN
                 .join(CurrentDBModel, CurrentDBModel.link == AnalysisDBModel.link, isouter=True)  # LEFT JOIN
+                .where(cast(CurrentDBModel.match_time, Time) < time_now)
                 .where(and_(
                     or_(
                         AnalysisDBModel.status.is_(None),
@@ -185,34 +188,32 @@ if __name__ == "__main__":
     database_online_service = DataBaseOnlineService()
     match_date_today = HelperService.get_date_with_point_between_day(day=0)
 
+
     while True:
         # Список видов спорта, которые есть в ТБ анализв
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
-            logger.info("list_sport_name is empty")
-            HelperService.pause_until_midnight()
-            break
+            logger.info("list_sport_name is empty: waiting 60 sec")
+            time.sleep(60)
+            # HelperService.pause_until_midnight()
+        else:
+            for rus_sport_name in list_sport_name:
+                eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
+                database_online_service = DataBaseOnlineService()
+                list_links_bef_update = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
+                logger.warning(f"________________________{eng_sport_name.upper()}________________________")
+                logger.info(
+                    f"for {eng_sport_name.upper()} need update links({len(list_links_bef_update)}): {list_links_bef_update}")
 
-        for rus_sport_name in list_sport_name:
-            eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
-            database_online_service = DataBaseOnlineService()
-            list_links_bef_update = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
-            logger.warning(f"________________________{eng_sport_name.upper()}________________________")
-            logger.info(
-                f"for {eng_sport_name.upper()} need update links({len(list_links_bef_update)}): {list_links_bef_update}")
+                # 02 Запрос по виду спорта для обновления
+                data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
+                main_page_service = MainPageService(data4parsing=data_for_parsing)
+                # 02 Список, который можно обновить
+                list_for_update_analysis , list_links_aft_update= main_page_service.get_list_for_update_analysis(list_links_aft_analysis=list_links_bef_update)
 
-            # 02 Запрос по виду спорта для обновления
-            data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
-            main_page_service = MainPageService(data4parsing=data_for_parsing)
-            # 02 Список, который можно обновить
-            list_for_update_analysis , list_links_aft_update= main_page_service.get_list_for_update_analysis(list_links_aft_analysis=list_links_bef_update)
+                # 03 Если есть ссылки, которые не обновились, то убираем их с comment="NO_UPDATE"
+                logging_difference_list(list_links_bef_update, list_links_aft_update, eng_sport_name)
 
-            # 03 Если есть ссылки, которые не обновились, то убираем их с comment="NO_UPDATE"
-            logging_difference_list(list_links_bef_update, list_links_aft_update, eng_sport_name)
+                # 04 Обновляем
+                database_online_service.update_analysis_db(list_for_update_analysis)
 
-            # 04 Обновляем и ждем
-            database_online_service.update_analysis_db(list_for_update_analysis)
-            logger.debug(f"Waiting {settings.PAUSE_SEC}")
-            time.sleep(settings.PAUSE_SEC)
-
-        exit()

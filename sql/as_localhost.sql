@@ -3,7 +3,7 @@ SELECT
 --    analysis.link,
 --    "current".id,
 --    "current".link,
---    "current".sport_name,
+    "current".sport_name,
 --    "current".match_date,
     "current".match_time,
     COALESCE("current".country, '') || '/' || COALESCE("current".tournament, '') || '/' || COALESCE("current".tour, '') AS "COUNTRY(TOURNAMENT)",
@@ -35,5 +35,6 @@ SELECT
 FROM flashscore.analysis
 left join flashscore."current"
 on "current".link = analysis.link
-where "current".match_date='13.04.2025'
+where "current".match_date='14.04.2025'
+--and match_time::TIME < '13:37'::TIME;
 order by "current".match_time
