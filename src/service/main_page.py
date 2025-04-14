@@ -174,7 +174,7 @@ class MainPageService:
             # Список для хранения результатов
             # Список для хранения результатов
             output_list = []
-            list_for_logger = []
+            list_links_for_logger = []
 
             # Перебираем каждый элемент в ResultSet
             for div in divs_sportname:
@@ -215,16 +215,16 @@ class MainPageService:
                             'who_now_win': who_now_win,
                         })
                         logger.info(f"for {link=} {status=} {res=}")
-                        list_for_logger.append(link)
+                        list_links_for_logger.append(link)
                     else:
                         logger.debug(f"{link} {status=} {res=}")
-            logger.info(f"{len(output_list)} record(s) update: {list_for_logger}")
+            logger.info(f"{len(output_list)} record(s) update: {list_links_for_logger}")
             logger.debug(f"{output_list=}")
             browser.quit()
-            return output_list
+            return output_list, list_links_for_logger
         except Exception as exc:
             logger.error(str(exc))
-            return []
+            return [], []
 
         # button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Предыдущий день']")
         # # Перебор найденных элементов

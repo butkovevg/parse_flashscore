@@ -155,6 +155,24 @@ class DataBaseOnlineService:
             self.session.rollback()  # Откат изменений в случае ошибки
             logger.error(f"Ошибка: {e}")
 
+def logging_difference_list(list_bef_update, list_aft_update, eng_sport_name):
+    if len(list_links_bef_update) != len(list_links_aft_update):
+        # Преобразуем списки в множества
+        set_aft_update = set(list_aft_update)
+        set_bef_update = set(list_bef_update)
+
+        # Находим разницу
+        difference = set_bef_update - set_aft_update
+
+        # Преобразуем результат обратно в список (если нужно)
+        difference_list = list(difference)
+
+        for link in difference_list:
+            base_link = f"https://www.flashscorekz.com/match/{eng_sport_name}/{link}"
+            logger.error(f"NO_UPDATE: {base_link}")
+            DataBaseOnlineService().update_comment(link=link, comment="NO_UPDATE")
+
+
 
 if __name__ == "__main__":
     logger.info(f' Initializing API {settings.TITLE}: {settings.VERSION}')
@@ -168,6 +186,7 @@ if __name__ == "__main__":
     match_date_today = HelperService.get_date_with_point_between_day(day=0)
 
     while True:
+        # Список видов спорта, которые есть в ТБ анализв
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
             logger.info("list_sport_name is empty")
@@ -177,21 +196,21 @@ if __name__ == "__main__":
         for rus_sport_name in list_sport_name:
             eng_sport_name = dct_translate_sport_name_rus_eng[rus_sport_name]
             database_online_service = DataBaseOnlineService()
-            list_links_aft_analysis = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
+            list_links_bef_update = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
             logger.warning(f"________________________{eng_sport_name.upper()}________________________")
             logger.info(
-                f"for {eng_sport_name.upper()} need update links({len(list_links_aft_analysis)}): {list_links_aft_analysis}")
+                f"for {eng_sport_name.upper()} need update links({len(list_links_bef_update)}): {list_links_bef_update}")
 
             # 02 Запрос по виду спорта для обновления
             data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
             main_page_service = MainPageService(data4parsing=data_for_parsing)
             # 02 Список, который можно обновить
-            list_for_update_analysis = main_page_service.get_list_for_update_analysis(
-                list_links_aft_analysis=list_links_aft_analysis)
-            for dct_for_update_analysis in list_for_update_analysis:
-                logger.debug(f"{eng_sport_name}: {dct_for_update_analysis}")
+            list_for_update_analysis , list_links_aft_update= main_page_service.get_list_for_update_analysis(list_links_aft_analysis=list_links_bef_update)
 
-            # 03 Обновляем и ждем
+            # 03 Если есть ссылки, которые не обновились, то убираем их с comment="NO_UPDATE"
+            logging_difference_list(list_links_bef_update, list_links_aft_update, eng_sport_name)
+
+            # 04 Обновляем и ждем
             database_online_service.update_analysis_db(list_for_update_analysis)
             logger.debug(f"Waiting {settings.PAUSE_SEC}")
             time.sleep(settings.PAUSE_SEC)
