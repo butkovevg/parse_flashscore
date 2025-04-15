@@ -1,43 +1,47 @@
-<style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: Arial, sans-serif;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Day of Week</title>
+</head>
+<body>
+    <!-- Элемент с датой -->
+    <table>
+        <tr>
+            <td id="date-cell">16.04.2025</td>
+        </tr>
+    </table>
 
-    th, td {
-        padding: 10px;
-        text-align: center;
-        border: 1px solid #ddd;
-    }
+    <script>
+        // Функция для получения дня недели
+        function getDayOfWeek(dateString) {
+            // Разбиваем строку даты на компоненты
+            const [day, month, year] = dateString.split('.').map(Number);
 
-    th {
-        background-color: #4CAF50; /* Зеленый фон для заголовков */
-        color: white;
-    }
+            // Создаем объект Date (месяцы в JavaScript начинаются с 0)
+            const date = new Date(year, month - 1, day);
 
-    td {
-        background: linear-gradient(to bottom right, #f0f8ff, #e6e6fa); /* Градиент для ячеек */
-    }
+            // Массив с названиями дней недели
+            const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
+            // Получаем день недели (0 - воскресенье, 1 - понедельник и т.д.)
+            const dayOfWeek = daysOfWeek[date.getDay()];
 
-</style>
+            return dayOfWeek;
+        }
 
-<table>
-    <tr>
-        <th>t</th>
+        // Находим элемент с датой
+        const dateCell = document.getElementById('date-cell');
 
-    </tr>
-    <tr>
-        <td>
-            {% if who_now_win is not none %}
-            1 {{ variable }}
-            {% else %}
-            1 else
-            {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <td>2 {{ who_now_win | d('') }}</td>
-    </tr>
-</table>
+        // Получаем текст из ячейки
+        const dateString = dateCell.textContent;
+
+        // Вычисляем день недели
+        const dayOfWeek = getDayOfWeek(dateString);
+
+        // Добавляем день недели в HTML
+        dateCell.textContent += ` (${dayOfWeek})`;
+    </script>
+</body>
+</html>

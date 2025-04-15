@@ -100,11 +100,12 @@ a:active {
          <th>ИТОГО</th>
     </tr>
 
-    <!--    НАПОЛНЕНИЕ ТАБЛИЦЫ   -->
+
+<!--    НАПОЛНЕНИЕ ТАБЛИЦЫ   -->
     {% for object_data in data %}
     <tr>
         <td> {{ object_data.shift_day }} </td>
-        <td> {{ object_data.dt }}</td>
+        <td class="date-cell">{{ object_data.dt }}</td>
         {% for sport in sports %}
             <td data-sport_name={{ sport }}>{{ object_data.main[sport] }}/{{ object_data.curr[sport] }}/{{ object_data.anal[sport] }}</td>
         {% endfor %}
@@ -120,6 +121,43 @@ a:active {
     {% endfor %}
 </table>
 <script>
+// Функция для получения дня недели
+function getDayOfWeek(dateString) {
+    // Разбиваем строку даты на компоненты
+    const [day, month, year] = dateString.split('.').map(Number);
+
+    // Создаем объект Date (месяцы в JavaScript начинаются с 0)
+    const date = new Date(year, month - 1, day);
+
+    // Массив с названиями дней недели
+    const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+
+    // Получаем день недели (0 - воскресенье, 1 - понедельник и т.д.)
+    const dayOfWeek = daysOfWeek[date.getDay()];
+
+    return dayOfWeek;
+}
+
+// Находим все элементы с классом date-cell
+const dateCells = document.querySelectorAll('.date-cell');
+
+// Обрабатываем каждый элемент
+dateCells.forEach(cell => {
+    const dateString = cell.textContent.trim(); // Получаем текст из ячейки
+    const dayOfWeek = getDayOfWeek(dateString); // Вычисляем день недели
+
+    // Добавляем день недели в HTML
+    cell.textContent += ` (${dayOfWeek})`;
+});
+
+
+
+
+
+
+
+
+
 function getValue(link) {
    var xhr = new XMLHttpRequest();
    xhr.open("GET", "/analysis/get_value1/" + link + "/" , true);

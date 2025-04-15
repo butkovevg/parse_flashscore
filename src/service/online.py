@@ -193,8 +193,7 @@ if __name__ == "__main__":
         # Список видов спорта, которые есть в ТБ анализв
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
-            logger.info("list_sport_name is empty: waiting 60 sec")
-            time.sleep(60)
+            logger.info("list_sport_name is empty")
             # HelperService.pause_until_midnight()
         else:
             for rus_sport_name in list_sport_name:
@@ -216,4 +215,7 @@ if __name__ == "__main__":
 
                 # 04 Обновляем
                 database_online_service.update_analysis_db(list_for_update_analysis)
+        logger.info("waiting 120 sec")
+        time.sleep(120)
+# Если ссылка не обновляется, то возможно полностью обновлять запись
 

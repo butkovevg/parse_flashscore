@@ -250,12 +250,9 @@ class InfoAnalysisDBService:
         time_filter = new_time.strftime('%H:%M')
         query_all_record = self.query.filter(CurrentDBModel.match_time > time_filter)
         # query_all_record = self.query.filter(AnalysisDBModel.comment.is_(None))
-        logger.warning(f"{query_all_record=}")
         query_all_record = query_all_record.order_by(CurrentDBModel.match_time)
         result = query_all_record.all()
-        logger.warning(f"{len(result)=}")
-        for i in result:
-            logger.info(i)
+        logger.info(f"get_match_today: {len(result)=}")
         return self.get_list_dct_models_analysis_and_current(result)
 
     def get_list_dct_models_analysis_and_current(self, result):
