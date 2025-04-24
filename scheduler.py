@@ -15,7 +15,7 @@ from src.service.main_page import MainPageService
 logger = get_logger(__name__)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--day', type=int, default=5)
+parser.add_argument('--day', type=int, default=0)
 parser.add_argument('--start', type=str, default="main")
 parser.add_argument('--week', dest='week', action='store_true')
 parser.add_argument('--no-week', dest='week', action='store_false')
@@ -36,6 +36,10 @@ def main():
         "handball",
         "tennis",
     ]
+
+    if day <2 : # Нет смысла парсить теннис за два дня и более
+        logger.debug("ADD tennis in list_sport_name_for_parsing")
+        list_sport_name_for_parsing.append("tennis")
 
     if start in ["main"]:
         # MAIN_PAGE

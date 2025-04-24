@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 
 
 class DataBaseOnlineService:
-    finished_status = ('Завершен', 'Будет доигран позже', 'Неявка', 'Послеовертайма', 'Перенесен')
+    finished_status = ('Завершен', 'Будет доигран позже', 'Неявка', 'Послеовертайма', 'Перенесен', 'Завершен(отказ)', 'Отменен')
 
     def __init__(self):
         self.session = next(get_session())
