@@ -174,14 +174,35 @@ class CurrentMatchService:
         logger.debug(f"Switched to section: {full_url}")
 
         try:
-            # Поиск элемента с классом "cell o_1 noOdds" и извлечение текста "2.00"
-            first_element = self.driver.find_element("css selector", "span.cell.o_1.noOdds")
-            first_value = first_element.find_element("css selector", "span.oddsValueInner").text
-            # Поиск элемента с классом "cell o_2 noOdds" и извлечение текста "3.90"
-            third_element = self.driver.find_element("css selector", "span.cell.o_2.noOdds")
-            third_value = third_element.find_element("css selector", "span.oddsValueInner").text
-            logger.debug(f"KF {first_value} {third_value}")  # 2.00
-            return first_value, third_value
+
+            # # # Поиск элемента с классом "cell o_1 noOdds" и извлечение текста "2.00"
+            # # first_element = self.driver.find_element("css selector", "span.cell.o_1.noOdds")
+            # # first_value = first_element.find_element("css selector", "span.oddsValueInner").text
+            # # # Поиск элемента с классом "cell o_2 noOdds" и извлечение текста "3.90"
+            # # third_element = self.driver.find_element("css selector", "span.cell.o_2.noOdds")
+            # # third_value = third_element.find_element("css selector", "span.oddsValueInner").text
+
+            cells = self.driver.find_elements(
+                By.XPATH,
+                "//div[@class='wclOddsRow']//div[contains(@class, 'wcl-oddsCell_djZ95')]"
+            )
+
+            logger.debug(f"WebElement found ({len(cells)})KF")
+            if len(cells) == 3:
+                kf1 = cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text
+                kf2 = cells[2].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text
+            elif len(cells) == 2:
+                kf1 = cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text
+                kf2 = cells[1].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text
+            else:
+                kf1 = 0
+                kf2 = 0
+                logger.debug(f"WebElement not found  for KF {full_url=}")
+
+
+            if  kf1 != 0 and kf2 != 0:
+                logger.info(f"KF for {full_url=} {kf1} {kf2}")  # 2.00
+            return kf1, kf2
         except NoSuchElementException as e:
             logger.warning(f"NoSuchElementException for KF {full_url=}")
             return 0, 0

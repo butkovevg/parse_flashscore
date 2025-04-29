@@ -7,7 +7,7 @@ SELECT
     analysis.who_must_win,
     analysis.who_now_win,
     analysis."comment",
-    analysis.status
+    analysis.status,
     analysis."result",
     "current".id,
     "current".link,
@@ -17,7 +17,7 @@ SELECT
     "current".country,
     "current".tournament,
     "current".tour,
-    "current".team1,+++++++++++++++++++++++++++
+    "current".team1,
     "current".team2,
     "current".score1,
     "current".score2,
