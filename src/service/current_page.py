@@ -140,37 +140,11 @@ class CurrentPageService:
         finally:
             browser.quit()
 
-    def get_tennis_match(self, link):
-        full_link = f"https://www.flashscorekz.com/match/{link}/#/match-summary"
-        browser = BrowserService.get_webdriver()
-        try:
-            browser.get(full_link)
-            logger.debug(f"browser.get({full_link})")
-            time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
-            current_db_model = CurrentMatchService(browser, self.data4parsing).get_tennis_match_model(link)
-            response_insert = self.insert(model=current_db_model)
-            if response_insert.status == StatusModel.SUCCESS:
-                return ResponseModel(status=StatusModel.SUCCESS, )
-            else:
-                return ResponseModel(status=StatusModel.ERROR, )
-        except ValueError as exc:
-            logger.warning(f"ERROR_ValueError {full_link}")
-            logger.warning(str(exc))
-            return ResponseModel(status=StatusModel.ERROR, )
-        except Exception as exc:
-            logger.error(f"ERROR {full_link}")
-            logger.error(repr(exc))
-            return ResponseModel(status=StatusModel.ERROR, )
-        finally:
-            browser.quit()
-
 
 if __name__ == "__main__":
-
     logger.info(f'Initializing test {os.path.basename(__file__)}')
     sport_name = "football"
     day = 0
     data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
     current_page_service = CurrentPageService(data4parsing=data_for_parsing)
     current_page_service.get_current_match(link="23cc7O9t")
-

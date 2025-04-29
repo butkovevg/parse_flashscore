@@ -68,8 +68,8 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#03 тур", input_value=tour, input_type=str)
 
         # 04 Команды
-        team1_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[2]/div[3]/div[2]/a").text
-        team2_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[4]/div[3]/div[1]/a").text
+        team1_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[1]/div[2]/div[3]/div[2]/a").text
+        team2_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[1]/div[4]/div[3]/div[1]/a").text
         ValidationCurrentMatch.is_validate(text="#04 команда№1", input_value=team1_name, input_type=str)
         ValidationCurrentMatch.is_validate(text="#04 команда№2", input_value=team2_name, input_type=str)
 

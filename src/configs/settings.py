@@ -15,9 +15,8 @@ class Setting(BaseSettings):
     EMAIL: str = "butkovevg@yandex.ru"
     MSG_ERROR: str = f"please, contact the developer {EMAIL}"
 
-    # для логирования
-    # уровни CRITICAL(50)-ERROR(40)-WARNING(30)-INFO(20)-DEBUG(10)-NOTSET(0)
-    LEVEL_LOGGER_HANDLER: int = 20
+    # уровень логирования CRITICAL(50)-ERROR(40)-WARNING(30)-INFO(20)-DEBUG(10)-NOTSET(0)
+    LEVEL_LOGGER_HANDLER: int = 10
 
     # DB
     DRIVER_NAME: str
