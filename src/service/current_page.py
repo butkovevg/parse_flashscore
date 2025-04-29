@@ -143,8 +143,8 @@ class CurrentPageService:
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    sport_name = "tennis"
+    sport_name = "basketball"
     day = 0
     data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
     current_page_service = CurrentPageService(data4parsing=data_for_parsing)
-    current_page_service.get_current_match(link="O0MEIAWs")
+    current_page_service.get_current_match(link="O0h9aI9d")

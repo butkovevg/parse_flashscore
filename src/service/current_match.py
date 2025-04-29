@@ -189,11 +189,11 @@ class CurrentMatchService:
 
             logger.debug(f"WebElement found ({len(cells)})KF")
             if len(cells) == 3:
-                kf1 = cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text
-                kf2 = cells[2].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text
+                kf1 = float(cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
+                kf2 = float(cells[2].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
             elif len(cells) == 2:
-                kf1 = cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text
-                kf2 = cells[1].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text
+                kf1 = float(cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
+                kf2 = float(cells[1].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
             else:
                 kf1 = 0
                 kf2 = 0
@@ -201,14 +201,18 @@ class CurrentMatchService:
 
 
             if  kf1 != 0 and kf2 != 0:
-                logger.info(f"KF for {full_url=} {kf1} {kf2}")  # 2.00
+                logger.info(f"KF {kf1} {kf2}")  # 2.00
             return kf1, kf2
+        except ValueError:
+            logger.warning(f"ValueError for KF {full_url=}")
+            return 0, 0
         except NoSuchElementException as e:
             logger.warning(f"NoSuchElementException for KF {full_url=}")
             return 0, 0
         except Exception as exc:
             logger.error(f"ERROR {full_url=}")
             logger.error(str(exc))
+            logger.error(exc)
             return 0, 0
 
 
