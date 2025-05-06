@@ -34,7 +34,6 @@ def main():
         "football",
         "basketball",
         "handball",
-        "tennis",
     ]
 
     if day <2 : # Нет смысла парсить теннис за два дня и более

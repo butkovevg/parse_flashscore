@@ -48,19 +48,19 @@ class CurrentMatchService:
         logger.debug("*" * 88)
         ValidationCurrentMatch.is_validate(text="#00 ссылка", input_value=link, input_type=str)
         # 01 вид спорта
-        sport_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[2]/nav/ol/li[1]/a/span").text
+        sport_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[1]/a/span").text
         ValidationCurrentMatch.is_validate(text="#01 вид спорта", input_value=sport_name, input_type=str)
 
         # 02 дата и время
-        dt = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[1]/div").text
+        dt = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[1]/div").text
         date_game, time_game = dt.split(" ")
         ValidationCurrentMatch.is_validate(text="#02 дата", input_value=date_game, input_type=str)
         ValidationCurrentMatch.is_validate(text="#02 время", input_value=time_game, input_type=str)
 
         # 03 страна/турнир/тур
-        country = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[2]/nav/ol/li[2]/a/span").text
+        country = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[2]/a/span").text
         ValidationCurrentMatch.is_validate(text="#03 страна", input_value=country, input_type=str)
-        tournament_header = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[2]/nav/ol/li[3]/a/span").text
+        tournament_header = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[3]/a/span").text
         list_tournament_tour = tournament_header.split(" - ")
         tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="")
         tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="")
@@ -68,16 +68,16 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#03 тур", input_value=tour, input_type=str)
 
         # 04 Команды
-        team1_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[1]/div[2]/div[3]/div[2]/a").text
-        team2_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[1]/div[4]/div[3]/div[1]/a").text
+        team1_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[2]/div[3]/div[2]/a").text
+        team2_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[4]/div[3]/div[1]/a").text
         ValidationCurrentMatch.is_validate(text="#04 команда№1", input_value=team1_name, input_type=str)
         ValidationCurrentMatch.is_validate(text="#04 команда№2", input_value=team2_name, input_type=str)
 
         # 05 счёт и статус
         try:
-            status = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[3]/div/div[2]/span").text
-            score1 = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[3]/div/div[1]/span[1]").text
-            score2 = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[6]/div[1]/div[3]/div[3]/div/div[1]/span[3]").text
+            status = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[2]/span").text
+            score1 = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[1]").text
+            score2 = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[3]").text
             score = f"{score1}:{score2}"
         except NoSuchElementException:
             status = "TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ."
