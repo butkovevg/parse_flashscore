@@ -12,6 +12,7 @@
 - Добавление линтера и проверок.
 ### Added
 - Добавил проверку ruff check и конфигурацию pyproject.toml.
+- Создал .pre-commit-config.yaml для pre-commit install
 ### Fixed
 - Устранил замечания(Problems от PyCharm)
 -
