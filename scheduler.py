@@ -35,11 +35,9 @@ def main():
         "basketball",
         "handball",
     ]
-
     if day <2 : # Нет смысла парсить теннис за два дня и более
         logger.debug("ADD tennis in list_sport_name_for_parsing")
         list_sport_name_for_parsing.append("tennis")
-
     if start in ["main"]:
         # MAIN_PAGE
         for sport_name in list_sport_name_for_parsing:

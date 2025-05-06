@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime
 
-from sqlalchemy import select, distinct, and_, or_,  cast, Time
+from sqlalchemy import Time, and_, cast, distinct, or_, select
 
 from src.configs.settings import settings
 from src.model.tables import AnalysisDBModel, CurrentDBModel
@@ -10,7 +10,8 @@ from src.service.database import get_session
 from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
-from src.service.main_page import dct_translate_sport_name_rus_eng, MainPageService
+from src.service.main_page import (MainPageService,
+                                   dct_translate_sport_name_rus_eng)
 
 logger = get_logger(__name__)
 

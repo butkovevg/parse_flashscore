@@ -3,4 +3,5 @@ repos:
     rev: v0.6.7  # или последняя версия
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]  # автофикс + показывает, что были изменения
+        args: [--exit-non-zero-on-fix]  # автофикс + показывает, что были изменения
+#        args: [--fix, --exit-non-zero-on-fix]  # автофикс + показывает, что были изменения

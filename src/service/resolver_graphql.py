@@ -1,5 +1,3 @@
-import typing
-
 import strawberry
 
 
@@ -20,17 +18,17 @@ def get_books_for_author(root):
 @strawberry.type
 class Author:
     name: str
-    books: typing.List[Book] = strawberry.field(resolver=get_books_for_author)
+    books: list[Book] = strawberry.field(resolver=get_books_for_author)
 
 
-def get_authors(root) -> typing.List[Author]:
+def get_authors(root) -> list[Author]:
     return [Author(name="Michael Crichton")]
 
 
 @strawberry.type
 class Query:
-    authors: typing.List[Author] = strawberry.field(resolver=get_authors)
-    books: typing.List[Book] = strawberry.field(resolver=get_books_for_author)
+    authors: list[Author] = strawberry.field(resolver=get_authors)
+    books: list[Book] = strawberry.field(resolver=get_books_for_author)
 
 
 schema = strawberry.Schema(query=Query)

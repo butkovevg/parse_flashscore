@@ -17,5 +17,8 @@ strawberry-graphql==0.224.1
 bs4==0.0.2
 fastapi-users[sqlalchemy]
 websockets==12.0
-ruff==0.11.8
-pre_commit==4.2.0
+
+# Add linters:
+ruff==0.11.8 #  ruff check .
+pre_commit==4.2.0 # add .pre-commit-config.yaml и ''pre-commit install''
+isort==6.0.1 # isort your_file.py
