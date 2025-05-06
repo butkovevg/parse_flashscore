@@ -43,7 +43,6 @@ class CurrentMatchService:
         self.data4parsing = data4parsing
 
     def get_current_match_model(self, link):
-        logger.debug("*" * 88)
         ValidationCurrentMatch.is_validate(text="#00 ссылка", input_value=link, input_type=str)
         # 01 вид спорта
         sport_name = self.driver.find_element(By.XPATH,
@@ -58,51 +57,20 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#02 время", input_value=time_game, input_type=str)
 
         # 03 страна/турнир/тур
-        country = self.driver.find_element(By.XPATH,
-                                           "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[2]/a/span").text
-        ValidationCurrentMatch.is_validate(text="#03 страна", input_value=country, input_type=str)
-        tournament_header = self.driver.find_element(By.XPATH,
-                                                     "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[3]/a/span").text
-        list_tournament_tour = tournament_header.split(" - ")
-        tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="")
-        tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="")
-        ValidationCurrentMatch.is_validate(text="#03 турнир", input_value=tournament, input_type=str)
-        ValidationCurrentMatch.is_validate(text="#03 тур", input_value=tour, input_type=str)
+        country, tournament, tour = self.get_country_tournament_tour()
 
         # 04 Команды
-        team1_name = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[2]/div[3]/div[2]/a").text
-        team2_name = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[4]/div[3]/div[1]/a").text
-        ValidationCurrentMatch.is_validate(text="#04 команда№1", input_value=team1_name, input_type=str)
-        ValidationCurrentMatch.is_validate(text="#04 команда№2", input_value=team2_name, input_type=str)
+        team1_name, team2_name = self.get_teams_name()
 
         # 05 счёт и статус
-        try:
-            status = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[2]/span").text
-            score1 = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[1]").text
-            score2 = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[3]").text
-            score = f"{score1}:{score2}"
-        except NoSuchElementException:
-            status = "TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ."
-            score1 = ""
-            score2 = ""
-            score = "Нет данных" + score1 + score2
-        ValidationCurrentMatch.is_validate(text="#05 счёт", input_value=score, input_type=str)
-        ValidationCurrentMatch.is_validate(text="#05 статус", input_value=status, input_type=str)
+        status, score1, score2 = self.get_status_scores()
 
         # Блок, определяет из таблицы:
         pos1, pos2 = 0, 0
         number_games1, number_games2 = 0, 0
         points1, points2 = 0, 0
         series1, series2 = "", ""
-        # 06 позиции
-        # 07 количество игр
-        # 08 очки
-        # 09 серия
+        # 06 позиции 07 количество игр 08 очки 09 серия
         rows = self.driver.find_elements(By.CSS_SELECTOR, ".ui-table__row")
 
         count = 0
@@ -113,7 +81,7 @@ class CurrentMatchService:
             team = arr_row[1]
             dct_parameters = dict_link[self.data4parsing.sport_name]
             if team == team1_name:
-                pos1 = int((arr_row[0].strip(".")))
+                pos1 = int(arr_row[0].strip("."))
                 if pos1 != count:
                     raise ValueError("Tables > 1")
                 number_games1 = ValidationCurrentMatch.get_integer_value(arr_row[dct_parameters["number_games"]])
@@ -132,20 +100,16 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#06 ПОЗИЦИЯ_2", input_value=pos2, input_type=int)
         ValidationCurrentMatch.is_validate(text="#06 ПОЗИЦИЯ_всего", input_value=number_of_teams_in_the_league,
                                            input_type=int)
-
         ValidationCurrentMatch.is_validate(text="#07 КОЛИЧЕСТВО ИГР1", input_value=number_games1, input_type=int)
         ValidationCurrentMatch.is_validate(text="#07 КОЛИЧЕСТВО ИГР2", input_value=number_games2, input_type=int)
-
         ValidationCurrentMatch.is_validate(text="#08 ОЧКИ1", input_value=points1, input_type=int)
         ValidationCurrentMatch.is_validate(text="#08 ОЧКИ2", input_value=points2, input_type=int)
-
         ValidationCurrentMatch.is_validate(text="#09 СЕРИЯ", input_value=series1, input_type=str)
         ValidationCurrentMatch.is_validate(text="#09 СЕРИЯ", input_value=series2, input_type=str)
         logger.debug("*" * 88)
         kf1, kf2 = self.get_coefficient()
         current_db_model = CurrentDBModel(
-            link=link,
-            sport_name=sport_name,
+            link=link, sport_name=sport_name,
             match_date=date_game,
             match_time=time_game,
             country=country,
@@ -168,8 +132,46 @@ class CurrentMatchService:
             kf1=kf1,
             kf2=kf2,
         )
-        logger.debug("*" * 88)
         return current_db_model
+    def get_country_tournament_tour(self):
+        country = self.driver.find_element(By.XPATH,
+                                           "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[2]/a/span").text
+        ValidationCurrentMatch.is_validate(text="#03 страна", input_value=country, input_type=str)
+        tournament_header = self.driver.find_element(By.XPATH,
+                                                     "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[3]/a/span").text
+        list_tournament_tour = tournament_header.split(" - ")
+        tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="")
+        tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="")
+        ValidationCurrentMatch.is_validate(text="#03 турнир", input_value=tournament, input_type=str)
+        ValidationCurrentMatch.is_validate(text="#03 тур", input_value=tour, input_type=str)
+
+        return country, tournament, tour
+    def get_teams_name(self):
+        team1_name = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[2]/div[3]/div[2]/a").text
+        team2_name = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[4]/div[3]/div[1]/a").text
+        ValidationCurrentMatch.is_validate(text="#04 команда№1", input_value=team1_name, input_type=str)
+        ValidationCurrentMatch.is_validate(text="#04 команда№2", input_value=team2_name, input_type=str)
+        return team1_name, team2_name
+
+    def get_status_scosers(self):
+        try:
+            status = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[2]/span").text
+            score1 = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[1]").text
+            score2 = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[3]").text
+            score = f"{score1}:{score2}"
+        except NoSuchElementException:
+            status = "TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ."
+            score1 = ""
+            score2 = ""
+            score = "Нет данных" + score1 + score2
+        ValidationCurrentMatch.is_validate(text="#05 счёт", input_value=score, input_type=str)
+        ValidationCurrentMatch.is_validate(text="#05 статус", input_value=status, input_type=str)
+        return status, score1, score2
 
     def get_coefficient(self):
 
@@ -196,10 +198,13 @@ class CurrentMatchService:
             )
 
             logger.debug(f"WebElement found ({len(cells)})KF")
-            if len(cells) == 3:
+
+            number_kf_with_draw = 3  # Если в матче м.б. ничья, то бывает три коэффициента
+            number_kf_without_draw = 2  # Если в матче м.б. ничья, то бывает три коэффициента
+            if len(cells) == number_kf_with_draw:
                 kf1 = float(cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
                 kf2 = float(cells[2].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
-            elif len(cells) == 2:
+            elif len(cells) == number_kf_without_draw:
                 kf1 = float(cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
                 kf2 = float(cells[1].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
             else:

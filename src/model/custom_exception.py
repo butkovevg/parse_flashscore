@@ -1,14 +1,15 @@
-from pydantic import BaseModel, Field,  FieldValidationInfo, field_validator
+from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
+
 
 # Pydantic модель ответов на ошибки
 class CustomExceptionModel(BaseModel):
-    status_code: int 
-    er_message: str 
+    status_code: int
+    er_message: str
     er_details: str
 
 
 class ItemsResponse(BaseModel):
-    item_id: float = Field(..., gt=0)  #  должен быть больше 0
+    item_id: float = Field(..., gt=0)  # должен быть больше 0
 
     @field_validator("item_id")
     @classmethod

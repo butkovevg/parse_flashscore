@@ -1,12 +1,9 @@
-import json
 import os
-from datetime import datetime
-from datetime import timedelta
-from typing import Optional
+from datetime import datetime, timedelta
 
 from sqlalchemy import update
 
-from src.model.tables import CurrentDBModel, AnalysisDBModel
+from src.model.tables import AnalysisDBModel, CurrentDBModel
 from src.service.database import get_session
 from src.service.helper import HelperService
 from src.service.logger_handlers import get_logger
@@ -16,16 +13,21 @@ logger = get_logger(__name__)
 
 class AnalysisService:
     def __init__(self, shift_day: int = 0):
-        self.analysis_model: Optional[AnalysisDBModel] = None
+        self.analysis_model: AnalysisDBModel | None = None
         self.session = next(get_session())
         self.shift_day = shift_day
 
     def is_selection_by_position_table(self, record: CurrentDBModel):
-        if record.position_total > 10 and record.num_games1 > 3 and record.num_games2 > 3:
-            if record.position1 < 3 and record.position_total - record.position2 < 3:
+        total_teams_in_table = 10  # Количество команд в таблице больше или равно
+        number_games_team1 = 3  # Количество игр первой команды больше чем
+        number_games_team2 = 3  # Количество игр второй команды больше чем
+        position_win_team = 3  # Позиция в таблице
+        position_loss_team = 3  # Позиция в таблице
+        if record.position_total >= total_teams_in_table and record.num_games1 > number_games_team1 and record.num_games2 > number_games_team2:
+            if record.position1 < position_win_team and record.position_total - record.position2 < position_loss_team:
                 self.analysis_model.by_position_table = 1
                 logger.debug(f"is_selection_by_position_table for {record.link}: {record.position1} {record.position2}")
-            elif record.position2 < 3 and record.position_total - record.position1 < 3:
+            elif record.position2 < position_win_team and record.position_total - record.position1 < position_loss_team:
                 if self.analysis_model.by_position_table == 0:
                     self.analysis_model.by_position_table = 2
                     logger.debug(
@@ -36,6 +38,8 @@ class AnalysisService:
     def is_selection_match_with_series(self, record: CurrentDBModel):
         dct_series1 = {}
         dct_series2 = {}
+        number_wins = 4  # Количество побед для серии
+        number_loss = 4  # Количество проигрышей для серии
         for letter in record.series1:
             if letter in dct_series1:
                 dct_series1[letter] += 1
@@ -47,12 +51,12 @@ class AnalysisService:
             else:
                 dct_series2[letter] = 1
 
-        if dct_series1.get("B", 0) > 4 and dct_series2.get("П", 0) > 4:
+        if dct_series1.get("B", 0) > number_wins and dct_series2.get("П", 0) > number_loss:
             self.analysis_model.by_series = 1
             logger.debug(
                 f"is_selection_match_with_series for {record.link}: {dct_series1.get('B', 0)} {dct_series2.get('П', 0)}")
 
-        elif dct_series2.get("B", 0) > 4 and dct_series1.get("П", 0) > 4:
+        elif dct_series2.get("B", 0) > number_wins and dct_series1.get("П", 0) > number_loss:
             if self.analysis_model.by_series == 0:
                 self.analysis_model.by_series = 2
                 logger.debug(
@@ -64,10 +68,11 @@ class AnalysisService:
         try:
             msg = f"{record.sport_name} {record.team1}: {record.team2} {record.kf1}: {record.kf2}"
             max_kf = 1.25
-            if 1.01 < float(record.kf1) < max_kf:
+            min_kf = 1.01
+            if min_kf < float(record.kf1) < max_kf:
                 self.analysis_model.by_coefficient = 1
                 logger.info(msg)
-            if 1.01 < float(record.kf2) < max_kf:
+            if min_kf < float(record.kf2) < max_kf:
                 if self.analysis_model.by_coefficient == 0:
                     self.analysis_model.by_coefficient = 2
                 else:
@@ -75,6 +80,7 @@ class AnalysisService:
                 logger.info(msg)
         except Exception as exc:
             logger.error(exc)
+
     def is_need_skip(self, current_model: CurrentDBModel):
         if current_model.sport_name == "ТЕННИС":
             if "ITF" in current_model.country:
@@ -107,9 +113,9 @@ class AnalysisService:
                     counter += 1
             logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
 
-
     def is_save(self):
-        set_who_must_win = {self.analysis_model.by_coefficient, self.analysis_model.by_series, self.analysis_model.by_position_table}
+        set_who_must_win = {self.analysis_model.by_coefficient, self.analysis_model.by_series,
+                            self.analysis_model.by_position_table}
         set_who_must_win.discard(0)
         if len(set_who_must_win) == 0:
             return False
@@ -118,7 +124,8 @@ class AnalysisService:
         else:
             self.analysis_model.who_must_win = 3
             self.analysis_model.comment = "ERR different "
-            logger.error(f"{self.analysis_model.link}: different: {self.analysis_model.by_coefficient}/{self.analysis_model.by_series}/{self.analysis_model.by_position_table}")
+            logger.error(
+                f"{self.analysis_model.link}: different: {self.analysis_model.by_coefficient}/{self.analysis_model.by_series}/{self.analysis_model.by_position_table}")
         return True
 
     def insert(self, analysis_model: AnalysisDBModel):
@@ -222,7 +229,7 @@ class InfoAnalysisDBService:
     def get_favorites(self):
         query_all_record = (
             self.query
-            .filter(AnalysisDBModel.is_favorites) # .filter(AnalysisDBModel.is_favorites == True)
+            .filter(AnalysisDBModel.is_favorites)  # .filter(AnalysisDBModel.is_favorites == True)
             .order_by(CurrentDBModel.match_time)
         )
         result = query_all_record.all()
@@ -291,27 +298,6 @@ class InfoAnalysisDBService:
 
 
 if __name__ == "__main__":
-    # 1: "Запись в БД после анализа",
-
-    choice = 1
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    if choice == 1:
-        parsing_service = AnalysisService(shift_day=0)
-        parsing_service.main()
-    elif choice == 2:
-        InfoAnalysisDBService().printer_link()
-    elif choice == 3:
-        parsing_service = InfoAnalysisDBService(0)
-        list_analysis_dct = parsing_service.merge()
-        js = json.dumps(list_analysis_dct[0], indent=4, ensure_ascii=False)
-        print(js)
-    elif choice == 4:
-        parsing_service = InfoAnalysisDBService(0)
-        parsing_service.update_favorities(link="l8camAxG")
-    elif choice == 5:
-        # ANALYSIS
-        day = 1
-        logger.debug(f"AnalysisService {day=}")
-        parsing_service = AnalysisService(shift_day=day)
-        parsing_service.get_tennis_main()
-        logger.debug(f"FINISH {day=}")
+    parsing_service = AnalysisService(shift_day=0)
+    parsing_service.main()

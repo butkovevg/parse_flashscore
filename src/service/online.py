@@ -10,14 +10,14 @@ from src.service.database import get_session
 from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
-from src.service.main_page import (MainPageService,
-                                   dct_translate_sport_name_rus_eng)
+from src.service.main_page import MainPageService, dct_translate_sport_name_rus_eng
 
 logger = get_logger(__name__)
 
 
 class DataBaseOnlineService:
-    finished_status = ('Завершен', 'Будет доигран позже', 'Неявка', 'Послеовертайма', 'Перенесен', 'Завершен(отказ)', 'Отменен')
+    finished_status = (
+    'Завершен', 'Будет доигран позже', 'Неявка', 'Послеовертайма', 'Перенесен', 'Завершен(отказ)', 'Отменен')
 
     def __init__(self):
         self.session = next(get_session())
@@ -159,6 +159,7 @@ class DataBaseOnlineService:
             self.session.rollback()  # Откат изменений в случае ошибки
             logger.error(f"Ошибка: {e}")
 
+
 def logging_difference_list(list_bef_update, list_aft_update, eng_sport_name):
     if len(list_links_bef_update) != len(list_links_aft_update):
         # Преобразуем списки в множества
@@ -177,7 +178,6 @@ def logging_difference_list(list_bef_update, list_aft_update, eng_sport_name):
             DataBaseOnlineService().update_comment(link=link, comment="NO_UPDATE")
 
 
-
 if __name__ == "__main__":
     logger.info(f' Initializing API {settings.TITLE}: {settings.VERSION}')
     logger.info(f' Visit endpoint: http://{settings.SERVER_HOST}:{settings.SERVER_PORT}/online/')
@@ -188,7 +188,6 @@ if __name__ == "__main__":
 
     database_online_service = DataBaseOnlineService()
     match_date_today = HelperService.get_date_with_point_between_day(day=0)
-
 
     while True:
         # Список видов спорта, которые есть в ТБ анализв
@@ -209,7 +208,8 @@ if __name__ == "__main__":
                 data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
                 main_page_service = MainPageService(data4parsing=data_for_parsing)
                 # 02 Список, который можно обновить
-                list_for_update_analysis , list_links_aft_update= main_page_service.get_list_for_update_analysis(list_links_aft_analysis=list_links_bef_update)
+                list_for_update_analysis, list_links_aft_update = main_page_service.get_list_for_update_analysis(
+                    list_links_aft_analysis=list_links_bef_update)
 
                 # 03 Если есть ссылки, которые не обновились, то убираем их с comment="NO_UPDATE"
                 logging_difference_list(list_links_bef_update, list_links_aft_update, eng_sport_name)
@@ -219,4 +219,3 @@ if __name__ == "__main__":
         logger.info("waiting 120 sec")
         time.sleep(120)
 # Если ссылка не обновляется, то возможно полностью обновлять запись
-

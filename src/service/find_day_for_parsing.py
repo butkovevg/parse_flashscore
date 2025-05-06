@@ -3,7 +3,7 @@ from copy import deepcopy
 from sqlalchemy import func
 
 from src.configs.settings import settings
-from src.model.tables import MainDBModel, CurrentDBModel, AnalysisDBModel
+from src.model.tables import AnalysisDBModel, CurrentDBModel, MainDBModel
 from src.service.database import get_session
 from src.service.helper import HelperService
 from src.service.logger_handlers import get_logger

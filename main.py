@@ -1,6 +1,4 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
+import logging
 import multiprocessing
 from contextlib import asynccontextmanager
 
@@ -33,7 +31,7 @@ tags_metadata = [
 async def lifespan(app: FastAPI):
     logger.info(f'Initializing API {settings.TITLE}: {settings.VERSION}')
     logger.info(f'Visit endpoint: http://{settings.SERVER_HOST}:{settings.SERVER_PORT}/analysis/time/0/')
-    if settings.LEVEL_LOGGER_HANDLER == 10:
+    if settings.LEVEL_LOGGER_HANDLER == logging.DEBUG:
         EnvironmentPrinterService.logger_env_from_settings()
         EnvironmentPrinterService.logger_all_environment_variables()
     yield
@@ -65,7 +63,7 @@ async def get_custom_exception(request: Request, exc: CustomException):
 # Обработчик глобальных исключений, который "ловит" все необработанные исключения
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    if settings.LEVEL_LOGGER_HANDLER == 10:  # DEBUG
+    if settings.LEVEL_LOGGER_HANDLER == logging.DEBUG:  # DEBUG
         description_error = str(exc)
 
     else:

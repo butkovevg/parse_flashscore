@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 import argparse
 import os
 
@@ -35,9 +32,11 @@ def main():
         "basketball",
         "handball",
     ]
-    if day <2 : # Нет смысла парсить теннис за два дня и более
+    list_tennis_days = [0,1] # Нет смысла парсить теннис за два дня и более
+    if day in list_tennis_days :
         logger.debug("ADD tennis in list_sport_name_for_parsing")
         list_sport_name_for_parsing.append("tennis")
+
     if start in ["main"]:
         # MAIN_PAGE
         for sport_name in list_sport_name_for_parsing:

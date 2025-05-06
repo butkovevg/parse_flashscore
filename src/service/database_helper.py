@@ -1,7 +1,12 @@
 from asyncio import current_task
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, async_scoped_session, AsyncSession
-from sqlalchemy.orm import DeclarativeBase, mapped_column, declared_attr, Mapped
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_scoped_session,
+    async_sessionmaker,
+    create_async_engine,
+)
+from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
 
 from src.configs.settings import settings
 
@@ -50,8 +55,12 @@ class DataBaseHelper:
 
 
 db_helper = DataBaseHelper(url=settings.DATABASE_URL_ASYNCPG, echo=settings.DB_ECHO)
+
+
 async def create_metadata():
     async with db_helper.engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
+
+
 if __name__ == '__main__':
     db_helper = DataBaseHelper(url=settings.DATABASE_URL_ASYNCPG, echo=settings.DB_ECHO)

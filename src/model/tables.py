@@ -1,5 +1,12 @@
-from sqlalchemy import VARCHAR, INTEGER, Boolean, Float
-from sqlalchemy import create_engine, Column, UniqueConstraint
+from sqlalchemy import (
+    INTEGER,
+    VARCHAR,
+    Boolean,
+    Column,
+    Float,
+    UniqueConstraint,
+    create_engine,
+)
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from src.configs.settings import settings

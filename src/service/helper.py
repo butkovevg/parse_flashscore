@@ -1,6 +1,6 @@
 import datetime
 import time
-from typing import List, Any
+from typing import Any
 
 from src.service.logger_handlers import get_logger
 
@@ -41,10 +41,10 @@ class HelperService:
         return new_date.strftime('%d.%m.%Y')
 
     @staticmethod
-    def get_element_for_list(lst: List, index: int, default_value: Any) -> Any:
+    def get_element_for_list(lst: list[Any], index: int, default_value: Any) -> Any:
         """
         Возвращает элемент списка по указанному индексу или значение по умолчанию, если такой элемент не существует.
-        :param lst: List - Список, из которого нужно получить элемент.
+        :param lst: list - Список, из которого нужно получить элемент.
         :param index: int - Индекс элемента в списке.
         :param default_value: - Any Значение, которое будет возвращено, если элемента с указанным индексом не существует
         в списке.
@@ -70,11 +70,13 @@ class HelperService:
     @staticmethod
     def get_who_now_win(result: str):
         """Логика описана в /model/tables/AnalysisDB"""
+        number_of_results_per_match = 2  # Кол-во результатов в матче
         if "-:-" in result:
             return None
         try:
             list_result = result.split(":")
-            if len(list_result) != 2:
+
+            if len(list_result) != number_of_results_per_match:
                 logger.warning(f"No 2 result for {result}:{list_result}")
             res_team1 = int(list_result[0])
             res_team2 = int(list_result[1])
