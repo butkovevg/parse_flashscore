@@ -88,7 +88,7 @@ class HelperService:
                 logger.warning(f"Look case {result}")
                 return 4
         except ValueError:
-            logger.error(f"result format INT:INT")
+            logger.error("result format INT:INT")
         except Exception as exc:
             logger.error(f"New err for {result}")
             logger.error(exc)

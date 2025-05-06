@@ -116,7 +116,7 @@ class CurrentPageService:
 
     def get_current_match(self, link):
         base_link = f"https://www.flashscorekz.com/match/{self.data4parsing.sport_name}/{link}"
-        fragment_table = f"#/standings/table/overall"
+        fragment_table = "#/standings/table/overall"
         full_link = f"{base_link}/{fragment_table}"
         browser = BrowserService.get_webdriver()
         try:

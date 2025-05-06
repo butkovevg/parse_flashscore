@@ -220,12 +220,9 @@ class InfoAnalysisDBService:
             logger.warning(f"{str(record)=}")
 
     def get_favorites(self):
-
-        new_time = self.current_time - timedelta(minutes=90)
-
         query_all_record = (
             self.query
-            .filter(AnalysisDBModel.is_favorites == True)
+            .filter(AnalysisDBModel.is_favorites) # .filter(AnalysisDBModel.is_favorites == True)
             .order_by(CurrentDBModel.match_time)
         )
         result = query_all_record.all()
@@ -291,7 +288,6 @@ class InfoAnalysisDBService:
         )
         self.session.execute(stmt)
         self.session.commit()
-        logger.warning(f"ok")
 
 
 if __name__ == "__main__":

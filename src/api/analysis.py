@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.background import BackgroundTasks
 
 from src.service.analysis import InfoAnalysisDBService
+from src.service.background_tasks import run
 from src.service.find_day_for_parsing import FindDayForParsingService
 from src.service.online import DataBaseOnlineService
 
@@ -15,8 +16,6 @@ router = APIRouter(
     prefix='/analysis',
     tags=['analysis'],
 )
-
-from src.service.background_tasks import run
 
 
 @router.get("/test_fone/")
@@ -53,10 +52,11 @@ async def update_favorites(analysis_id: int):
 
 
 @router.get("/time/{day}/")
-async def get_value(request: Request, day: int):
+async def get_time_value(request: Request, day: int):
     service = InfoAnalysisDBService(day)
     matches = service.get_match_today()
     return templates.TemplateResponse("analysis_time.html", {"request": request, "matches": matches, "day": day})
+
 
 @router.get("/render/")
 async def test_render(request: Request):
@@ -64,10 +64,11 @@ async def test_render(request: Request):
 
 
 @router.get("/time/{day}/json")
-async def get_value(request: Request, day: int):
+async def get_time_value_json(request: Request, day: int):
     service = InfoAnalysisDBService(day)
     matches = service.get_match_today()
     return matches
+
 
 @router.get("/{day}/")
 async def get_value(request: Request, day: int = 0):
@@ -85,6 +86,7 @@ async def find_day(request: Request):
     return templates.TemplateResponse("find.html", {"request": request,
                                                     "data": data,
                                                     "sports": list_sports})
+
 
 @router.patch("/update_comment/{link}")
 async def update_comment(request: Request, link: str, comment: Optional[str] = None):

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, status
 
 from src.model.custom_exception import ItemsResponse, CustomExceptionModel
 from src.service.custom_handler_exception import CustomException
@@ -7,8 +7,6 @@ router = APIRouter(
     prefix='/exc',
     tags=['exc'],
 )
-
-
 
 
 # ДОБАВИЛИ много мета-информации для описания нашей конечной точки
@@ -27,5 +25,5 @@ async def read_item(item_id: int):
     if item_id == 42:
         raise CustomException(detail="Item not found", status_code=404,
                               message="You're trying to get an item that doesn't exist. Try entering a different item_id.")
-    1/0
+    1 / 0
     return {"item_id": item_id}

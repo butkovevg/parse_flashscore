@@ -8,6 +8,7 @@ from src.configs.settings import settings
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
 # def close_file(file_name):
 #    if os.path.exists(file_name):
 #        os.close(file_name)  # Закрываем файл
@@ -39,7 +40,7 @@ class JsonFormatter(logging.Formatter):
 
 
 string_formatter = logging.Formatter(
-    f"%(asctime)s - [%(levelname)s] - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s")
+    "%(asctime)s - [%(levelname)s] - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s")
 json_formatter = JsonFormatter()
 
 

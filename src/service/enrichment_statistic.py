@@ -1,7 +1,5 @@
 import time
 
-from selenium.webdriver.common.by import By
-
 from src.configs.settings import settings
 from src.service.browser import BrowserService
 from src.service.logger_handlers import get_logger

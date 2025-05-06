@@ -1,9 +1,6 @@
 import typing
-from typing import List
 
 import strawberry
-
-
 
 
 def get_author_for_book(root) -> "Author":
@@ -34,5 +31,6 @@ def get_authors(root) -> typing.List[Author]:
 class Query:
     authors: typing.List[Author] = strawberry.field(resolver=get_authors)
     books: typing.List[Book] = strawberry.field(resolver=get_books_for_author)
+
 
 schema = strawberry.Schema(query=Query)

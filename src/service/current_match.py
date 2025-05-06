@@ -5,9 +5,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from src.model.tables import CurrentDBModel
-from src.service.browser import BrowserService
 from src.service.helper import HelperService
-from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
 from src.service.main_page import dict_link
 
@@ -17,7 +15,7 @@ logger = get_logger(__name__)
 class ValidationCurrentMatch:
     @staticmethod
     def is_validate(text: str, input_value, input_type):
-        if type(input_value) == input_type:
+        if isinstance(input_value, input_type):
             logger.debug(f"{str(text):<20}: {str(input_type):<12}-->{str(input_value):<20}".upper())
         else:
             logger.error(f"{text}: expect {input_type}-->{input_value} reality-->{type(input_value)}".upper())
@@ -25,9 +23,9 @@ class ValidationCurrentMatch:
     @staticmethod
     def get_integer_value(input_value):
         try:
-            if type(input_value) == int:
+            if isinstance(input_value, int):
                 return input_value
-            elif type(input_value) == str:
+            elif isinstance(input_value, str):
                 output_value = int(input_value.split(".")[0])
                 return output_value
         except ValueError:
@@ -48,19 +46,23 @@ class CurrentMatchService:
         logger.debug("*" * 88)
         ValidationCurrentMatch.is_validate(text="#00 ссылка", input_value=link, input_type=str)
         # 01 вид спорта
-        sport_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[1]/a/span").text
+        sport_name = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[1]/a/span").text
         ValidationCurrentMatch.is_validate(text="#01 вид спорта", input_value=sport_name, input_type=str)
 
         # 02 дата и время
-        dt = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[1]/div").text
+        dt = self.driver.find_element(By.XPATH,
+                                      "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[1]/div").text
         date_game, time_game = dt.split(" ")
         ValidationCurrentMatch.is_validate(text="#02 дата", input_value=date_game, input_type=str)
         ValidationCurrentMatch.is_validate(text="#02 время", input_value=time_game, input_type=str)
 
         # 03 страна/турнир/тур
-        country = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[2]/a/span").text
+        country = self.driver.find_element(By.XPATH,
+                                           "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[2]/a/span").text
         ValidationCurrentMatch.is_validate(text="#03 страна", input_value=country, input_type=str)
-        tournament_header = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[3]/a/span").text
+        tournament_header = self.driver.find_element(By.XPATH,
+                                                     "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[3]/a/span").text
         list_tournament_tour = tournament_header.split(" - ")
         tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="")
         tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="")
@@ -68,16 +70,21 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#03 тур", input_value=tour, input_type=str)
 
         # 04 Команды
-        team1_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[2]/div[3]/div[2]/a").text
-        team2_name = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[4]/div[3]/div[1]/a").text
+        team1_name = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[2]/div[3]/div[2]/a").text
+        team2_name = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[4]/div[3]/div[1]/a").text
         ValidationCurrentMatch.is_validate(text="#04 команда№1", input_value=team1_name, input_type=str)
         ValidationCurrentMatch.is_validate(text="#04 команда№2", input_value=team2_name, input_type=str)
 
         # 05 счёт и статус
         try:
-            status = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[2]/span").text
-            score1 = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[1]").text
-            score2 = self.driver.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[3]").text
+            status = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[2]/span").text
+            score1 = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[1]").text
+            score2 = self.driver.find_element(By.XPATH,
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[3]").text
             score = f"{score1}:{score2}"
         except NoSuchElementException:
             status = "TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ."
@@ -163,6 +170,7 @@ class CurrentMatchService:
         )
         logger.debug("*" * 88)
         return current_db_model
+
     def get_coefficient(self):
 
         new_fragment = "#/match-summary/match-summary"
@@ -199,14 +207,13 @@ class CurrentMatchService:
                 kf2 = 0
                 logger.debug(f"WebElement not found  for KF {full_url=}")
 
-
-            if  kf1 != 0 and kf2 != 0:
+            if kf1 != 0 and kf2 != 0:
                 logger.info(f"KF {kf1} {kf2}")  # 2.00
             return kf1, kf2
         except ValueError:
             logger.warning(f"ValueError for KF {full_url=}")
             return 0, 0
-        except NoSuchElementException as e:
+        except NoSuchElementException:
             logger.warning(f"NoSuchElementException for KF {full_url=}")
             return 0, 0
         except Exception as exc:
@@ -216,7 +223,5 @@ class CurrentMatchService:
             return 0, 0
 
 
-
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-
