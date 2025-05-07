@@ -155,7 +155,7 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#04 команда№2", input_value=team2_name, input_type=str)
         return team1_name, team2_name
 
-    def get_status_scosers(self):
+    def get_status_scores(self):
         try:
             status = self.driver.find_element(By.XPATH,
                                               "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[2]/span").text
@@ -199,8 +199,8 @@ class CurrentMatchService:
 
             logger.debug(f"WebElement found ({len(cells)})KF")
 
-            number_kf_with_draw = 3  # Если в матче м.б. ничья, то бывает три коэффициента
-            number_kf_without_draw = 2  # Если в матче м.б. ничья, то бывает три коэффициента
+            number_kf_with_draw = 3  # Если в матче м.б. Ничья, то бывает три коэффициента
+            number_kf_without_draw = 2  # Если в матче м.б. Ничья, то бывает три коэффициента
             if len(cells) == number_kf_with_draw:
                 kf1 = float(cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
                 kf2 = float(cells[2].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)

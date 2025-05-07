@@ -65,6 +65,7 @@ class FindDayForParsingService:
             return results
         except Exception as exc:
             logger.error(f"Подробности ошибки {str(exc)}")
+            return []
         finally:
             self.session.close()
 

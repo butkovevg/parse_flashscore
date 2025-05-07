@@ -81,13 +81,14 @@ class AnalysisService:
         except Exception as exc:
             logger.error(exc)
 
-    def is_need_skip(self, current_model: CurrentDBModel):
+    @staticmethod
+    def is_need_skip(current_model: CurrentDBModel):
         if current_model.sport_name == "ТЕННИС":
             if "ITF" in current_model.country:
                 return True
         return False
 
-    def main(self):
+    def main(self)-> None:
         unprocessed_records = self.get_list_from_db()
         counter = 0
         length_unprocessed_records = len(unprocessed_records)
@@ -106,12 +107,13 @@ class AnalysisService:
             self.is_selection_match_with_series(current_model)
 
             if self.is_save():
-                if self.is_need_skip(current_model):
+                if AnalysisService.is_need_skip(current_model):
                     logger.debug(f"is_need_skip: {current_model.link}, {current_model.country}")
                 else:
                     self.insert(analysis_model=self.analysis_model)
                     counter += 1
             logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
+
 
     def is_save(self):
         set_who_must_win = {self.analysis_model.by_coefficient, self.analysis_model.by_series,
@@ -141,10 +143,6 @@ class AnalysisService:
             self.session.rollback()
 
     def update(self, current_db_model: CurrentDBModel, status: bool = True):
-        """
-        :param status:
-        :return:
-        """
         stmt = (
             update(CurrentDBModel).
             where(CurrentDBModel.id == current_db_model.id).
@@ -153,7 +151,7 @@ class AnalysisService:
         self.session.execute(stmt)
         self.session.commit()
 
-    def get_list_from_db(self):
+    def get_list_from_db(self) -> list:
         try:
             match_date = HelperService.get_date_with_point_between_day(self.shift_day)
             logger.debug(f"get_list_from_db {match_date=}")
@@ -164,22 +162,15 @@ class AnalysisService:
                 .filter_by(match_date=match_date)
                 # .filter(CurrentDBModel.position1 != 0)
             )
-
             # Необработанных записей для вида спорта по дате
             query_unprocessed_record = query_all_record.filter_by(status=None)
-
             len_all_record = query_all_record.count()
             len_unprocessed_record = query_unprocessed_record.count()
-
             logger.debug(f"{len_unprocessed_record=}/{len_all_record=}")
-
-            # unprocessed_records = query_unprocessed_record.all()
-
             return query_all_record.all()
         except Exception as exc:
             logger.error(f"Подробности ошибки {str(exc)}")
-        finally:
-            self.session.close()
+            return []
 
 
 class InfoAnalysisDBService:
@@ -235,11 +226,9 @@ class InfoAnalysisDBService:
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
 
-        return self.get_list_dct_models_analysis_and_current(result)
+        return InfoAnalysisDBService.get_list_dct_models_analysis_and_current(result)
 
     def merge(self):
-        # new_time = self.current_time - timedelta(minutes=90)
-        # time_filter = new_time.strftime('%H:%M')
         query_all_record = (
             self.query
             .order_by(CurrentDBModel.match_time)
@@ -247,7 +236,7 @@ class InfoAnalysisDBService:
         query_all_record = query_all_record.filter(AnalysisDBModel.comment.is_(None))
         result = query_all_record.all()
         logger.warning(f"{len(result)=}")
-        return self.get_list_dct_models_analysis_and_current(result)
+        return InfoAnalysisDBService.get_list_dct_models_analysis_and_current(result)
 
     def get_match_today(self):
         new_time = self.current_time - timedelta(minutes=90)
@@ -257,9 +246,10 @@ class InfoAnalysisDBService:
         query_all_record = query_all_record.order_by(CurrentDBModel.match_time)
         result = query_all_record.all()
         logger.info(f"get_match_today: {len(result)=}")
-        return self.get_list_dct_models_analysis_and_current(result)
+        return InfoAnalysisDBService.get_list_dct_models_analysis_and_current(result)
 
-    def get_list_dct_models_analysis_and_current(self, result):
+    @staticmethod
+    def get_list_dct_models_analysis_and_current(result):
         output_list = []
         for analysis, current in result:
             row_dict = {}
@@ -278,23 +268,7 @@ class InfoAnalysisDBService:
             output_list.append(row_dict)
         return output_list
 
-    def update_favorites(self, analysis_id: int):
-        query_link = (
-            self.session
-            .query(AnalysisDBModel)
-            .filter(AnalysisDBModel.id == analysis_id)
-        )
-        analysis_db_model = query_link.all()[0]
-        print(analysis_db_model)
-        logger.warning(f"{analysis_db_model=}")
 
-        stmt = (
-            update(AnalysisDBModel).
-            where(AnalysisDBModel.id == analysis_id).
-            values(is_favorites=not analysis_db_model.is_favorites)
-        )
-        self.session.execute(stmt)
-        self.session.commit()
 
 
 if __name__ == "__main__":

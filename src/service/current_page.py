@@ -114,7 +114,7 @@ class CurrentPageService:
             logger.error(main_db_model.link)
             self.session.rollback()
 
-    def get_current_match(self, link):
+    def get_current_match(self, link) -> ResponseModel:
         base_link = f"https://www.flashscorekz.com/match/{self.data4parsing.sport_name}/{link}"
         fragment_table = "#/standings/table/overall"
         full_link = f"{base_link}/{fragment_table}"
