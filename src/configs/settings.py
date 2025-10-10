@@ -9,9 +9,9 @@ PATH_ENV = os.path.join(ROOT_DIR, '.env')
 
 class Setting(BaseSettings):
     """Класс работы с .env"""
-    TITLE: str = "parse_flashscore"
+    TITLE: str = "FLASHSCORE"
     DESCRIPTION: str = ""
-    VERSION: str = "v0.0.5"
+    VERSION: str = "v0.0.6"
     NAME: str = ""
     EMAIL: str = "butkovevg@yandex.ru"
     MSG_ERROR: str = f"please, contact the developer {EMAIL}"

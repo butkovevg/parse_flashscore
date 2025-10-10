@@ -1,5 +1,4 @@
 import os
-import time
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -133,6 +132,7 @@ class CurrentMatchService:
             kf2=kf2,
         )
         return current_db_model
+
     def get_country_tournament_tour(self):
         country = self.driver.find_element(By.XPATH,
                                            "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[2]/a/span").text
@@ -146,6 +146,7 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#03 тур", input_value=tour, input_type=str)
 
         return country, tournament, tour
+
     def get_teams_name(self):
         team1_name = self.driver.find_element(By.XPATH,
                                               "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[2]/div[3]/div[2]/a").text
@@ -175,13 +176,12 @@ class CurrentMatchService:
 
     def get_coefficient(self):
 
-        new_fragment = "#/match-summary/match-summary"
-        self.driver.execute_script(f"window.location.hash = '{new_fragment}'")
-        time.sleep(5)
+        # new_fragment = "#/match-summary/match-summary"
+        # self.driver.execute_script(f"window.location.hash = '{new_fragment}'")
+        # time.sleep(5)
 
-        # DELETE
         full_url = self.driver.current_url
-        logger.debug(f"Switched to section: {full_url}")
+        # logger.debug(f"Switched to section: {full_url}")
 
         try:
 
@@ -192,12 +192,25 @@ class CurrentMatchService:
             # # third_element = self.driver.find_element("css selector", "span.cell.o_2.noOdds")
             # # third_value = third_element.find_element("css selector", "span.oddsValueInner").text
 
-            cells = self.driver.find_elements(
-                By.XPATH,
-                "//div[@class='wclOddsRow']//div[contains(@class, 'wcl-oddsCell_djZ95')]"
-            )
+            cells = []
+            try:
+                # Найти все элементы с коэффициентами
+                odds_elements = self.driver.find_elements(By.XPATH, '//span[@data-testid="wcl-oddsValue"]')
 
-            logger.debug(f"WebElement found ({len(cells)})KF")
+                # Отфильтровать только те, где текст — число (а не "-")
+                valid_odds = []
+                for el in odds_elements:
+                    text = el.text.strip()
+                    if text and text != '-' and text.replace('.', '', 1).isdigit():
+                        valid_odds.append(text)
+
+                print("Найденные коэффициенты:", valid_odds)  # → ['1.46', '2.59']
+                for i in cells:
+                    logger.warning(f"{i.text}: {type(i)} {i}")
+            except TypeError:
+                logger.warning("ERR TMP1")
+            except Exception as e:
+                logger.warning(f"ERR TMP3 {str(e)}")
 
             number_kf_with_draw = 3  # Если в матче м.б. Ничья, то бывает три коэффициента
             number_kf_without_draw = 2  # Если в матче м.б. Ничья, то бывает три коэффициента

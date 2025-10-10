@@ -25,18 +25,16 @@ class CurrentPageService:
 
     def get_list_links_from_db(self):
         try:
-            translate_sport_name = dict_link[self.data4parsing.sport_name]["sport_name"]
+            rus_translate_sport_name = dict_link[self.data4parsing.sport_name]["sport_name"]
             en_sport_name = self.data4parsing.sport_name
-            logger.warning(f"{en_sport_name}")
+            logger.info(f"{en_sport_name} {self.data4parsing.match_date=}")
 
             # запрос для всех записей для вида спорта по дате
-            logger.warning(f"{self.data4parsing.match_date=}")
-            logger.warning(f"{translate_sport_name=}")
             query_all_record = (
                 self.session
                 .query(MainDBModel)
                 .filter_by(match_date=self.data4parsing.match_date)
-                .filter_by(sport_name=translate_sport_name)
+                .filter_by(sport_name=rus_translate_sport_name)
             )
 
             # Необработанных записей для вида спорта по дате
@@ -122,7 +120,7 @@ class CurrentPageService:
         try:
             browser.get(full_link)
             logger.debug(f"browser.get({full_link})")
-            time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
+            time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 5))
             current_db_model = CurrentMatchService(browser, self.data4parsing).get_current_match_model(link)
             response_insert = self.insert(model=current_db_model)
             if response_insert.status == StatusModel.SUCCESS:

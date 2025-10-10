@@ -22,3 +22,6 @@ websockets==12.0
 ruff==0.11.8 #  ruff check .
 pre_commit==4.2.0 # add .pre-commit-config.yaml и ''pre-commit install''
 isort==6.0.1 # isort your_file.py
+
+# for load testing
+# locust==2.37.0
