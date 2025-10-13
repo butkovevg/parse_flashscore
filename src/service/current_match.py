@@ -184,15 +184,6 @@ class CurrentMatchService:
         # logger.debug(f"Switched to section: {full_url}")
 
         try:
-
-            # # # Поиск элемента с классом "cell o_1 noOdds" и извлечение текста "2.00"
-            # # first_element = self.driver.find_element("css selector", "span.cell.o_1.noOdds")
-            # # first_value = first_element.find_element("css selector", "span.oddsValueInner").text
-            # # # Поиск элемента с классом "cell o_2 noOdds" и извлечение текста "3.90"
-            # # third_element = self.driver.find_element("css selector", "span.cell.o_2.noOdds")
-            # # third_value = third_element.find_element("css selector", "span.oddsValueInner").text
-
-            cells = []
             try:
                 # Найти все элементы с коэффициентами
                 odds_elements = self.driver.find_elements(By.XPATH, '//span[@data-testid="wcl-oddsValue"]')
@@ -204,22 +195,20 @@ class CurrentMatchService:
                     if text and text != '-' and text.replace('.', '', 1).isdigit():
                         valid_odds.append(text)
 
-                print("Найденные коэффициенты:", valid_odds)  # → ['1.46', '2.59']
-                for i in cells:
-                    logger.warning(f"{i.text}: {type(i)} {i}")
+                logger.warning(f"Найденные коэффициенты({len(valid_odds)}):  {valid_odds}")
             except TypeError:
-                logger.warning("ERR TMP1")
+                logger.error("ERR TMP1")
             except Exception as e:
-                logger.warning(f"ERR TMP3 {str(e)}")
+                logger.error(f"ERR TMP3 {str(e)}")
 
-            number_kf_with_draw = 3  # Если в матче м.б. Ничья, то бывает три коэффициента
-            number_kf_without_draw = 2  # Если в матче м.б. Ничья, то бывает три коэффициента
-            if len(cells) == number_kf_with_draw:
-                kf1 = float(cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
-                kf2 = float(cells[2].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
-            elif len(cells) == number_kf_without_draw:
-                kf1 = float(cells[0].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
-                kf2 = float(cells[1].find_element(By.CSS_SELECTOR, "span[data-testid='wcl-oddsValue']").text)
+            number_kf_with_draw = [3, 6, 9, 12]  # Если в матче м.б. Ничья, то бывает три коэффициента
+            number_kf_without_draw = [2, 4, 6, 8, 10]  # Если в матче м.б. Ничья, то бывает три коэффициента
+            if len(valid_odds) in number_kf_with_draw:
+                kf1 = float(valid_odds[0])
+                kf2 = float(valid_odds[2])
+            elif len(valid_odds) in number_kf_without_draw:
+                kf1 = float(valid_odds[0])
+                kf2 = float(valid_odds[1])
             else:
                 kf1 = 0
                 kf2 = 0
