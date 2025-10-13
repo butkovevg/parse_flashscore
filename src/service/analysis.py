@@ -6,9 +6,7 @@ from sqlalchemy import update
 from src.model.tables import AnalysisDBModel, CurrentDBModel
 from src.service.database import get_session
 from src.service.helper import HelperService
-from src.service.logger_handlers import get_logger
-
-logger = get_logger(__name__)
+from src.service.logger_handlers import logger
 
 
 class AnalysisService:
@@ -88,7 +86,7 @@ class AnalysisService:
                 return True
         return False
 
-    def main(self)-> None:
+    def main(self) -> None:
         unprocessed_records = self.get_list_from_db()
         counter = 0
         length_unprocessed_records = len(unprocessed_records)
@@ -113,7 +111,6 @@ class AnalysisService:
                     self.insert(analysis_model=self.analysis_model)
                     counter += 1
             logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
-
 
     def is_save(self):
         set_who_must_win = {self.analysis_model.by_coefficient, self.analysis_model.by_series,
@@ -267,8 +264,6 @@ class InfoAnalysisDBService:
             row_dict.pop("registry", None)
             output_list.append(row_dict)
         return output_list
-
-
 
 
 if __name__ == "__main__":

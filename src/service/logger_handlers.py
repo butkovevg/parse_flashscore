@@ -86,3 +86,6 @@ def get_logger(name):
     logger.addHandler(get_stream_handler())
 
     return logger
+
+
+logger = get_logger(__name__)
