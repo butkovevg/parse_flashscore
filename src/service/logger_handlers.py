@@ -7,6 +7,7 @@ from logging.handlers import TimedRotatingFileHandler
 from src.configs.settings import settings
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+LOGS_DIR = os.path.join(ROOT_DIR, 'logs')
 
 
 # def close_file(file_name):
@@ -45,7 +46,7 @@ json_formatter = JsonFormatter()
 
 
 def get_file_handler_detailed():
-    path_detailed_logs = os.path.join(ROOT_DIR, f"../logs/log_detailed_{settings.TITLE}.log")
+    path_detailed_logs = os.path.join(LOGS_DIR, f"log_detailed_{settings.TITLE}.log")
     # close_file(file_name=path_detailed_logs)
     file_handler = TimedRotatingFileHandler(
         filename=path_detailed_logs,
@@ -63,7 +64,7 @@ def get_file_handler_detailed():
 
 
 def get_file_handler_error():
-    path_error_logs = os.path.join(ROOT_DIR, f"../logs/log_error_{settings.TITLE}.log")
+    path_error_logs = os.path.join(LOGS_DIR, f"log_error_{settings.TITLE}.log")
     # close_file(file_name=path_error_logs)
     file_handler = logging.FileHandler(path_error_logs)
     file_handler.setLevel(logging.ERROR)
@@ -79,13 +80,13 @@ def get_stream_handler():
 
 
 def get_logger(name):
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(get_file_handler_detailed())
-    logger.addHandler(get_file_handler_error())
-    logger.addHandler(get_stream_handler())
+    custom_logger = logging.getLogger(name)
+    custom_logger.setLevel(logging.DEBUG)
+    custom_logger.addHandler(get_file_handler_detailed())
+    custom_logger.addHandler(get_file_handler_error())
+    custom_logger.addHandler(get_stream_handler())
 
-    return logger
+    return custom_logger
 
 
 logger = get_logger(__name__)

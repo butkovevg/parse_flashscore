@@ -31,6 +31,7 @@ async def start_process(
         hidden: bool,
         mode: ModeEnum
 ):
+
     background_tasks.add_task(process, sport, day_number, hidden, mode)
     return ResponseModel(status=StatusModel.SUCCESS,
                          data=f"Фоновая задача запущена {datetime.utcnow().isoformat() + 'Z'}")

@@ -18,6 +18,7 @@ class Setting(BaseSettings):
 
     # уровень логирования CRITICAL(50)-ERROR(40)-WARNING(30)-INFO(20)-DEBUG(10)-NOTSET(0)
     LEVEL_LOGGER_HANDLER: int = logging.INFO
+    IS_HEADLESS: bool = True
 
     # DB
     DRIVER_NAME: str

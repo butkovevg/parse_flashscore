@@ -116,7 +116,7 @@ class CurrentPageService:
         base_link = f"https://www.flashscorekz.com/match/{self.data4parsing.sport_name}/{link}"
         fragment_table = "#/standings/table/overall"
         full_link = f"{base_link}/{fragment_table}"
-        browser = BrowserService.get_webdriver()
+        browser = BrowserService.get_webdriver(is_headless=settings.IS_HEADLESS)
         try:
             browser.get(full_link)
             logger.debug(f"browser.get({full_link})")

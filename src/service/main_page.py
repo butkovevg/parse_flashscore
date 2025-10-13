@@ -82,7 +82,7 @@ class MainPageService:
         try:
             link = dict_link.get(self.data4parsing.sport_name).get("link")
             delimiter = dict_link.get(self.data4parsing.sport_name).get("delimiter")
-            browser = BrowserService.get_webdriver()
+            browser = BrowserService.get_webdriver(is_headless=settings.IS_HEADLESS)
             browser.get(link)
             time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
 
@@ -144,7 +144,7 @@ class MainPageService:
     def get_list_for_update_analysis(self, list_links_aft_analysis: list):
         try:
             link = dict_link.get(self.data4parsing.sport_name).get("link")
-            browser = BrowserService.get_webdriver()
+            browser = BrowserService.get_webdriver(is_headless=settings.IS_HEADLESS)
             browser.get(link)
             time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
             page_source = browser.page_source
