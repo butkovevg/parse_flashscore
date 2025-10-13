@@ -8,7 +8,7 @@ from src.configs.settings import settings
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGS_DIR = os.path.join(ROOT_DIR, 'logs')
-
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 # def close_file(file_name):
 #    if os.path.exists(file_name):
