@@ -4,6 +4,7 @@ from enum import Enum
 class ModeEnum(str, Enum):
     main = "main"
     current = "current"
+    analysis = "analysis"
 
 class TypesOfSportsModel(Enum):
     football: str = "ФУТБОЛ"
