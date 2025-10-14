@@ -14,6 +14,6 @@ class TypesOfSportsModel(Enum):
     tennis: str = "ТЕННИС"
 
 
-rus_types_sports = [member.value for member in TypesOfSportsModel]
-english_types_sports = [member.name for member in TypesOfSportsModel ]
+rus_list_types_sports = [member.value for member in TypesOfSportsModel]
+english_list_types_sports = [member.name for member in TypesOfSportsModel]
 dct_rus_to_eng = {member.value: member.name for member in TypesOfSportsModel}
