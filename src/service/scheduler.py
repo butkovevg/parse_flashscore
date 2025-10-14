@@ -31,6 +31,9 @@ class SchedulerService:
         self.current_page_service = CurrentPageService(data4parsing=self.data_for_parsing)
         self.analysis_service = AnalysisService(shift_day=shift_day)
 
+    def __del__(self):
+        self.scan_analysis()
+
     def __str__(self):
         return f"{self.data_for_parsing.shift_day} {self.data_for_parsing.english_sport_name}"
 
@@ -80,9 +83,7 @@ def run_day(shift_day: int):
 
         for scheduler_service in list_scheduler_service:
             list_methods.append(lambda svc=scheduler_service: run_mode(scheduler_service=svc, mode="current"))
-        # для анализа
-        if len(list_scheduler_service) > 0:
-            list_methods.append(lambda svc=scheduler_service: run_mode(scheduler_service=svc, mode="analysis"))
+
         for call_method in list_methods:
             call_method()
     else:
@@ -95,10 +96,6 @@ def run_day(shift_day: int):
         settings.IS_HEADLESS = True
         for scheduler_service in list_scheduler_service:
             run_mode(scheduler_service=scheduler_service, mode="current")
-
-        # для анализа
-        if len(list_scheduler_service) > 0:
-            run_mode(scheduler_service=list_scheduler_service[0], mode="analysis")
 
 
 def run_mode(scheduler_service: SchedulerService, mode: str):
