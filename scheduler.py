@@ -90,11 +90,16 @@ def run_day(shift_day: int):
         for call_method in list_methods:
             call_method()
     else:
+        # Main
+        settings.IS_HEADLESS = False
         for scheduler_service in list_scheduler_service:
             run_mode(scheduler_service=scheduler_service, mode="main")
 
+        # Current
+        settings.IS_HEADLESS = True
         for scheduler_service in list_scheduler_service:
             run_mode(scheduler_service=scheduler_service, mode="current")
+
         # для анализа
         if len(list_scheduler_service) > 0:
             run_mode(scheduler_service=list_scheduler_service[0], mode="analysis")
