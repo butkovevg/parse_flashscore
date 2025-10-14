@@ -107,7 +107,23 @@ a:active {
         <td> {{ object_data.shift_day }} </td>
         <td class="date-cell">{{ object_data.dt }}</td>
         {% for sport in sports %}
-            <td data-sport_name={{ sport }}>{{ object_data.main[sport] }}/{{ object_data.curr[sport] }}/{{ object_data.anal[sport] }}</td>
+            <td data-sport_name={{ sport }}>
+                <button class="start-process-btn"
+                    data-rus_sport_name="{{ sport }}"
+                    data-shift_day="{{ object_data.shift_day }}"
+                    data-hidden="false"
+                    data-mode="main"
+                    title="Запустить main обработку">
+                </button>
+                {{ object_data.main[sport] }}/{{ object_data.curr[sport] }}/{{ object_data.anal[sport] }}
+                <button class="start-process-btn"
+                    data-rus_sport_name="{{ sport }}"
+                    data-shift_day="{{ object_data.shift_day }}"
+                    data-hidden="true"
+                    data-mode="current"
+                    title="Запустить current обработку">
+                </button>
+            </td>
         {% endfor %}
         <!--    СЧИТАЮ МАТЧИ В АНАЛИЗЕ   -->
         {% set total = [0] %} {# Оборачиваем в список #}
@@ -121,6 +137,45 @@ a:active {
     {% endfor %}
 </table>
 <script>
+// Выполнение POST-запроса
+document.addEventListener('DOMContentLoaded', function () {
+document.querySelectorAll('.start-process-btn').forEach(button => {
+    button.addEventListener('click', async function () {
+        const rusSportName = encodeURIComponent(this.dataset.rus_sport_name);
+        const shiftDay = encodeURIComponent(this.dataset.shift_day);
+        const hiddenM = encodeURIComponent(this.dataset.hidden);
+        const modeM = encodeURIComponent(this.dataset.mode);
+
+        //const url = `http://localhost:8000/scheduler/start-process/?rus_sport_name=${rusSportName}&shift_day=${shiftDay}&hidden=${hiddenM}&mode=${modeM}`;
+        const url = `http://localhost:8000/scheduler/start-process/?rus_sport_name=${rusSportName}&shift_day=${shiftDay}&hidden=${hiddenM}&mode=${modeM}`;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    // Если ваш API требует Content-Type, добавьте:
+                    // 'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                // Пустое тело, как в curl -d ''
+                body: ''
+            });
+
+            if (response.ok) {
+                alert('Процесс запущен успешно!');
+            } else {
+                alert('Ошибка при запуске процесса: ' + response.status);
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Не удалось отправить запрос.');
+        }
+    });
+});
+});
+
+
+
+
 // Функция для получения дня недели
 function getDayOfWeek(dateString) {
     // Разбиваем строку даты на компоненты

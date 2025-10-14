@@ -12,9 +12,7 @@ from src.service.browser import BrowserService
 from src.service.database import get_session
 from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
-from src.service.logger_handlers import get_logger
-
-logger = get_logger(__name__)
+from src.service.logger_handlers import logger
 
 dict_link = {
     "football": {
@@ -202,7 +200,6 @@ class MainPageService:
                     except Exception as exc:
                         print("ERR", link, exc)
                         res = "Error -:-"
-
 
                     if link in list_links_aft_analysis:
                         # Добавляем данные в список
