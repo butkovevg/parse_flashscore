@@ -5,10 +5,8 @@ from selenium.webdriver.common.by import By
 
 from src.model.tables import CurrentDBModel
 from src.service.helper import HelperService
-from src.service.logger_handlers import get_logger
+from src.service.logger_handlers import logger
 from src.service.main_page import dict_link
-
-logger = get_logger(__name__)
 
 
 class ValidationCurrentMatch:

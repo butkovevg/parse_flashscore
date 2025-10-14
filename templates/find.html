@@ -91,7 +91,7 @@ a:active {
 <table>
 <!--    ШАПКА   -->
     <tr>
-        <th> # </th>
+        <th><a href="/"> # </th>
         <th>ДАТА</th>
 
               {% for sport in sports %}
@@ -139,38 +139,83 @@ a:active {
 <script>
 // Выполнение POST-запроса
 document.addEventListener('DOMContentLoaded', function () {
-document.querySelectorAll('.start-process-btn').forEach(button => {
-    button.addEventListener('click', async function () {
-        const rusSportName = encodeURIComponent(this.dataset.rus_sport_name);
-        const shiftDay = encodeURIComponent(this.dataset.shift_day);
-        const hiddenM = encodeURIComponent(this.dataset.hidden);
-        const modeM = encodeURIComponent(this.dataset.mode);
-
-        //const url = `http://localhost:8000/scheduler/start-process/?rus_sport_name=${rusSportName}&shift_day=${shiftDay}&hidden=${hiddenM}&mode=${modeM}`;
-        const url = `http://localhost:8000/scheduler/start-process/?rus_sport_name=${rusSportName}&shift_day=${shiftDay}&hidden=${hiddenM}&mode=${modeM}`;
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'accept': 'application/json',
-                    // Если ваш API требует Content-Type, добавьте:
-                    // 'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                // Пустое тело, как в curl -d ''
-                body: ''
-            });
-
-            if (response.ok) {
-                alert('Процесс запущен успешно!');
-            } else {
-                alert('Ошибка при запуске процесса: ' + response.status);
-            }
-        } catch (error) {
-            console.error('Ошибка:', error);
-            alert('Не удалось отправить запрос.');
+    // Функция для показа уведомления в правом нижнем углу
+    function showToast(message, isSuccess = true) {
+        // Создаём контейнер для уведомлений, если его ещё нет
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.style.position = 'fixed';
+            toastContainer.style.bottom = '20px';
+            toastContainer.style.right = '20px';
+            toastContainer.style.zIndex = '10000';
+            toastContainer.style.maxWidth = '300px';
+            document.body.appendChild(toastContainer);
         }
+
+        // Создаём само уведомление
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.padding = '12px 16px';
+        toast.style.marginTop = '8px';
+        toast.style.borderRadius = '6px';
+        toast.style.color = '#fff';
+        toast.style.fontSize = '14px';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        toast.style.animation = 'fadeIn 0.3s ease-out';
+
+        // Стиль в зависимости от успеха/ошибки
+        if (isSuccess) {
+            toast.style.backgroundColor = '#28a745'; // зелёный
+        } else {
+            toast.style.backgroundColor = '#dc3545'; // красный
+        }
+
+        toastContainer.appendChild(toast);
+
+        // Удаляем уведомление через 5 секунд
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.5s ease-in forwards';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 500);
+        }, 5000);
+    }
+
+    // Добавляем обработчики на кнопки
+    document.querySelectorAll('.start-process-btn').forEach(button => {
+        button.addEventListener('click', async function () {
+            const rusSportName = encodeURIComponent(this.dataset.rus_sport_name);
+            const shiftDay = encodeURIComponent(this.dataset.shift_day);
+            const hiddenM = encodeURIComponent(this.dataset.hidden || 'true');
+            const modeM = encodeURIComponent(this.dataset.mode || 'current');
+
+            const url = `http://localhost:8000/scheduler/start-process/?rus_sport_name=${rusSportName}&shift_day=${shiftDay}&hidden=${hiddenM}&mode=${modeM}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'accept': 'application/json'
+                    },
+                    body: ''
+                });
+
+                if (response.ok) {
+                    showToast('Процесс запущен успешно!');
+                } else {
+                    const errorMsg = await response.text().catch(() => '');
+                    showToast(`Ошибка: ${response.status} ${errorMsg}`, false);
+                }
+            } catch (error) {
+                console.error('Ошибка запроса:', error);
+                showToast('Не удалось отправить запрос.', false);
+            }
+        });
     });
-});
 });
 
 
@@ -250,3 +295,15 @@ function navigateToValue(offset) {
 }
 
 </script>
+
+<!-- Добавляем CSS-анимации для плавного появления/исчезновения -->
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(10px); }
+}
+</style>

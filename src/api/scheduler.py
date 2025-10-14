@@ -11,6 +11,7 @@ from src.model.types_of_sports import (
     TypesOfSportsModel,
     dct_rus_to_eng,
 )
+from src.service.logger_handlers import logger
 from src.service.scheduler import SchedulerService, get_scheduler_service, run_mode
 
 router = APIRouter(
@@ -27,6 +28,7 @@ async def start_process(
         hidden: bool = True,
         mode: ModeEnum = ModeEnum.main,
 ):
+    logger.info(f"input {rus_sport_name=}, {shift_day=}, {hidden=}, {mode=} ")
     settings.IS_HEADLESS = hidden
     eng_sport_name = dct_rus_to_eng.get(rus_sport_name.value)
     scheduler_service: SchedulerService = get_scheduler_service(eng_sport_name=eng_sport_name, shift_day=shift_day)
