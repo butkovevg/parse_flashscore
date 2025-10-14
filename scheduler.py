@@ -30,8 +30,10 @@ class SchedulerService:
         self.main_page_service = MainPageService(data4parsing=self.data_for_parsing)
         self.current_page_service = CurrentPageService(data4parsing=self.data_for_parsing)
         self.analysis_service = AnalysisService(shift_day=shift_day)
+
     def __str__(self):
-        return str(self.data_for_parsing.shift_day)
+        return f"{self.data_for_parsing.shift_day} {self.data_for_parsing.english_sport_name}"
+
     def scan_main_page(self):
         logger.info(f"   scan_main_page {self.data_for_parsing}")
         # self.main_page_service.get_list_link_with_main_page()
@@ -42,9 +44,8 @@ class SchedulerService:
         # self.current_page_service.get_list_links_from_db()
 
     def scan_analysis(self):
-        logger.info(f"    scan_analysis {self.data_for_parsing}")
+        logger.info(f"    scan_analysis {self.data_for_parsing.shift_day}")
         # self.analysis_service.main()
-
 
 
 def get_scheduler_service(eng_sport_name, shift_day: int):
@@ -65,13 +66,38 @@ def run_day(shift_day: int):
         if 'tennis' in english_list_types_sports:
             local_english_list_types_sports.remove('tennis')
 
-    # list_scheduler_service = []
-    for number_of_list, eng_sport_name in enumerate(local_english_list_types_sports):
+    list_scheduler_service = []
+    for eng_sport_name in local_english_list_types_sports:
         scheduler_service = get_scheduler_service(eng_sport_name=eng_sport_name, shift_day=shift_day)
-        run_mode(scheduler_service, mode="main")
-        run_mode(scheduler_service, mode="current")
-        if number_of_list == len(local_english_list_types_sports) - 1:  # Если это последний элемент
-            run_mode(scheduler_service, mode="analysis")
+        list_scheduler_service.append(scheduler_service)
+        # run_mode(scheduler_service, mode="main")
+        # run_mode(scheduler_service, mode="current")
+        # if number_of_list == len(local_english_list_types_sports) - 1:  # Если это последний элемент
+        #     run_mode(scheduler_service, mode="analysis")
+
+    # Чтобы для каждого дня сначала шли все MAIN_PAGE, потом все CURRENT_PAGE, потом один analysis
+    is_call_method = True
+    if is_call_method:
+        list_methods = []
+        for scheduler_service in list_scheduler_service:
+            list_methods.append(lambda svc=scheduler_service: run_mode(scheduler_service=svc, mode="main"))
+
+        for scheduler_service in list_scheduler_service:
+            list_methods.append(lambda svc=scheduler_service: run_mode(scheduler_service=svc, mode="current"))
+        # для анализа
+        if len(list_scheduler_service) > 0:
+            list_methods.append(lambda svc=scheduler_service: run_mode(scheduler_service=svc, mode="analysis"))
+        for call_method in list_methods:
+            call_method()
+    else:
+        for scheduler_service in list_scheduler_service:
+            run_mode(scheduler_service=scheduler_service, mode="main")
+
+        for scheduler_service in list_scheduler_service:
+            run_mode(scheduler_service=scheduler_service, mode="current")
+        # для анализа
+        if len(list_scheduler_service) > 0:
+            run_mode(scheduler_service=list_scheduler_service[0], mode="analysis")
 
 
 def run_mode(scheduler_service: SchedulerService, mode: str):
@@ -89,11 +115,12 @@ def main():
     # settings.IS_HEADLESS = False
     run_week()
 
+
 if __name__ == "__main__":
     logger.info(f'Initializing {os.path.basename(__file__)} {settings.VERSION}')
     is_week = True
     if is_week:
-        for day in range(0,7):
+        for day in range(0, 7):
             FindDayForParsingService().main(shift_day=day)
         run_week()
     else:
