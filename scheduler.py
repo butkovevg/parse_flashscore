@@ -2,8 +2,7 @@ import argparse
 import os
 
 from src.configs.settings import settings
-from src.service.analysis import AnalysisService
-from src.service.current_page import CurrentPageService
+from src.model.types_of_sports import dct_rus_to_eng
 from src.service.find_day_for_parsing import FindDayForParsingService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
@@ -24,7 +23,21 @@ start = args.start.lower()
 is_week = args.week
 
 
+def run_scheduler(rus_sport_name, day_number, mode):
+    if mode in ["main"]:
+        # MAIN_PAGE
+        eng_sport_name = dct_rus_to_eng.get(rus_sport_name)
+        data_for_parsing = InputDataForParsing(english_sport_name=eng_sport_name, shift_day=day_number)
+        parsing_service = MainPageService(data4parsing=data_for_parsing)
+        logger.debug(f"MAIN_PAGE {data_for_parsing}")
+        parsing_service.get_list_link_with_main_page()
+        parsing_service.insert()
+    else:
+        logger.error(f"{mode} don`t found")
+
+
 def main():
+    settings.IS_HEADLESS = False
     logger.debug(f"{day=}")
     list_sport_name_for_parsing = [
         "volleyball",
@@ -32,34 +45,34 @@ def main():
         "basketball",
         "handball",
     ]
-    list_tennis_days = [0,1] # Нет смысла парсить теннис за два дня и более
-    if day in list_tennis_days :
+    list_tennis_days = [0, 1]  # Нет смысла парсить теннис за два дня и более
+    if day in list_tennis_days:
         logger.debug("ADD tennis in list_sport_name_for_parsing")
         list_sport_name_for_parsing.append("tennis")
 
     if start in ["main"]:
         # MAIN_PAGE
         for sport_name in list_sport_name_for_parsing:
-            data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
+            data_for_parsing = InputDataForParsing(english_sport_name=sport_name, shift_day=day)
             parsing_service = MainPageService(data4parsing=data_for_parsing)
             logger.debug(f"MAIN_PAGE {data_for_parsing}")
             parsing_service.get_list_link_with_main_page()
             parsing_service.insert()
 
-    if start in ["main", "current"]:
-        # CURRENT_PAGE
-        for sport_name in list_sport_name_for_parsing:
-            data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
-            logger.debug(f"CURRENT_PAGE {data_for_parsing}")
-            parsing_service = CurrentPageService(data4parsing=data_for_parsing)
-            parsing_service.get_list_links_from_db()
-
-
-    # ANALYSIS
-    logger.debug(f"AnalysisService {day=}")
-    parsing_service = AnalysisService(shift_day=day)
-    parsing_service.main()
-    logger.debug(f"FINISH {day=}")
+    # if start in ["main", "current"]:
+    #     # CURRENT_PAGE
+    #     for sport_name in list_sport_name_for_parsing:
+    #         data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
+    #         logger.debug(f"CURRENT_PAGE {data_for_parsing}")
+    #         parsing_service = CurrentPageService(data4parsing=data_for_parsing)
+    #         parsing_service.get_list_links_from_db()
+    #
+    #
+    # # ANALYSIS
+    # logger.debug(f"AnalysisService {day=}")
+    # parsing_service = AnalysisService(shift_day=day)
+    # parsing_service.main()
+    # logger.debug(f"FINISH {day=}")
 
 
 if __name__ == "__main__":

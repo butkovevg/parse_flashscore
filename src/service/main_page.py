@@ -80,8 +80,8 @@ class MainPageService:
 
     def get_list_link_with_main_page(self):
         try:
-            link = dict_link.get(self.data4parsing.sport_name).get("link")
-            delimiter = dict_link.get(self.data4parsing.sport_name).get("delimiter")
+            link = dict_link.get(self.data4parsing.english_sport_name).get("link")
+            delimiter = dict_link.get(self.data4parsing.english_sport_name).get("delimiter")
             browser = BrowserService.get_webdriver(is_headless=settings.IS_HEADLESS)
             browser.get(link)
             time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
@@ -129,7 +129,7 @@ class MainPageService:
                 link = self.list_link[index_link]
                 self.session.add(MainDBModel(
                     link=link,
-                    sport_name=dict_link[self.data4parsing.sport_name]["sport_name"],
+                    sport_name=dict_link[self.data4parsing.english_sport_name]["sport_name"],
                     match_date=self.data4parsing.match_date,
                 ))
                 self.session.commit()
@@ -143,16 +143,16 @@ class MainPageService:
 
     def get_list_for_update_analysis(self, list_links_aft_analysis: list):
         try:
-            link = dict_link.get(self.data4parsing.sport_name).get("link")
+            link = dict_link.get(self.data4parsing.english_sport_name).get("link")
             browser = BrowserService.get_webdriver(is_headless=settings.IS_HEADLESS)
             browser.get(link)
             time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 10))
             page_source = browser.page_source
             soup = BeautifulSoup(page_source, 'html.parser')
-            delimiter = dict_link.get(self.data4parsing.sport_name).get("delimiter")
+            delimiter = dict_link.get(self.data4parsing.english_sport_name).get("delimiter")
 
             # Поиск по CSS-селектору
-            sportName = dict_link[self.data4parsing.sport_name]['sportName']
+            sportName = dict_link[self.data4parsing.english_sport_name]['sportName']
             css_selector = f'div.sportName.{sportName}'
             divs_sportname = soup.select(css_selector)
 

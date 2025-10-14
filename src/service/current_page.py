@@ -25,8 +25,8 @@ class CurrentPageService:
 
     def get_list_links_from_db(self):
         try:
-            rus_translate_sport_name = dict_link[self.data4parsing.sport_name]["sport_name"]
-            en_sport_name = self.data4parsing.sport_name
+            rus_translate_sport_name = dict_link[self.data4parsing.english_sport_name]["sport_name"]
+            en_sport_name = self.data4parsing.english_sport_name
             logger.info(f"{en_sport_name} {self.data4parsing.match_date=}")
 
             # запрос для всех записей для вида спорта по дате
@@ -44,7 +44,7 @@ class CurrentPageService:
             logger.debug(f"{len_unprocessed_record=}/{len_all_record=}")
 
             if len_all_record == 0:
-                logger.info(f"NO LINK  {self.data4parsing.sport_name} {self.data4parsing.match_date}")
+                logger.info(f"NO LINK  {self.data4parsing.english_sport_name} {self.data4parsing.match_date}")
             elif len_unprocessed_record > 0:
                 logger.debug(f"Raw links for {self.data4parsing}")
                 logger.debug(f"It remains to process {len_unprocessed_record}/{len_all_record}")
@@ -113,7 +113,7 @@ class CurrentPageService:
             self.session.rollback()
 
     def get_current_match(self, link) -> ResponseModel:
-        base_link = f"https://www.flashscorekz.com/match/{self.data4parsing.sport_name}/{link}"
+        base_link = f"https://www.flashscorekz.com/match/{self.data4parsing.english_sport_name}/{link}"
         fragment_table = "#/standings/table/overall"
         full_link = f"{base_link}/{fragment_table}"
         browser = BrowserService.get_webdriver(is_headless=settings.IS_HEADLESS)

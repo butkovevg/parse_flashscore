@@ -78,7 +78,7 @@ class CurrentMatchService:
             row = i.text
             arr_row = row.split("\n")
             team = arr_row[1]
-            dct_parameters = dict_link[self.data4parsing.sport_name]
+            dct_parameters = dict_link[self.data4parsing.english_sport_name]
             if team == team1_name:
                 pos1 = int(arr_row[0].strip("."))
                 if pos1 != count:
