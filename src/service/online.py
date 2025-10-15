@@ -184,7 +184,7 @@ if __name__ == "__main__":
     logger.info(f'Initializing file {os.path.basename(__file__)}')
 
     day = 0
-    data_for_parsing = InputDataForParsing(sport_name="__basketball", shift_day=day)
+    data_for_parsing = InputDataForParsing(english_sport_name="__basketball", shift_day=day)
 
     database_online_service = DataBaseOnlineService()
     match_date_today = HelperService.get_date_with_point_between_day(day=0)
@@ -205,7 +205,7 @@ if __name__ == "__main__":
                     f"for {eng_sport_name.upper()} need update links({len(list_links_bef_update)}): {list_links_bef_update}")
 
                 # 02 Запрос по виду спорта для обновления
-                data_for_parsing = InputDataForParsing(sport_name=eng_sport_name, shift_day=day)
+                data_for_parsing = InputDataForParsing(english_sport_name=eng_sport_name, shift_day=day)
                 main_page_service = MainPageService(data4parsing=data_for_parsing)
                 # 02 Список, который можно обновить
                 list_for_update_analysis, list_links_aft_update = main_page_service.get_list_for_update_analysis(
