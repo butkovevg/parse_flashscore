@@ -1,18 +1,16 @@
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Query
 from pydantic import Field
 
-from src.configs.settings import settings
 from src.model.response import ResponseModel, StatusModel
 from src.model.types_of_sports import (
-    ModeEnum,
+    ModeParseEnum,
     TypesOfSportsModel,
-    dct_rus_to_eng,
 )
 from src.service.logger_handlers import logger
-from src.service.scheduler import SchedulerService, get_scheduler_service, run_mode
+from src.service.scheduler import ManagerScheduler
 
 router = APIRouter(
     prefix='/scheduler',
@@ -23,15 +21,13 @@ router = APIRouter(
 @router.post("/start-process/")
 async def start_process(
         background_tasks: BackgroundTasks,
-        rus_sport_name: TypesOfSportsModel = TypesOfSportsModel.volleyball,
-        shift_day: Annotated[int, Field(ge=0, le=6)] = 0,
-        hidden: bool = True,
-        mode: ModeEnum = ModeEnum.main,
+        rus_sport_name: TypesOfSportsModel,
+        shift_day: Annotated[int | None, Field(ge=0, le=6)] = Query(None),
+        is_hidden: bool = True,
+        mode_parse: ModeParseEnum = ModeParseEnum.main,
 ):
-    logger.info(f"input {rus_sport_name=}, {shift_day=}, {hidden=}, {mode=} ")
-    settings.IS_HEADLESS = hidden
-    eng_sport_name = dct_rus_to_eng.get(rus_sport_name.value)
-    scheduler_service: SchedulerService = get_scheduler_service(eng_sport_name=eng_sport_name, shift_day=shift_day)
-    background_tasks.add_task(run_mode, scheduler_service, mode.value)
+    logger.info(f"input for ManagerScheduler: {rus_sport_name=}, {shift_day=}, {is_hidden=}, {mode_parse=} ")
+    manager_scheduler = ManagerScheduler(rus_sport_name, shift_day, is_hidden, mode_parse)
+    background_tasks.add_task(manager_scheduler.run_week)
     return ResponseModel(status=StatusModel.SUCCESS,
                          data=f"Фоновая задача запущена {datetime.utcnow().isoformat() + 'Z'}")
