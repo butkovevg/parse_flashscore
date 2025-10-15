@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Query
+from fastapi import APIRouter, BackgroundTasks
 from pydantic import Field
 
 from src.model.response import ResponseModel, StatusModel
@@ -22,7 +22,7 @@ router = APIRouter(
 async def start_process(
         background_tasks: BackgroundTasks,
         rus_sport_name: TypesOfSportsModel,
-        shift_day: Annotated[int | None, Field(ge=0, le=6)] = Query(None),
+        shift_day: Annotated[int, Field(ge=-1, le=6)],
         is_hidden: bool = True,
         mode_parse: ModeParseEnum = ModeParseEnum.main,
 ):

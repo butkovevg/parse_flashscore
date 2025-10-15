@@ -92,10 +92,41 @@ a:active {
 <!--    ШАПКА   -->
     <tr>
         <th><a href="/"> # </th>
-        <th>ДАТА</th>
-
+        <th>
+            <button class="start-process-btn"
+                data-rus_sport_name="ВCE"
+                data-shift_day="-1"
+                data-is_hidden="false"
+                data-mode_parse="main"
+                title="Запустить main всей недели по всем видам спорта">
+            </button>
+            ДАТА
+            <button class="start-process-btn"
+                data-rus_sport_name="ВCE"
+                data-shift_day="-1"
+                data-is_hidden="true"
+                data-mode_parse="current"
+                title="Запустить current всей недели по всем видам спорта">
+            </button>
+        </th>
               {% for sport in sports %}
-                        <th>{{ sport }}</th>
+                        <th>
+                            <button class="start-process-btn"
+                                data-rus_sport_name="{{ sport }}"
+                                data-shift_day="-1"
+                                data-is_hidden="false"
+                                data-mode_parse="main"
+                                title="Запустить main всей недели по виду спорта">
+                            </button>
+                            {{ sport }}
+                            <button class="start-process-btn"
+                                data-rus_sport_name="{{ sport }}"
+                                data-shift_day="-1"
+                                data-is_hidden="true"
+                                data-mode_parse="current"
+                                title="Запустить current всей недели по виду спорта">
+                            </button>
+                        </th>
               {% endfor %}
          <th>ИТОГО</th>
     </tr>
@@ -104,23 +135,45 @@ a:active {
 <!--    НАПОЛНЕНИЕ ТАБЛИЦЫ   -->
     {% for object_data in data %}
     <tr>
-        <td> {{ object_data.shift_day }} </td>
-        <td class="date-cell">{{ object_data.dt }}</td>
+        <!--    номер дня   -->
+        <td>
+            <button class="start-process-btn"
+                    data-rus_sport_name="ВCE"
+                    data-shift_day="{{ object_data.shift_day }}"
+                    data-is_hidden="false"
+                    data-mode_parse="main"
+                    title="Запустить main обработку дня">
+            </button>
+            {{ object_data.shift_day }}
+            <button class="start-process-btn"
+                    data-rus_sport_name="ВCE"
+                    data-shift_day="{{ object_data.shift_day }}"
+                    data-is_hidden="true"
+                    data-mode_parse="current"
+                    title="Запустить current обработку дня">
+            </button>
+        </td>
+
+        <!--    дата   -->
+        <td class="date-cell">
+            {{ object_data.dt }}
+        </td>
+
         {% for sport in sports %}
             <td data-sport_name={{ sport }}>
                 <button class="start-process-btn"
                     data-rus_sport_name="{{ sport }}"
                     data-shift_day="{{ object_data.shift_day }}"
-                    data-hidden="false"
-                    data-mode="main"
+                    data-is_hidden="false"
+                    data-mode_parse="main"
                     title="Запустить main обработку">
                 </button>
                 {{ object_data.main[sport] }}/{{ object_data.curr[sport] }}/{{ object_data.anal[sport] }}
                 <button class="start-process-btn"
                     data-rus_sport_name="{{ sport }}"
                     data-shift_day="{{ object_data.shift_day }}"
-                    data-hidden="true"
-                    data-mode="current"
+                    data-is_hidden="true"
+                    data-mode_parse="current"
                     title="Запустить current обработку">
                 </button>
             </td>
@@ -190,10 +243,10 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', async function () {
             const rusSportName = encodeURIComponent(this.dataset.rus_sport_name);
             const shiftDay = encodeURIComponent(this.dataset.shift_day);
-            const hiddenM = encodeURIComponent(this.dataset.hidden || 'true');
-            const modeM = encodeURIComponent(this.dataset.mode || 'current');
+            const is_hidden = encodeURIComponent(this.dataset.is_hidden || 'true');
+            const mode_parse = encodeURIComponent(this.dataset.mode_parse || 'current');
 
-            const url = `http://localhost:8000/scheduler/start-process/?rus_sport_name=${rusSportName}&shift_day=${shiftDay}&hidden=${hiddenM}&mode=${modeM}`;
+            const url = `http://localhost:8000/scheduler/start-process/?rus_sport_name=${rusSportName}&shift_day=${shiftDay}&is_hidden=${is_hidden}&mode_parse=${mode_parse}`;
 
             try {
                 const response = await fetch(url, {

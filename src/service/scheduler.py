@@ -35,25 +35,26 @@ class SchedulerService:
         self.main_page_service = MainPageService(data4parsing=self.data_for_parsing)
         self.current_page_service = CurrentPageService(data4parsing=self.data_for_parsing)
         self.analysis_service = AnalysisService(shift_day=shift_day)
-
-    # def __del__(self):
-    #     self.scan_analysis()
+        self.is_debug = False
 
     def __str__(self):
         return f"{self.data_for_parsing.shift_day} {self.data_for_parsing.english_sport_name}"
 
     def scan_main_page(self):
         logger.info(f"   scan_main_page {self.data_for_parsing}")
-        # self.main_page_service.get_list_link_with_main_page()
-        # self.main_page_service.insert()
+        if not self.is_debug:
+            self.main_page_service.get_list_link_with_main_page()
+            self.main_page_service.insert()
 
     def scan_current_page(self):
         logger.info(f"scan_current_page {self.data_for_parsing}")
-        # self.current_page_service.get_list_links_from_db()
+        if not self.is_debug:
+            self.current_page_service.get_list_links_from_db()
 
     def scan_analysis(self):
         logger.info(f"    scan_analysis {self.data_for_parsing.shift_day}")
-        # self.analysis_service.main()
+        if not self.is_debug:
+            self.analysis_service.main()
 
 
 def get_scheduler_service(eng_sport_name: str, shift_day: int):
@@ -75,7 +76,7 @@ class ManagerScheduler:
     """
     Логика отбора запуска:
     1. Какие виды спорта запускать
-    2. За какие дни запускать.
+    2. За какие дни запускать.(-1 = вся неделя)
     3.  Со скрытым браузером
     4. В режиме только main, current, analysis или all
     """
@@ -94,7 +95,7 @@ class ManagerScheduler:
             self.english_list_types_sports = [dct_rus_to_eng.get(rus_sport_name.value)]
 
         # 2. За какие дни запускать.
-        if shift_day is None:
+        if shift_day == -1:
             self.list_days = [0, 1, 2, 3, 4, 5, 6]
         else:
             self.list_days = [shift_day]
@@ -138,7 +139,9 @@ class ManagerScheduler:
             settings.IS_HEADLESS = True
             for scheduler_service in list_scheduler_service:
                 run_mode(scheduler_service=scheduler_service, mode="current")
-        if "analysis" in self.list_mode_parse:
+
+        # analysis
+        if "analysis" in self.list_mode_parse or "current" in self.list_mode_parse:
             if len(list_scheduler_service) > 0:
                 run_mode(scheduler_service=list_scheduler_service[0], mode="analysis")
 
