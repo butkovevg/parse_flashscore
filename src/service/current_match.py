@@ -193,7 +193,7 @@ class CurrentMatchService:
                     if text and text != '-' and text.replace('.', '', 1).isdigit():
                         valid_odds.append(text)
 
-                logger.warning(f"Найденные коэффициенты({len(valid_odds)}):  {valid_odds}")
+                logger.debug(f"Найденные коэффициенты({len(valid_odds)}):  {valid_odds}")
             except TypeError:
                 logger.error("ERR TMP1")
             except Exception as e:

@@ -86,17 +86,7 @@ class MainPageService:
 
             # Кликаем на следующий день, если day > 0
             while abs(self.data4parsing.shift_day) > 0:
-                # button_move_day = browser.find_element(By.XPATH, "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[2]/div/div[1]/div[2]/div/button[3]")
                 button_move_day = browser.find_element(By.CSS_SELECTOR, 'button[data-day-picker-arrow="next"]')
-                # button_move_day = browser.find_element(By.XPATH, "//button[@title='Следующий день']")
-                # button_move_day = browser.find_element.find_element(By.XPATH, "//button[contains(@class, 'calendar__navigation--tomorrow')]")
-                #
-                # from selenium.webdriver.common.by import By
-                # from selenium.webdriver.support.ui import WebDriverWait
-                # from selenium.webdriver.support import expected_conditions as EC
-                # # Явное ожидание появления кнопки
-                # wait = WebDriverWait(browser, 10)  # Максимальное время ожидания — 10 секунд
-                # button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@title='Следующий день']")))
                 if self.data4parsing.shift_day < 0:  # Если отрицательное число
                     self.data4parsing.shift_day += 1
                     button_move_day = browser.find_element(By.CSS_SELECTOR, "[title='Предыдущий день']")

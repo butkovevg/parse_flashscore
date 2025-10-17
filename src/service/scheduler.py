@@ -127,6 +127,9 @@ class ManagerScheduler:
             scheduler_service = get_scheduler_service(eng_sport_name=eng_sport_name, shift_day=shift_day)
             list_scheduler_service.append(scheduler_service)
 
+        self.runner(list_scheduler_service)
+
+    def runner(self, list_scheduler_service):
         # Чтобы для каждого дня сначала шли все MAIN_PAGE, потом все CURRENT_PAGE, потом один analysis
         # Main
         if "main" in self.list_mode_parse:
