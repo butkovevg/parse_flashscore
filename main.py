@@ -82,4 +82,6 @@ if __name__ == '__main__':
         host=settings.SERVER_HOST,
         port=settings.SERVER_PORT,
         reload=True,
+        log_level="info",  # или "warning", "error"
+        access_log=False  # ← вот это отключает логи запросов
     )

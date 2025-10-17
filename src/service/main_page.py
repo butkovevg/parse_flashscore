@@ -100,11 +100,13 @@ class MainPageService:
             ids = [tag['id'] for tag in soup.select('div[id]')]
             ids_filtered = filter(lambda x: x.startswith(delimiter), ids)
             self.list_link = [link.replace(delimiter, "") for link in ids_filtered]
-            browser.quit()
+            return self.list_link
 
         except Exception as exc:
             logger.error(str(exc))
             return []
+        finally:
+            browser.quit()
 
     def insert(self) -> None:
         """
