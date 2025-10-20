@@ -50,15 +50,21 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     lifespan=lifespan,
 )
+# Добавление middleware (важно: до регистрации маршрутов)
+# app.add_middleware(LoggingMiddleware)
+
 app.mount("/static", StaticFiles(directory="templates"), name="static")
 app.include_router(router)
+
 
 # Обработчик пользовательских исключений, который "ловит" все необработанные исключения
 @app.exception_handler(CustomException)
 async def get_custom_exception(request: Request, exc: CustomException):
     logger.error(f"custom_exception {exc.status_code}: {exc.detail}")
-    error = jsonable_encoder(CustomExceptionModel(status_code=exc.status_code, er_message=exc.message, er_details=exc.detail))
+    error = jsonable_encoder(
+        CustomExceptionModel(status_code=exc.status_code, er_message=exc.message, er_details=exc.detail))
     return JSONResponse(status_code=exc.status_code, content=error)
+
 
 # Обработчик глобальных исключений, который "ловит" все необработанные исключения
 @app.exception_handler(Exception)
@@ -73,6 +79,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"error": description_error}
     )
+
 
 if __name__ == '__main__':
     multiprocessing.freeze_support()
