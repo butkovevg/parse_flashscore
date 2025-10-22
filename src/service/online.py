@@ -199,7 +199,6 @@ if __name__ == "__main__":
     while True:
         # Список видов спорта, которые есть в ТБ анализв
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
-        # ToDo: delete
         list_sport_name = ["ГАНДБОЛ"]
 
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
