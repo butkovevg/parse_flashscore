@@ -17,7 +17,14 @@ logger = get_logger(__name__)
 
 class DataBaseOnlineService:
     finished_status = (
-    'Завершен', 'Будет доигран позже', 'Неявка', 'Послеовертайма', 'Перенесен', 'Завершен(отказ)', 'Отменен')
+        'Завершен',
+        'Будет доигран позже',
+        'Неявка',
+        'Послеовертайма',
+        'Перенесен',
+        'Завершен(отказ)',
+        'Отменен',
+    )
 
     def __init__(self):
         self.session = next(get_session())
@@ -183,15 +190,18 @@ if __name__ == "__main__":
     logger.info(f' Visit endpoint: http://{settings.SERVER_HOST}:{settings.SERVER_PORT}/online/')
     logger.info(f'Initializing file {os.path.basename(__file__)}')
 
-    day = 0
-    data_for_parsing = InputDataForParsing(english_sport_name="__basketball", shift_day=day)
+    shift_day = 0
+    data_for_parsing = InputDataForParsing(english_sport_name="handball", shift_day=shift_day)
 
     database_online_service = DataBaseOnlineService()
-    match_date_today = HelperService.get_date_with_point_between_day(day=0)
+    match_date_today = HelperService.get_date_with_point_between_day(day=shift_day)
 
     while True:
         # Список видов спорта, которые есть в ТБ анализв
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
+        # ToDo: delete
+        list_sport_name = ["ГАНДБОЛ"]
+
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
             logger.info("list_sport_name is empty")
             # HelperService.pause_until_midnight()
@@ -205,7 +215,7 @@ if __name__ == "__main__":
                     f"for {eng_sport_name.upper()} need update links({len(list_links_bef_update)}): {list_links_bef_update}")
 
                 # 02 Запрос по виду спорта для обновления
-                data_for_parsing = InputDataForParsing(english_sport_name=eng_sport_name, shift_day=day)
+                data_for_parsing = InputDataForParsing(english_sport_name=eng_sport_name, shift_day=shift_day)
                 main_page_service = MainPageService(data4parsing=data_for_parsing)
                 # 02 Список, который можно обновить
                 list_for_update_analysis, list_links_aft_update = main_page_service.get_list_for_update_analysis(
