@@ -17,7 +17,7 @@ class Setting(BaseSettings):
     MSG_ERROR: str = f"please, contact the developer {EMAIL}"
 
     # уровень логирования CRITICAL(50)-ERROR(40)-WARNING(30)-INFO(20)-DEBUG(10)-NOTSET(0)
-    LEVEL_LOGGER_HANDLER: int = logging.INFO
+    LEVEL_LOGGER_HANDLER: int = logging.DEBUG
     IS_HEADLESS: bool = True
 
     # DB

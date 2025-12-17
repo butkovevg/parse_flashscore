@@ -43,12 +43,12 @@ class CurrentMatchService:
         ValidationCurrentMatch.is_validate(text="#00 ссылка", input_value=link, input_type=str)
         # 01 вид спорта
         sport_name = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[1]/a/span").text
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[1]/nav/ol/li[1]/a/span").text
         ValidationCurrentMatch.is_validate(text="#01 вид спорта", input_value=sport_name, input_type=str)
 
         # 02 дата и время
         dt = self.driver.find_element(By.XPATH,
-                                      "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[1]/div").text
+                                      "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/div[1]/div[1]/div").text
         date_game, time_game = dt.split(" ")
         ValidationCurrentMatch.is_validate(text="#02 дата", input_value=date_game, input_type=str)
         ValidationCurrentMatch.is_validate(text="#02 время", input_value=time_game, input_type=str)
@@ -133,10 +133,10 @@ class CurrentMatchService:
 
     def get_country_tournament_tour(self):
         country = self.driver.find_element(By.XPATH,
-                                           "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[2]/a/span").text
+                                           "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[1]/nav/ol/li[2]/a/span").text
         ValidationCurrentMatch.is_validate(text="#03 страна", input_value=country, input_type=str)
         tournament_header = self.driver.find_element(By.XPATH,
-                                                     "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/nav/ol/li[3]/a/span").text
+                                                     "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[1]/nav/ol/li[3]/a/span").text
         list_tournament_tour = tournament_header.split(" - ")
         tournament = HelperService.get_element_for_list(lst=list_tournament_tour, index=0, default_value="")
         tour = HelperService.get_element_for_list(lst=list_tournament_tour, index=1, default_value="")
@@ -147,9 +147,9 @@ class CurrentMatchService:
 
     def get_teams_name(self):
         team1_name = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[2]/div[3]/div[2]/a").text
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/div[1]/div[2]/div[3]/div[2]/a").text
         team2_name = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[1]/div[4]/div[3]/div[1]/a").text
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/div[1]/div[4]/div[3]/div[1]/a").text
         ValidationCurrentMatch.is_validate(text="#04 команда№1", input_value=team1_name, input_type=str)
         ValidationCurrentMatch.is_validate(text="#04 команда№2", input_value=team2_name, input_type=str)
         return team1_name, team2_name
@@ -157,11 +157,11 @@ class CurrentMatchService:
     def get_status_scores(self):
         try:
             status = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[2]/span").text
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/div[1]/div[3]/div/div[2]/span").text
             score1 = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[1]").text
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/div[1]/div[3]/div/div[1]/span[1]").text
             score2 = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[3]/div[3]/div/div[1]/span[3]").text
+                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/div[1]/div[3]/div/div[1]/span[3]").text
             score = f"{score1}:{score2}"
         except NoSuchElementException:
             status = "TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ."

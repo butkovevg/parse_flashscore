@@ -53,7 +53,7 @@ class CurrentPageService:
                 for index_record in range(len_unprocessed_record):
                     unprocessed_record = unprocessed_records[index_record]
                     logger.info(
-                        f"process {unprocessed_record}({en_sport_name}): {index_record + 1}/{len_unprocessed_record} ")
+                        f"process_{self.data4parsing.shift_day}day_({en_sport_name[:3]}): {index_record + 1}/{len_unprocessed_record} {unprocessed_record}")
 
                     response = self.get_current_match(link=unprocessed_record.link)
 
@@ -143,6 +143,6 @@ if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
     sport_name = "basketball"
     day = 0
-    data_for_parsing = InputDataForParsing(sport_name=sport_name, shift_day=day)
+    data_for_parsing = InputDataForParsing(english_sport_name=sport_name, shift_day=day)
     current_page_service = CurrentPageService(data4parsing=data_for_parsing)
-    current_page_service.get_current_match(link="O0h9aI9d")
+    current_page_service.get_current_match(link="WU3FGVsp")
