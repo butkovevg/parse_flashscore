@@ -3,17 +3,15 @@ import logging
 import os
 from datetime import datetime
 from logging.handlers import TimedRotatingFileHandler
+from pathlib import Path
 
 from src.configs.settings import settings
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-LOGS_DIR = os.path.join(ROOT_DIR, 'logs')
+# Определяем корневую директорию проекта (на 3 уровня выше текущего файла)
+LOGS_DIR = Path(__file__).resolve().parent.parent.parent / 'logs'
 os.makedirs(LOGS_DIR, exist_ok=True)
+print(LOGS_DIR)
 
-# def close_file(file_name):
-#    if os.path.exists(file_name):
-#        os.close(file_name)  # Закрываем файл
-#        #os.remove('имя_файла.log')  # Удаляем файл
 
 class ColoredFormatter(logging.Formatter):
     COLORS = {
