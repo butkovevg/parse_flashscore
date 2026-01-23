@@ -1,21 +1,23 @@
-// Читаем лог-файл с хоста
-discovery.file "fastapi_logs" {
-  targets = [
-    { __path__ = "C:/Users/evgeniy.butkov/PycharmProjects/parse_flashscore/logs/log_detailed_FLASHSCORE.log" }
-  ]
+// Читаем файл с логами
+local.file "log_file" {
+  filename = "/app/logs/log_detailed_FLASHSCORE.log"
 }
 
-local.file_match "fastapi_logs_match" {
-  path_targets = discovery.file.fastapi_logs.targets
-}
-
-loki.source.file "fastapi_loki" {
-  targets    = local.file_match.fastapi_logs_match.targets
-  forward_to = [loki.write.default.receiver]
-}
-
+// Отправляем напрямую в Loki
 loki.write "default" {
   endpoint {
     url = "http://loki:3100/loki/api/v1/push"
   }
+}
+
+// Источник логов → Loki
+loki.source.file "fastapi_logs" {
+  targets = [{
+    __path__ = "/app/logs/log_detailed_FLASHSCORE.log",
+    labels = {
+      job = "fastapi",
+      instance = "host"
+    }
+  }]
+  forward_to = [loki.write.default.receiver]
 }
