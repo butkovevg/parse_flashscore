@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from src.api import router
 from src.configs.settings import settings
@@ -50,6 +51,9 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     lifespan=lifespan,
 )
+
+Instrumentator().instrument(app).expose(app)  # Включить метрики prometheus
+
 # Добавление middleware (важно: до регистрации маршрутов)
 # app.add_middleware(LoggingMiddleware)
 

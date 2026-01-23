@@ -7,10 +7,9 @@ from pathlib import Path
 
 from src.configs.settings import settings
 
-# Определяем корневую директорию проекта (на 3 уровня выше текущего файла)
+# Определяем корневую директорию проекта (на 2 уровня выше текущего файла)
 LOGS_DIR = Path(__file__).resolve().parent.parent.parent / 'logs'
 os.makedirs(LOGS_DIR, exist_ok=True)
-print(LOGS_DIR)
 
 
 class ColoredFormatter(logging.Formatter):
