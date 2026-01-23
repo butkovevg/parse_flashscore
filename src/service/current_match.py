@@ -26,7 +26,7 @@ class ValidationCurrentMatch:
                 output_value = int(input_value.split(".")[0])
                 return output_value
         except ValueError:
-            logger.warning(f"ValueError no integer: {type(input_value)} {input_value}")
+            logger.debug(f"ValueError no integer: {type(input_value)} {input_value}")
             return 0
         except Exception as exc:
             logger.error(str(exc))
@@ -213,7 +213,7 @@ class CurrentMatchService:
                 logger.debug(f"WebElement not found  for KF {full_url=}")
 
             if kf1 != 0 and kf2 != 0:
-                logger.info(f"KF {kf1} {kf2}")  # 2.00
+                logger.debug(f"KF {kf1} {kf2}")  # 2.00
             return kf1, kf2
         except ValueError:
             logger.warning(f"ValueError for KF {full_url=}")

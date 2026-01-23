@@ -2,6 +2,7 @@ import os
 import time
 from random import randint
 
+from plyer import notification
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 
@@ -60,10 +61,15 @@ class CurrentPageService:
                     if response.status == StatusModel.SUCCESS:
                         self.update(main_db_model=unprocessed_record, status=True)
                     elif response.status == StatusModel.ERROR:
-
                         self.update(main_db_model=unprocessed_record, status=False)
                     else:
                         logger.error("an unhandled error")
+
+                notification.notify(
+                    title="",
+                    message=f"{self.data4parsing.english_sport_name} {self.data4parsing.shift_day}",
+                    timeout=10  # В секундах
+                )
             else:
                 logger.info(f"All link processed {self.data4parsing}")
         except Exception as exc:
@@ -128,8 +134,8 @@ class CurrentPageService:
             else:
                 return ResponseModel(status=StatusModel.ERROR, )
         except ValueError as exc:
-            logger.warning(f"ERROR_ValueError {full_link}")
-            logger.warning(str(exc))
+            logger.debug(f"ERROR_ValueError {full_link}")
+            logger.debug(str(exc))
             return ResponseModel(status=StatusModel.ERROR, )
         except Exception as exc:
             logger.error(f"ERROR {full_link}")
