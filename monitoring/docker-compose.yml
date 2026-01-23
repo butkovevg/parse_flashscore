@@ -27,12 +27,9 @@ services:
     container_name: alloy
     volumes:
       - ./config/alloy-config.river:/etc/alloy/config.river
-      # Монтируем лог-файл или всю папку с логами
-      - C:/Users/evgeniy.butkov/PycharmProjects/parse_flashscore/logs:/logs:ro
+      - C:/Users/evgeniy.butkov/PycharmProjects/parse_flashscore/logs:/app/logs:ro
     networks:
       - monitoring
-    depends_on:
-      - loki
 
   grafana:
     image: grafana/grafana:10.2.3

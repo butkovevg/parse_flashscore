@@ -1,23 +1,34 @@
-// Читаем файл с логами
-local.file "log_file" {
-  filename = "/app/logs/log_detailed_FLASHSCORE.log"
+// Отключаем встроенные экспортёры
+prometheus.remote_write "default" {
+  // Не отправляем никуда
 }
 
-// Отправляем напрямую в Loki
+// Отключаем OTLP-экспорт в Tempo
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "noop:0"  // фиктивный endpoint
+  }
+}
+
+// Отключаем сбор системных метрик
+prometheus.exporter.unix "disabled" {
+  disabled_collectors = [
+    "cpu", "diskstats", "filesystem", "loadavg", "meminfo",
+    "netdev", "netstat", "os", "textfile", "time"
+  ]
+}
+
+// === ВАШИ КОМПОНЕНТЫ ===
 loki.write "default" {
   endpoint {
     url = "http://loki:3100/loki/api/v1/push"
   }
 }
 
-// Источник логов → Loki
 loki.source.file "fastapi_logs" {
   targets = [{
     __path__ = "/app/logs/log_detailed_FLASHSCORE.log",
-    labels = {
-      job = "fastapi",
-      instance = "host"
-    }
+    labels = { job = "fastapi" }
   }]
   forward_to = [loki.write.default.receiver]
 }
