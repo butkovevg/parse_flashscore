@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Endpoints</title>
+</head>
+<body>
+<h1>Список всех endpoint'ов</h1>
+<ul>
+    {% for route in routes %}
+    <li>
+        <strong>
+            <a href="{{ route.url }}" target="_blank">{{ route.url }}</a><br>
+        </strong>
+    </li>
+    <br>
+    {% endfor %}
+</ul>
+</body>
+</html>

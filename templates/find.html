@@ -1,0 +1,362 @@
+<style>
+* {
+  font-family: 'Roboto', sans-serif;
+}
+button {
+    transition-duration: 0.4s;
+    background-color: rgba(35,19,245, 0);
+    border: 3px solid red;
+    border-radius: 10%;
+    width: 100%;
+    height: 100%;
+    border: none;
+    color: back;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    margin: 4px 2px;
+    cursor: pointer;
+    letter-spacing:2px
+}
+button:hover {
+  background-color: rgba(0, 189, 150, 1); /* Green */
+  color: white;
+}
+table {
+   border-collapse: collapse;
+   width: 100%;
+}
+
+th {
+ position: sticky;
+ top: 0;
+ background-color: white;
+}
+th, td {
+   text-align: center;
+   padding: 5px;
+   border: 1px solid black;
+}
+td[data-sport_name='ВОЛЕЙБОЛ'] {
+   background-color: rgba(0, 69, 255, 0.5);
+   border: 1px solid black;
+   border-radius: 1%;
+}
+td[data-sport_name='БАСКЕТБОЛ'] {
+   background-color: rgba(255, 182, 13, 0.5);
+   border: 1px solid black;
+   border-radius: 1%;
+}
+td[data-sport_name='ГАНДБОЛ'] {
+   background-color: rgba(194,194,194, 0.5);
+   border: 1px solid black;
+   border-radius: 1%;
+}
+td[data-sport_name='ФУТБОЛ'] {
+   background-color: rgba(2,253,38, 0.5);
+   border: 1px solid black;
+   border-radius: 1%;
+}
+.green-button {
+   background-color: green;
+}
+
+.red-button {
+   background-color: red;
+}
+/* Цвет ссылки по умолчанию */
+a:link {
+    color: black; /* Замените на желаемый цвет */
+}
+/* Цвет посещенной ссылки */
+a:visited {
+    color: black; /* Замените на желаемый цвет */
+}
+/* Цвет ссылки при наведении курсора */
+a:hover {
+    color: black; /* Замените на желаемый цвет */
+}
+/* Цвет активной ссылки */
+a:active {
+    color: black; /* Замените на желаемый цвет */
+
+
+</style>
+<head>
+    <link rel="icon" href="/static/ball.ico" type="image/x-icon">
+</head>
+
+<table>
+<!--    ШАПКА   -->
+    <tr>
+        <th><a href="/"> # </th>
+        <th>
+            <button class="start-process-btn"
+                data-rus_sport_name="ВCE"
+                data-shift_day="-1"
+                data-is_hidden="false"
+                data-mode_parse="main"
+                title="Запустить main всей недели по всем видам спорта">
+            </button>
+            ДАТА
+            <button class="start-process-btn"
+                data-rus_sport_name="ВCE"
+                data-shift_day="-1"
+                data-is_hidden="true"
+                data-mode_parse="current"
+                title="Запустить current всей недели по всем видам спорта">
+            </button>
+        </th>
+              {% for sport in sports %}
+                        <th>
+                            <button class="start-process-btn"
+                                data-rus_sport_name="{{ sport }}"
+                                data-shift_day="-1"
+                                data-is_hidden="false"
+                                data-mode_parse="main"
+                                title="Запустить main всей недели по виду спорта">
+                            </button>
+                            {{ sport }}
+                            <button class="start-process-btn"
+                                data-rus_sport_name="{{ sport }}"
+                                data-shift_day="-1"
+                                data-is_hidden="true"
+                                data-mode_parse="current"
+                                title="Запустить current всей недели по виду спорта">
+                            </button>
+                        </th>
+              {% endfor %}
+         <th>ИТОГО</th>
+    </tr>
+
+
+<!--    НАПОЛНЕНИЕ ТАБЛИЦЫ   -->
+    {% for object_data in data %}
+    <tr>
+        <!--    номер дня   -->
+        <td>
+            <button class="start-process-btn"
+                    data-rus_sport_name="ВCE"
+                    data-shift_day="{{ object_data.shift_day }}"
+                    data-is_hidden="false"
+                    data-mode_parse="main"
+                    title="Запустить main обработку дня">
+            </button>
+            {{ object_data.shift_day }}
+            <button class="start-process-btn"
+                    data-rus_sport_name="ВCE"
+                    data-shift_day="{{ object_data.shift_day }}"
+                    data-is_hidden="true"
+                    data-mode_parse="current"
+                    title="Запустить current обработку дня">
+            </button>
+        </td>
+
+        <!--    дата   -->
+        <td class="date-cell">
+            {{ object_data.dt }}
+        </td>
+
+        {% for sport in sports %}
+            <td data-sport_name={{ sport }}>
+                <button class="start-process-btn"
+                    data-rus_sport_name="{{ sport }}"
+                    data-shift_day="{{ object_data.shift_day }}"
+                    data-is_hidden="false"
+                    data-mode_parse="main"
+                    title="Запустить main обработку">
+                </button>
+                {{ object_data.main[sport] }}/{{ object_data.curr[sport] }}/{{ object_data.anal[sport] }}
+                <button class="start-process-btn"
+                    data-rus_sport_name="{{ sport }}"
+                    data-shift_day="{{ object_data.shift_day }}"
+                    data-is_hidden="true"
+                    data-mode_parse="current"
+                    title="Запустить current обработку">
+                </button>
+            </td>
+        {% endfor %}
+        <!--    СЧИТАЮ МАТЧИ В АНАЛИЗЕ   -->
+        {% set total = [0] %} {# Оборачиваем в список #}
+        {% for sport in sports %}
+          {% set _ = total.append(total.pop() + object_data.anal.get(sport, 0)) %}
+        {% endfor %}
+        <td>{{ total[0] }}</td>
+
+
+    </tr>
+    {% endfor %}
+</table>
+<script>
+// Выполнение POST-запроса
+document.addEventListener('DOMContentLoaded', function () {
+    // Функция для показа уведомления в правом нижнем углу
+    function showToast(message, isSuccess = true) {
+        // Создаём контейнер для уведомлений, если его ещё нет
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.style.position = 'fixed';
+            toastContainer.style.bottom = '20px';
+            toastContainer.style.right = '20px';
+            toastContainer.style.zIndex = '10000';
+            toastContainer.style.maxWidth = '300px';
+            document.body.appendChild(toastContainer);
+        }
+
+        // Создаём само уведомление
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.padding = '12px 16px';
+        toast.style.marginTop = '8px';
+        toast.style.borderRadius = '6px';
+        toast.style.color = '#fff';
+        toast.style.fontSize = '14px';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        toast.style.animation = 'fadeIn 0.3s ease-out';
+
+        // Стиль в зависимости от успеха/ошибки
+        if (isSuccess) {
+            toast.style.backgroundColor = '#28a745'; // зелёный
+        } else {
+            toast.style.backgroundColor = '#dc3545'; // красный
+        }
+
+        toastContainer.appendChild(toast);
+
+        // Удаляем уведомление через 5 секунд
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.5s ease-in forwards';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 500);
+        }, 5000);
+    }
+
+    // Добавляем обработчики на кнопки
+    document.querySelectorAll('.start-process-btn').forEach(button => {
+        button.addEventListener('click', async function () {
+            const rusSportName = encodeURIComponent(this.dataset.rus_sport_name);
+            const shiftDay = encodeURIComponent(this.dataset.shift_day);
+            const is_hidden = encodeURIComponent(this.dataset.is_hidden || 'true');
+            const mode_parse = encodeURIComponent(this.dataset.mode_parse || 'current');
+
+            const url = `http://localhost:8000/scheduler/start-process/?rus_sport_name=${rusSportName}&shift_day=${shiftDay}&is_hidden=${is_hidden}&mode_parse=${mode_parse}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'accept': 'application/json'
+                    },
+                    body: ''
+                });
+
+                if (response.ok) {
+                    showToast('Процесс запущен успешно!');
+                } else {
+                    const errorMsg = await response.text().catch(() => '');
+                    showToast(`Ошибка: ${response.status} ${errorMsg}`, false);
+                }
+            } catch (error) {
+                console.error('Ошибка запроса:', error);
+                showToast('Не удалось отправить запрос.', false);
+            }
+        });
+    });
+});
+
+
+
+
+// Функция для получения дня недели
+function getDayOfWeek(dateString) {
+    // Разбиваем строку даты на компоненты
+    const [day, month, year] = dateString.split('.').map(Number);
+
+    // Создаем объект Date (месяцы в JavaScript начинаются с 0)
+    const date = new Date(year, month - 1, day);
+
+    // Массив с названиями дней недели
+    const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+
+    // Получаем день недели (0 - воскресенье, 1 - понедельник и т.д.)
+    const dayOfWeek = daysOfWeek[date.getDay()];
+
+    return dayOfWeek;
+}
+
+// Находим все элементы с классом date-cell
+const dateCells = document.querySelectorAll('.date-cell');
+
+// Обрабатываем каждый элемент
+dateCells.forEach(cell => {
+    const dateString = cell.textContent.trim(); // Получаем текст из ячейки
+    const dayOfWeek = getDayOfWeek(dateString); // Вычисляем день недели
+
+    // Добавляем день недели в HTML
+    cell.textContent += ` (${dayOfWeek})`;
+});
+
+
+
+
+
+
+
+
+
+function getValue(link) {
+   var xhr = new XMLHttpRequest();
+   xhr.open("GET", "/analysis/get_value1/" + link + "/" , true);
+   xhr.onreadystatechange = function () {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+          btn.innerHTML = "Получено";
+          btn.style.backgroundColor = "green";
+          btn.style.color = "white";
+      }
+  }
+  xhr.send();
+}
+
+<!--document.getElementById('FavoritesButton').addEventListener('click', function() {-->
+<!--   this.classList.toggle('yellow');-->
+<!--   this.classList.toggle('gray');-->
+<!--});-->
+
+function toggleStatus(id) {
+  var button = document.getElementById("FavoritesButton" + id);
+  if (button.className === "green-button") {
+      button.className = "red-button";
+      fetch(`/analysis/update_favorites/${id}`)
+           .then(response => response.json())
+           .then(data => console.log(data));
+  } else {
+      button.className = "green-button";
+      fetch(`/analysis/update_favorites/${id}`)
+           .then(response => response.json())
+           .then(data => console.log(data));
+  }
+}
+function navigateToValue(offset) {
+ window.location.href = `/analysis/${offset}/`;
+}
+
+</script>
+
+<!-- Добавляем CSS-анимации для плавного появления/исчезновения -->
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(10px); }
+}
+</style>

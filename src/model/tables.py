@@ -1,12 +1,18 @@
-from sqlalchemy import VARCHAR, INTEGER, Boolean
-
-from src.configs.settings import settings
-
-DB_URL = f"{settings.DRIVER_NAME}://{settings.USERNAME_DB}:{settings.PASSWORD_DB}@" \
-         f"{settings.HOST_DB}:{settings.PORT_DB}/{settings.DB_NAME}"
-from sqlalchemy import create_engine, Column, UniqueConstraint
+from sqlalchemy import (
+    INTEGER,
+    VARCHAR,
+    Boolean,
+    Column,
+    Float,
+    UniqueConstraint,
+    create_engine,
+)
 from sqlalchemy.orm import declarative_base, sessionmaker
+
 from src.configs.settings import settings
+
+DB_URL = f"{settings.DRIVER_NAME}://{settings.DB_USERNAME}:{settings.DB_PASSWORD}@" \
+         f"{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
 
 # Делаем модель для работы с данными из БД
 Base = declarative_base()
@@ -27,7 +33,7 @@ class MainDBModel(Base):
     status = Column(Boolean, default=None)
 
     def __str__(self):
-        return f"ID: {self.id}, Link: {self.link}, Sport Name: {self.sport_name}, Match Date: {self.match_date}, Status: {self.status}"
+        return f"{self.link}"
     # def __str__(self):
     #     return f"{self.id=}, {self.link=}, {self.match_date=}, {self.sport_name=}, {self.status=}"
     # # def __str__(self):
@@ -74,16 +80,44 @@ class CurrentDBModel(Base):
     # 09 СЕРИЯ
     series1 = Column(VARCHAR, nullable=False)
     series2 = Column(VARCHAR, nullable=False)
-    # 10 ПРОЧЕЕ:
-    status = Column(Boolean, default=None)
+    # 10 Коф-ты:
+    kf1 = Column(Float, default=0)
+    kf2 = Column(Float, default=0)
+    # 11 ПРОЧЕЕ:
+    status = Column(VARCHAR, default=None)
 
     def __str__(self):
-        return f"ID: {self.id}, Link: {self.link}, Sport Name: {self.sport_name}, Match Date: {self.match_date}, Match Time: {self.match_time}, Country: {self.country}, Tournament: {self.tournament}, Tour: {self.tour}, Team1: {self.team1}, Team2: {self.team2}, Score1: {self.score1}, Score2: {self.score2}, Match Status: {self.match_status}, Position1: {self.position1}, Position2: {self.position2}, Position Total: {self.position_total}, Num Games1: {self.num_games1}, Num Games2: {self.num_games2}, Points1: {self.points1}, Points2: {self.points2}, Series1: {self.series1}, Series2: {self.series2}, Status: {self.status}"
+        return f"{self.link}_{self.sport_name}"
+
+
+class AnalysisDBModel(Base):
+    """
+    0-нет инфы
+    1- первый матч выиграет
+    2- второй матч выиграет
+    3- ничья
+    4 - личный просмотр матча
+    """
+    __table_args__ = (
+        UniqueConstraint('id', 'link'),
+        {"schema": settings.SCHEME_NAME},
+    )
+    __tablename__ = settings.TABLE_NAME_ANALYSIS
+
+    id = Column(INTEGER, primary_key=True, nullable=False)
+    link = Column(VARCHAR, unique=True, nullable=False)
+    by_coefficient = Column(INTEGER, default=0)
+    by_series = Column(INTEGER, default=0)
+    by_position_table = Column(INTEGER, default=0)
+    who_must_win = Column(INTEGER, default=None)
+    who_now_win = Column(INTEGER, default=None)
+    comment = Column(VARCHAR, default=None)
+    status = Column(VARCHAR, default=None)
+    result = Column(VARCHAR, default=None)
 
 
 if __name__ == "__main__":
     engine = create_engine(DB_URL)
-
     Session = sessionmaker(bind=engine)
     session = Session()
     Base.metadata.create_all(bind=engine)

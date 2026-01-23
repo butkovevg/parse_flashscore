@@ -1,3 +1,5 @@
 venv/
 src/logs
 src/configs/.env
+TODOLIST.md
+alembic.ini

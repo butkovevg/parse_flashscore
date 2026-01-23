@@ -1,30 +1,43 @@
 import os
+from datetime import datetime, timedelta
 
 from sqlalchemy import update
 
-from src.model.tables import CurrentDBModel
+from src.model.tables import AnalysisDBModel, CurrentDBModel
 from src.service.database import get_session
 from src.service.helper import HelperService
-from src.service.logger_handlers import get_logger
-
-logger = get_logger(__name__)
+from src.service.logger_handlers import logger
 
 
 class AnalysisService:
     def __init__(self, shift_day: int = 0):
+        self.analysis_model: AnalysisDBModel | None = None
         self.session = next(get_session())
         self.shift_day = shift_day
 
-    def is_match_leader_and_outsder(self, record: CurrentDBModel):
-        if record.position_total > 10:
-            if record.position1 < 4 and record.position_total - record.position2 < 4:
-                self.log_match_leader_and_outsder(record)
-            elif record.position2 < 4 and record.position_total - record.position1 < 4:
-                self.log_match_leader_and_outsder(record)
+    def is_selection_by_position_table(self, record: CurrentDBModel):
+        total_teams_in_table = 10  # Количество команд в таблице больше или равно
+        number_games_team1 = 3  # Количество игр первой команды больше чем
+        number_games_team2 = 3  # Количество игр второй команды больше чем
+        position_win_team = 3  # Позиция в таблице
+        position_loss_team = 3  # Позиция в таблице
+        if record.position_total >= total_teams_in_table and record.num_games1 > number_games_team1 and record.num_games2 > number_games_team2:
+            if record.position1 < position_win_team and record.position_total - record.position2 < position_loss_team:
+                self.analysis_model.by_position_table = 1
+                logger.debug(f"is_selection_by_position_table for {record.link}: {record.position1} {record.position2}")
+            elif record.position2 < position_win_team and record.position_total - record.position1 < position_loss_team:
+                if self.analysis_model.by_position_table == 0:
+                    self.analysis_model.by_position_table = 2
+                    logger.debug(
+                        f"is_selection_by_position_table for {record.link}: {record.position1} {record.position2}")
+                else:
+                    logger.error(f"Error for {record.link}: {record.position1} {record.position2}")
 
-    def is_match_with_series(self, record: CurrentDBModel):
+    def is_selection_match_with_series(self, record: CurrentDBModel):
         dct_series1 = {}
         dct_series2 = {}
+        number_wins = 4  # Количество побед для серии
+        number_loss = 4  # Количество проигрышей для серии
         for letter in record.series1:
             if letter in dct_series1:
                 dct_series1[letter] += 1
@@ -35,31 +48,98 @@ class AnalysisService:
                 dct_series2[letter] += 1
             else:
                 dct_series2[letter] = 1
-        if dct_series1.get("B", 0) > 2 and dct_series2.get("П", 0) > 2:
-            self.log_match_with_series(record)
-        elif dct_series1.get("B", 0) > 2 and dct_series2.get("П", 0) > 2:
-            self.log_match_with_series(record)
 
-    def log_match_with_series(self, record: CurrentDBModel):
-        self.update(current_db_model=record)
-        logger.warning(f"update {record.team1}:{record.team2} {record.series1} {record.series2}")
+        if dct_series1.get("B", 0) > number_wins and dct_series2.get("П", 0) > number_loss:
+            self.analysis_model.by_series = 1
+            logger.debug(
+                f"is_selection_match_with_series for {record.link}: {dct_series1.get('B', 0)} {dct_series2.get('П', 0)}")
 
-    def log_match_leader_and_outsder(self, record):
-        self.update(current_db_model=record)
-        logger.warning(
-            f"update {record.team1}:{record.team2} {record.position1}:{record.position2}==={record.position_total}")
+        elif dct_series2.get("B", 0) > number_wins and dct_series1.get("П", 0) > number_loss:
+            if self.analysis_model.by_series == 0:
+                self.analysis_model.by_series = 2
+                logger.debug(
+                    f"is_selection_match_with_series for {record.link}: {dct_series1.get('П', 0)} {dct_series2.get('В', 0)}")
+            else:
+                logger.error(f"Error for {record.link}: {record.position1} {record.position2}")
 
-    def main(self):
+    def is_selection_by_coefficient(self, record: CurrentDBModel):
+        try:
+            msg = f"{record.sport_name} {record.team1}: {record.team2} {record.kf1}: {record.kf2}"
+            max_kf = 1.25
+            min_kf = 1.01
+            if min_kf < float(record.kf1) < max_kf:
+                self.analysis_model.by_coefficient = 1
+                logger.info(msg)
+            if min_kf < float(record.kf2) < max_kf:
+                if self.analysis_model.by_coefficient == 0:
+                    self.analysis_model.by_coefficient = 2
+                else:
+                    logger.error(f"Check low kf and {msg}")
+                logger.info(msg)
+        except Exception as exc:
+            logger.error(exc)
+
+    @staticmethod
+    def is_need_skip(current_model: CurrentDBModel):
+        if current_model.sport_name == "ТЕННИС":
+            if "ITF" in current_model.country:
+                return True
+        return False
+
+    def main(self) -> None:
         unprocessed_records = self.get_list_from_db()
-        for record in unprocessed_records:
-            self.is_match_leader_and_outsder(record)
-            self.is_match_with_series(record)
+        counter = 0
+        length_unprocessed_records = len(unprocessed_records)
+        for index in range(length_unprocessed_records):
+
+            current_model = unprocessed_records[index]
+            self.analysis_model = AnalysisDBModel(
+                link=current_model.link,
+                by_coefficient=0,
+                by_series=0,
+                by_position_table=0,
+                who_must_win=0,
+            )
+            self.is_selection_by_coefficient(current_model)
+            self.is_selection_by_position_table(current_model)
+            self.is_selection_match_with_series(current_model)
+
+            if self.is_save():
+                if AnalysisService.is_need_skip(current_model):
+                    logger.debug(f"is_need_skip: {current_model.link}, {current_model.country}")
+                else:
+                    self.insert(analysis_model=self.analysis_model)
+                    counter += 1
+            logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
+
+    def is_save(self):
+        set_who_must_win = {self.analysis_model.by_coefficient, self.analysis_model.by_series,
+                            self.analysis_model.by_position_table}
+        set_who_must_win.discard(0)
+        if len(set_who_must_win) == 0:
+            return False
+        elif len(set_who_must_win) == 1:
+            self.analysis_model.who_must_win = set_who_must_win.pop()
+        else:
+            self.analysis_model.who_must_win = 3
+            self.analysis_model.comment = "ERR different "
+            logger.error(
+                f"{self.analysis_model.link}: different: {self.analysis_model.by_coefficient}/{self.analysis_model.by_series}/{self.analysis_model.by_position_table}")
+        return True
+
+    def insert(self, analysis_model: AnalysisDBModel):
+        """
+        """
+        try:
+            self.session.add(analysis_model)
+            self.session.commit()
+            logger.debug(f'insert record: {analysis_model}')
+        except Exception as exc:
+            description_error = f"ERROR: {str(exc)} for {analysis_model}"
+            logger.error(description_error)
+            self.session.rollback()
 
     def update(self, current_db_model: CurrentDBModel, status: bool = True):
-        """
-        :param status:
-        :return:
-        """
         stmt = (
             update(CurrentDBModel).
             where(CurrentDBModel.id == current_db_model.id).
@@ -68,37 +148,40 @@ class AnalysisService:
         self.session.execute(stmt)
         self.session.commit()
 
-    def get_list_from_db(self):
+    def get_list_from_db(self) -> list:
         try:
+            match_date = HelperService.get_date_with_point_between_day(self.shift_day)
+            logger.debug(f"get_list_from_db {match_date=}")
             # запрос для всех записей для вида спорта по дате
             query_all_record = (
                 self.session
                 .query(CurrentDBModel)
-                .filter_by(match_date=HelperService.get_date_with_point_between_day(self.shift_day))
-                .filter(CurrentDBModel.position1 != 0)
+                .filter_by(match_date=match_date)
+                # .filter(CurrentDBModel.position1 != 0)
             )
-
             # Необработанных записей для вида спорта по дате
             query_unprocessed_record = query_all_record.filter_by(status=None)
-
             len_all_record = query_all_record.count()
             len_unprocessed_record = query_unprocessed_record.count()
-
             logger.debug(f"{len_unprocessed_record=}/{len_all_record=}")
-
-            unprocessed_records = query_unprocessed_record.all()
-
-            return unprocessed_records
+            return query_all_record.all()
         except Exception as exc:
             logger.error(f"Подробности ошибки {str(exc)}")
-        finally:
-            self.session.close()
+            return []
 
 
 class InfoAnalysisDBService:
     def __init__(self, shift_day: int = 0):
-        self.session = next(get_session())
+
         self.shift_day = shift_day
+        self.session = next(get_session())
+        self.current_time = datetime.now()
+        self.query = (
+            self.session
+            .query(AnalysisDBModel, CurrentDBModel)
+            .outerjoin(CurrentDBModel, AnalysisDBModel.link == CurrentDBModel.link)
+            .filter(CurrentDBModel.match_date == HelperService.get_date_with_point_between_day(day=self.shift_day))
+        )
 
     def get_list_from_db(self):
         # запрос для всех записей для вида спорта по дате
@@ -113,15 +196,77 @@ class InfoAnalysisDBService:
         )
 
         matches = query_all_record.all()
+        logger.warning(f"{matches=}")
         return matches
+
+    def printer_link(self):
+        matches = self.get_list_from_db()
+        for match_index in range(len(matches)):
+            match = matches[match_index]
+            print(f"[{match_index} {match.match_time} {match.position_total}: "
+                  f"{match.position1}-{match.position2} {match.country} {match.team1}: {match.team2}]"
+                  f"(https://www.flashscorekz.com/match/{match.link}/#/standings/table/overall)")
+            print()
+
+    def main(self):
+        matches = self.get_list_from_db()
+        for match_index in range(len(matches)):
+            record = matches[match_index]
+            logger.warning(f"{str(record)=}")
+
+    def get_favorites(self):
+        query_all_record = (
+            self.query
+            .filter(AnalysisDBModel.is_favorites)  # .filter(AnalysisDBModel.is_favorites == True)
+            .order_by(CurrentDBModel.match_time)
+        )
+        result = query_all_record.all()
+        logger.warning(f"{len(result)=}")
+
+        return InfoAnalysisDBService.get_list_dct_models_analysis_and_current(result)
+
+    def merge(self):
+        query_all_record = (
+            self.query
+            .order_by(CurrentDBModel.match_time)
+        )
+        query_all_record = query_all_record.filter(AnalysisDBModel.comment.is_(None))
+        result = query_all_record.all()
+        logger.warning(f"{len(result)=}")
+        return InfoAnalysisDBService.get_list_dct_models_analysis_and_current(result)
+
+    def get_match_today(self):
+        new_time = self.current_time - timedelta(minutes=90)
+        time_filter = new_time.strftime('%H:%M')
+        query_all_record = self.query.filter(CurrentDBModel.match_time > time_filter)
+        # query_all_record = self.query.filter(AnalysisDBModel.comment.is_(None))
+        query_all_record = query_all_record.order_by(CurrentDBModel.match_time)
+        result = query_all_record.all()
+        logger.info(f"get_match_today: {len(result)=}")
+        return InfoAnalysisDBService.get_list_dct_models_analysis_and_current(result)
+
+    @staticmethod
+    def get_list_dct_models_analysis_and_current(result):
+        output_list = []
+        for analysis, current in result:
+            row_dict = {}
+            for attr in dir(current):
+                if not attr.startswith("_"):
+                    row_dict[attr] = getattr(current, attr)
+            for attr in dir(analysis):
+                if not attr.startswith("_"):
+                    if attr == "id":
+                        row_dict["analysis_id"] = getattr(analysis, attr)
+                    else:
+                        row_dict[attr] = getattr(analysis, attr)
+
+            row_dict.pop("metadata", None)
+            row_dict.pop("registry", None)
+            output_list.append(row_dict)
+        return output_list
 
 
 if __name__ == "__main__":
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    # data_for_parsing1 = InputDataForParsing(sport_name="volleyball", shift_day=0)
-    # data_for_parsing2 = InputDataForParsing(sport_name="football", shift_day=0)
-    parsing_service = AnalysisService()
+    parsing_service = AnalysisService(shift_day=0)
     parsing_service.main()
-    # window.location.href = xhr.responseText;
-    # infoanalysisdbservice= InfoAnalysisDBService()
-    # infoanalysisdbservice.main()

@@ -1,13 +1,7 @@
-class MyCustomException(Exception):
-    def __init__(self, status="error", status_code=500, data="no description", details=None):
-        self.status = status
-        self.status_code = status_code
-        self.data = data
-        self.details = details
+from fastapi import HTTPException
 
-    def __str__(self):
-        return f"MyCustomException(" \
-               f"{self.status=}, " \
-               f"{self.status_code=}, " \
-               f"{self.data =}, " \
-               f"{self.details =})"
+
+class CustomException(HTTPException):
+    def __init__(self, detail: str, status_code: int, message: str):
+        super().__init__(status_code=status_code, detail=detail)
+        self.message = message

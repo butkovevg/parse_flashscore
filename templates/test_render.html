@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Day of Week</title>
+</head>
+<body>
+    <!-- Элемент с датой -->
+    <table>
+        <tr>
+            <td id="date-cell">16.04.2025</td>
+        </tr>
+    </table>
+
+    <script>
+        // Функция для получения дня недели
+        function getDayOfWeek(dateString) {
+            // Разбиваем строку даты на компоненты
+            const [day, month, year] = dateString.split('.').map(Number);
+
+            // Создаем объект Date (месяцы в JavaScript начинаются с 0)
+            const date = new Date(year, month - 1, day);
+
+            // Массив с названиями дней недели
+            const daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+
+            // Получаем день недели (0 - воскресенье, 1 - понедельник и т.д.)
+            const dayOfWeek = daysOfWeek[date.getDay()];
+
+            return dayOfWeek;
+        }
+
+        // Находим элемент с датой
+        const dateCell = document.getElementById('date-cell');
+
+        // Получаем текст из ячейки
+        const dateString = dateCell.textContent;
+
+        // Вычисляем день недели
+        const dayOfWeek = getDayOfWeek(dateString);
+
+        // Добавляем день недели в HTML
+        dateCell.textContent += ` (${dayOfWeek})`;
+    </script>
+</body>
+</html>
