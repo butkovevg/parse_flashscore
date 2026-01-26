@@ -52,7 +52,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-Instrumentator().instrument(app).expose(app)  # Включить метрики prometheus
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # Добавление middleware (важно: до регистрации маршрутов)
 # app.add_middleware(LoggingMiddleware)

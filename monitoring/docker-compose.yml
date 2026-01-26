@@ -1,51 +1,67 @@
-version: '3.8'
+version: "3.9"
+
+networks:
+  observability:
+    name: observability
 
 services:
+  loki:
+    image: grafana/loki:2.9.6
+    container_name: loki
+    command: -config.file=/etc/loki/loki-config.yaml
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki-data:/loki
+    networks:
+      - observability
+
   prometheus:
-    image: prom/prometheus:v2.47.1
+    image: prom/prometheus:v2.52.0
     container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prom-data:/prometheus
     networks:
-      - monitoring
-
-  loki:
-    image: grafana/loki:2.9.6
-    container_name: loki
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./config/loki-config.yaml:/etc/loki/local-config.yaml
-      - ./data/loki:/loki          # ← одна папка для всех данных
-    networks:
-      - monitoring
-
-  alloy:
-    image: grafana/alloy:v1.1.0
-    container_name: alloy
-    volumes:
-      - ./config/alloy-config.river:/etc/alloy/config.river
-      - C:/Users/evgeniy.butkov/PycharmProjects/parse_flashscore/logs:/app/logs:ro
-    networks:
-      - monitoring
+      - observability
 
   grafana:
-    image: grafana/grafana:10.2.3
+    image: grafana/grafana:10.4.3
     container_name: grafana
     ports:
       - "3000:3000"
-    volumes:
-      - ./config/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
-    networks:
-      - monitoring
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      # удобно для локалки; в проде лучше выключить
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on:
-      - prometheus
       - loki
+      - prometheus
+    networks:
+      - observability
 
-networks:
-  monitoring:
-    driver: bridge
+  alloy:
+    image: grafana/alloy:v1.3.1
+    container_name: alloy
+    command: run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+    volumes:
+      - ./alloy.hcl:/etc/alloy/config.alloy:ro
+      - "C:\\Users\\evgeniy.butkov\\PycharmProjects\\parse_flashscore\\logs\\log_detailed_FLASHSCORE.log:/var/log/fastapi/log_detailed_FLASHSCORE.log:ro"
+    depends_on:
+      - loki
+    networks:
+      - observability
+
+volumes:
+  loki-data:
+  prom-data:
+  grafana-data:
