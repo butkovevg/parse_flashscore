@@ -239,7 +239,7 @@ class InfoAnalysisDBService:
         new_time = self.current_time - timedelta(minutes=90)
         time_filter = new_time.strftime('%H:%M')
         query_all_record = self.query.filter(CurrentDBModel.match_time > time_filter)
-        # query_all_record = self.query.filter(AnalysisDBModel.comment.is_(None))
+        query_all_record = query_all_record.filter(AnalysisDBModel.comment.is_(None))
         query_all_record = query_all_record.order_by(CurrentDBModel.match_time)
         result = query_all_record.all()
         logger.info(f"get_match_today: {len(result)=}")
