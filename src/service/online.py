@@ -210,15 +210,13 @@ if __name__ == "__main__":
                 database_online_service = DataBaseOnlineService()
                 list_links_bef_update = database_online_service.get_list_links_from_db(rus_sport_name, match_date_today)
                 logger.warning(f"________________________{eng_sport_name.upper()}________________________")
-                logger.info(
-                    f"for {eng_sport_name.upper()} need update links({len(list_links_bef_update)}): {list_links_bef_update}")
+                logger.info(f"for {eng_sport_name.upper()} need update links({len(list_links_bef_update)}): {list_links_bef_update}")
 
                 # 02 Запрос по виду спорта для обновления
                 data_for_parsing = InputDataForParsing(english_sport_name=eng_sport_name, shift_day=shift_day)
                 main_page_service = MainPageService(data4parsing=data_for_parsing)
                 # 02 Список, который можно обновить
-                list_for_update_analysis, list_links_aft_update = main_page_service.get_list_for_update_analysis(
-                    list_links_aft_analysis=list_links_bef_update)
+                list_for_update_analysis, list_links_aft_update = main_page_service.get_list_for_update_analysis(list_links_aft_analysis=list_links_bef_update)
 
                 # 03 Если есть ссылки, которые не обновились, то убираем их с comment="NO_UPDATE"
                 logging_difference_list(list_links_bef_update, list_links_aft_update, eng_sport_name)
