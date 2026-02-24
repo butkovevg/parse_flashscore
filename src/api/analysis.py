@@ -80,11 +80,18 @@ async def get_value(request: Request, day: int = 0):
 async def find_day(request: Request):
     service = FindDayForParsingService()
     data = service.all()
-    list_sports = ['ВОЛЕЙБОЛ', 'ФУТБОЛ', 'БАСКЕТБОЛ', 'ГАНДБОЛ', 'ТЕННИС']
-
     return templates.TemplateResponse("find.html", {"request": request,
                                                     "data": data,
-                                                    "sports": list_sports})
+                                                    "sports": list(FindDayForParsingService.dct_types_of_sports.keys())})
+@router.get("/for_stat")
+async def for_stat(request: Request):
+    service = FindDayForParsingService()
+    data = service.all()
+    data_for_stat = service.for_stat(data)
+    return templates.TemplateResponse("for_stat.html", {"request": request,
+                                                    "data": data,
+                                                    "sports": list(FindDayForParsingService.dct_types_of_sports.keys()),
+                                                    "data_for_stat": data_for_stat})
 
 
 @router.patch("/update_comment/{link}")
