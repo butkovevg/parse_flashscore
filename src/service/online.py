@@ -140,6 +140,7 @@ class DataBaseOnlineService:
 
     def update_analysis_db(self, list_for_update_analysis: list):
         try:
+
             # # # Подготовка данных для массового обновления
             # # update_data = []
             # # for item in list_for_update_analysis:
@@ -199,7 +200,8 @@ if __name__ == "__main__":
     while True:
         # Список видов спорта, которые есть в ТБ анализв
         list_sport_name = database_online_service.get_list_sport_name(match_date_today)
-        list_sport_name = ["ГАНДБОЛ"]
+        logger.warning(list_sport_name)
+        # list_sport_name = ["ТЕННИС"]
 
         if len(list_sport_name) == 0:  # Если нет матчей для обновления, то засыпаем до завтра
             logger.info("list_sport_name is empty")

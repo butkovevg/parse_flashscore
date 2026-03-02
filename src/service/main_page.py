@@ -167,46 +167,43 @@ class MainPageService:
             list_links_for_logger = []
 
             # Перебираем каждый элемент в ResultSet
+
             for div in divs_sportname:
                 # Находим все матчи внутри текущего блока
                 matches = div.find_all('div', class_='event__match')
-                # for match in matches:
-                for index in range(0, len(matches)):
-                    match = matches[index]
-                    # Извлекаем id (если существует)
-                    link = match.get('id', None)
-                    if link is not None:
-                        link = link.replace(delimiter, "")
-                    else:
+
+                for match in matches:
+                    # Извлекаем ID матча (убираем префикс delimiter)
+                    match_id = match.get('id')
+                    if not match_id or not match_id.startswith(delimiter):
                         continue
+                    match_id = match_id.replace(delimiter, "")
 
-                    # Извлекаем текст (если элементы существуют)
-                    status = match.find('div', class_='event__stage--block')
-                    status = status.text.strip() if status else None
+                    # Извлекаем статус матча
+                    status_elem = match.find('div', class_='event__stage--block')
+                    status = status_elem.text.strip() if status_elem else None
 
-                    scores = soup.find_all('span', class_='event__score')
-                    try:
-                        res1 = scores[index * 2].text.strip()
-                        res2 = scores[index * 2 + 1].text.strip()
-                        res = f"{res1}:{res2}"
-                    except Exception as exc:
-                        print("ERR", link, exc)
-                        res = "Error -:-"
+                    # Извлекаем счета — ищем ОТНОСИТЕЛЬНО текущего матча, а не всей страницы!
+                    score_home = match.find('span', class_='event__score--home')
+                    score_away = match.find('span', class_='event__score--away')
 
-                    if link in list_links_aft_analysis:
-                        # Добавляем данные в список
+                    res1 = score_home.text.strip() if score_home else "-"
+                    res2 = score_away.text.strip() if score_away else "-"
+                    res = f"{res1}:{res2}"
+
+                    if match_id in list_links_aft_analysis:
                         who_now_win = HelperService.get_who_now_win(res)
                         logger.debug(f"{who_now_win=}")
                         output_list.append({
-                            'link': link,
+                            'link': match_id,
                             'status': status,
                             'result': res,
                             'who_now_win': who_now_win,
                         })
-                        logger.info(f"for {link=} {status=} {res=}")
-                        list_links_for_logger.append(link)
+                        logger.info(f"for {match_id=} {status=} {res=}")
+                        list_links_for_logger.append(match_id)
                     else:
-                        logger.debug(f"{link} {status=} {res=}")
+                        logger.debug(f"{match_id} {status=} {res=}")
             logger.info(f"{len(output_list)} record(s) update: {list_links_for_logger}")
             logger.debug(f"{output_list=}")
             browser.quit()
