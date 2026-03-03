@@ -9,6 +9,18 @@ logger = get_logger(__name__)
 
 class HelperService:
     @staticmethod
+    def get_day_name(date_str):
+        date_obj = datetime.datetime.strptime(date_str, "%d.%m.%Y")
+
+        # Номер дня недели (0 = понедельник, 6 = воскресенье)
+        weekday_num = date_obj.weekday()
+
+        # Название дня недели на русском
+        days_ru = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+        day_name = days_ru[weekday_num]
+        return day_name
+
+    @staticmethod
     def get_new_date(day: int) -> datetime.date:
         """
         Возвращает новую дату, сдвинутую на указанное количество дней.

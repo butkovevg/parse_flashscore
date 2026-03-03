@@ -84,52 +84,6 @@ class DataBaseOnlineService:
         finally:
             self.session.close()
 
-        #     translate_sport_name = dict_link[self.data4parsing.sport_name]["sport_name"]
-        #     en_sport_name = self.data4parsing.sport_name
-        #     logger.warning(f"{en_sport_name}")
-        #     # запрос для всех записей для вида спорта по дате
-        #     logger.warning(f"{self.data4parsing.match_date=}")
-        #     logger.warning(f"{translate_sport_name=}")
-        #     query_all_record = (
-        #         self.session
-        #         .query(AnalysisDBModel)
-        #         .filter_by(match_date=self.data4parsing.match_date)
-        #         .filter_by(sport_name=translate_sport_name)
-        #     )
-        #
-        #     # Необработанных записей для вида спорта по дате
-        #     query_unprocessed_record = query_all_record.filter_by(status=None)
-        #
-        #     len_all_record = query_all_record.count()
-        #     len_unprocessed_record = query_unprocessed_record.count()
-        #
-        #     logger.debug(f"{len_unprocessed_record=}/{len_all_record=}")
-        #     if len_all_record == 0:
-        #         logger.info(f"NO LINK  {self.data4parsing.sport_name} {self.data4parsing.match_date}")
-        #     elif len_unprocessed_record > 0:
-        #         logger.debug(f"Raw links for {self.data4parsing}")
-        #         logger.debug(f"It remains to process {len_unprocessed_record}/{len_all_record}")
-        #         # парсер конкретных матчей
-        #         unprocessed_records = query_unprocessed_record.all()
-        #         for index_record in range(len_unprocessed_record):
-        #             unprocessed_record = unprocessed_records[index_record]
-        #             logger.info(
-        #                 f"process {unprocessed_record}({en_sport_name}): {index_record + 1}/{len_unprocessed_record} ")
-        #             if self.data4parsing.sport_name == "tennis":
-        #                 response = self.get_tennis_match(link=unprocessed_record.link)
-        #             else:
-        #                 response = self.get_current_match(link=unprocessed_record.link)
-        #
-        #             if response.status == StatusModel.SUCCESS:
-        #                 self.update(main_db_model=unprocessed_record, status=True)
-        #             elif response.status == StatusModel.ERROR:
-        #
-        #                 self.update(main_db_model=unprocessed_record, status=False)
-        #             else:
-        #                 logger.error("an unhandled error")
-        #     else:
-        #         logger.info(f"All link processed {self.data4parsing}")
-
     def update_comment(self, link: str, comment: str):
         list_for_update_analysis = [
             {"link": link,
@@ -141,18 +95,6 @@ class DataBaseOnlineService:
 
     def update_analysis_db(self, list_for_update_analysis: list):
         try:
-
-            # # # Подготовка данных для массового обновления
-            # # update_data = []
-            # # for item in list_for_update_analysis:
-            # #     update_data.append({'link': item['link'], 'status': item['status']})
-            #
-            # # Массовое обновление
-            # self.session.bulk_update_mappings(AnalysisDBModel, list_for_update_analysis)
-            #
-            # # Фиксация изменений в базе данных
-            # self.session.commit()
-            # print("Массовое обновление завершено.")
             for dct_for_update_analysis in list_for_update_analysis:
                 link = dct_for_update_analysis['link']
                 dct_for_update_analysis.pop('link')
@@ -312,7 +254,6 @@ if __name__ == "__main__":
         current_date = yesterday
         while current_date >= start_date:
             match_date = current_date.strftime("%d.%m.%Y")
-            logger.info(f"{'-' * 99}Start {match_date}")
+            logger.info(f"{'-' * 99}Start {match_date}({HelperService.get_day_name(date_str=match_date)})")
             database_online_service.get_historical_analytics(match_date=match_date)
             current_date -= timedelta(days=1)  # шаг на 1 день назад
-        # 06.04.2025
