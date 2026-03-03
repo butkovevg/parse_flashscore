@@ -82,16 +82,20 @@ async def find_day(request: Request):
     data = service.all()
     return templates.TemplateResponse("find.html", {"request": request,
                                                     "data": data,
-                                                    "sports": list(FindDayForParsingService.dct_types_of_sports.keys())})
+                                                    "sports": list(
+                                                        FindDayForParsingService.dct_types_of_sports.keys())})
+
+
 @router.get("/for_stat")
 async def for_stat(request: Request):
     service = FindDayForParsingService()
     data = service.all()
     data_for_stat = service.for_stat(data)
     return templates.TemplateResponse("for_stat.html", {"request": request,
-                                                    "data": data,
-                                                    "sports": list(FindDayForParsingService.dct_types_of_sports.keys()),
-                                                    "data_for_stat": data_for_stat})
+                                                        "data": data,
+                                                        "sports": list(
+                                                            FindDayForParsingService.dct_types_of_sports.keys()),
+                                                        "data_for_stat": data_for_stat})
 
 
 @router.patch("/update_comment/{link}")
@@ -100,3 +104,9 @@ async def update_comment(request: Request, link: str, comment: str | None = None
     database_online_service = DataBaseOnlineService()
     database_online_service.update_comment(link, comment)
     return {"message": "Comment updated successfully", "link": link, "new_comment": comment}
+
+
+@router.patch("/get_historical_analytics/{match_date}/")
+async def get_historical_analytics(request: Request, match_date: str):
+    database_online_service = DataBaseOnlineService()
+    return database_online_service.get_historical_analytics(match_date=match_date)

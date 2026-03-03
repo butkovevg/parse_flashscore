@@ -4,16 +4,14 @@ import time
 from sqlalchemy import Time, and_, cast, distinct, or_, select
 
 from src.configs.settings import settings
-from src.model.response import StatusModel
+from src.model.response import ResponseModel, StatusModel
 from src.model.tables import AnalysisDBModel, CurrentDBModel
 from src.service.current_page import CurrentPageService
 from src.service.database import get_session
 from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
-from src.service.logger_handlers import get_logger
+from src.service.logger_handlers import logger
 from src.service.main_page import MainPageService, dct_translate_sport_name_rus_eng
-
-logger = get_logger(__name__)
 
 
 class DataBaseOnlineService:
@@ -209,7 +207,7 @@ class DataBaseOnlineService:
         for tuple_from_db in list_links_analysis_for_day:
             link = tuple_from_db[0]
             rus_translate_sport_name = tuple_from_db[1]
-            english_sport_name = dct_translate_sport_name_rus_eng[rus_translate_sport_name]
+            english_sport_name = dct_translate_sport_name_rus_eng[rus_translate_sport_name.upper()]
 
             logger.debug(
                 f" {link=}  {rus_translate_sport_name}({english_sport_name}) status {tuple_from_db[2]} who_must_win {tuple_from_db[3]}")
@@ -224,15 +222,16 @@ class DataBaseOnlineService:
                 dct = response.data
                 status = dct.get('status', 'NO_STATUS')
                 if status not in DataBaseOnlineService.finished_status:
-                    logger.error(f"{status=} for {DataBaseOnlineService.finished_status=}")
+                    logger.error(f"{link} {status=} for {DataBaseOnlineService.finished_status=}")
                 if status == 'TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ.':
                     dct['status'] = "ОТМЕНЕН"
                 logger.info(
-                    f"{match_date}({counter}/{len(list_links_analysis_for_day)}) for {dct.get('link', 'NO_LINK')} {status}({dct.get('result', 'NO_RESULT')}<{dct.get('who_now_win', 'NO_who_now_win')}>)")
+                    f"{match_date}({counter}/{len(list_links_analysis_for_day)}) for {dct.get('link', 'NO_LINK')} {dct.get('status', 'NO_STATUS')}({dct.get('result', 'NO_RESULT')}<{dct.get('who_now_win', 'NO_who_now_win')}>)")
 
                 service.update_analysis_db([dct])
             else:
                 logger.error(f"Error for {link}")
+        return ResponseModel()
 
 
 def logging_difference_list(list_bef_update, list_aft_update, eng_sport_name):
@@ -316,3 +315,4 @@ if __name__ == "__main__":
             logger.info(f"{'-' * 99}Start {match_date}")
             database_online_service.get_historical_analytics(match_date=match_date)
             current_date -= timedelta(days=1)  # шаг на 1 день назад
+        # 06.04.2025
