@@ -120,4 +120,11 @@ if __name__ == "__main__":
     import os
 
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    logger.info(HelperService.get_who_now_win(result="19:"))
+    list_sport_name_rus_eng = [
+        "football",
+        "volleyball",
+        "basketball",
+        "handball",
+        "tennis",
+    ]
+    logger.info(HelperService.get_full_link(english_sport_name="football", link="UZ73R5LF"))
