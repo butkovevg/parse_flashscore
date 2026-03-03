@@ -1,6 +1,5 @@
 import os
 import time
-from datetime import datetime
 
 from sqlalchemy import Time, and_, cast, distinct, or_, select
 
@@ -26,9 +25,8 @@ class DataBaseOnlineService:
         'Послеовертайма',
         'Перенесен',
         'Завершен(отказ)',
-        'Отменен',
+        'ОТМЕНЕН',
         'ТЕХ. ПОРАЖЕНИЕ',
-        'TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ.',
     )
 
     def __init__(self):
@@ -204,6 +202,38 @@ class DataBaseOnlineService:
         finally:
             self.session.close()
 
+    def get_historical_analytics(self, match_date: str = "03.02.2026"):
+        list_links_analysis_for_day = self.get_list_links_analysys_for_day(match_date=match_date)
+
+        counter = 0
+        for tuple_from_db in list_links_analysis_for_day:
+            link = tuple_from_db[0]
+            rus_translate_sport_name = tuple_from_db[1]
+            english_sport_name = dct_translate_sport_name_rus_eng[rus_translate_sport_name]
+
+            logger.debug(
+                f" {link=}  {rus_translate_sport_name}({english_sport_name}) status {tuple_from_db[2]} who_must_win {tuple_from_db[3]}")
+            data4parsing = InputDataForParsing(english_sport_name=english_sport_name, should_fetch_odds=False)
+
+            current_page_service = CurrentPageService(data4parsing=data4parsing)
+            response: StatusModel = current_page_service.get_current_match(link=link, mode="update")
+
+            counter += 1
+            if response.status == StatusModel.SUCCESS:
+                service = DataBaseOnlineService()
+                dct = response.data
+                status = dct.get('status', 'NO_STATUS')
+                if status not in DataBaseOnlineService.finished_status:
+                    logger.error(f"{status=} for {DataBaseOnlineService.finished_status=}")
+                if status == 'TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ.':
+                    dct['status'] = "ОТМЕНЕН"
+                logger.info(
+                    f"{match_date}({counter}/{len(list_links_analysis_for_day)}) for {dct.get('link', 'NO_LINK')} {status}({dct.get('result', 'NO_RESULT')}<{dct.get('who_now_win', 'NO_who_now_win')}>)")
+
+                service.update_analysis_db([dct])
+            else:
+                logger.error(f"Error for {link}")
+
 
 def logging_difference_list(list_bef_update, list_aft_update, eng_sport_name):
     if len(list_links_bef_update) != len(list_links_aft_update):
@@ -272,31 +302,17 @@ if __name__ == "__main__":
             # Если ссылка не обновляется, то возможно полностью обновлять запись
 
     elif endpoint_name == "offline":
+        from datetime import datetime, timedelta
 
-        match_date = "03.02.2026"
-        list_links_analysys_for_day = database_online_service.get_list_links_analysys_for_day(match_date=match_date)
+        # Вчерашняя дата
+        yesterday = datetime.now() - timedelta(days=1)
+        # 5 лет назад
+        start_date = yesterday - timedelta(days=5 * 365)
 
-        counter = 0
-        for tuple_from_db in list_links_analysys_for_day:
-            link = tuple_from_db[0]
-            rus_translate_sport_name = tuple_from_db[1]
-            english_sport_name = dct_translate_sport_name_rus_eng[rus_translate_sport_name]
-
-            logger.debug(f" {link=}  {rus_translate_sport_name}({english_sport_name}) status {tuple_from_db[2]} who_must_win {tuple_from_db[3]}")
-            data4parsing = InputDataForParsing(english_sport_name=english_sport_name, should_fetch_odds=False)
-
-            current_page_service = CurrentPageService(data4parsing=data4parsing)
-            response: StatusModel = current_page_service.get_current_match(link=link, mode="update")
-
-            counter += 1
-            if response.status == StatusModel.SUCCESS:
-                service = DataBaseOnlineService()
-                dct= response.data
-                status = dct.get('status', 'NO_STATUS')
-                logger.info( f"{match_date}({counter}/{len(list_links_analysys_for_day)}) for {dct.get('link', 'NO_LINK')} {status}({dct.get('result', 'NO_RESULT')}<{dct.get('who_now_win', 'NO_who_now_win')}>)")
-                if  status not in DataBaseOnlineService.finished_status:
-                    logger.error(f"{status=} for {DataBaseOnlineService.finished_status=}")
-                service.update_analysis_db([dct])
-            else:
-                logger.error(f"Error for {link}")
-
+        # Цикл от сегодняшней даты назад к 5 годам назад
+        current_date = yesterday
+        while current_date >= start_date:
+            match_date = current_date.strftime("%d.%m.%Y")
+            logger.info(f"{'-' * 99}Start {match_date}")
+            database_online_service.get_historical_analytics(match_date=match_date)
+            current_date -= timedelta(days=1)  # шаг на 1 день назад
