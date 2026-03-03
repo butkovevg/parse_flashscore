@@ -9,6 +9,13 @@ logger = get_logger(__name__)
 
 class HelperService:
     @staticmethod
+    def get_full_link(english_sport_name: str, link: str):
+        base_link = f"https://www.flashscorekz.com/match/{english_sport_name}/{link}"
+        fragment_table = "#/standings/table/overall"
+        full_link = f"{base_link}/{fragment_table}"
+        return full_link
+
+    @staticmethod
     def get_day_name(date_str):
         date_obj = datetime.datetime.strptime(date_str, "%d.%m.%Y")
 

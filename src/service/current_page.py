@@ -120,9 +120,7 @@ class CurrentPageService:
             self.session.rollback()
 
     def get_current_match(self, link: str, mode: str = "insert") -> ResponseModel:
-        base_link = f"https://www.flashscorekz.com/match/{self.data4parsing.english_sport_name}/{link}"
-        fragment_table = "#/standings/table/overall"
-        full_link = f"{base_link}/{fragment_table}"
+        full_link = HelperService.get_full_link(english_sport_name=self.data4parsing.english_sport_name, link=link)
         browser = BrowserService.get_webdriver(is_headless=settings.IS_HEADLESS)
         try:
             browser.get(full_link)
