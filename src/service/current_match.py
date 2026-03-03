@@ -254,8 +254,7 @@ class CurrentMatchService:
 
     def get_status_scores(self):
         try:
-            status = self.driver.find_element(By.XPATH,
-                                              "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/div[1]/div[3]/div/div[2]/span").text
+            status = self.driver.find_element(By.CSS_SELECTOR, "div.detailScore__status span.fixedHeaderDuel__detailStatus").text
             score1 = self.driver.find_element(By.XPATH,
                                               "/html/body/div[4]/div[1]/div/div[1]/main/div[5]/div[1]/div[2]/div[1]/div[3]/div/div[1]/span[1]").text
             score2 = self.driver.find_element(By.XPATH,

@@ -166,8 +166,10 @@ class DataBaseOnlineService:
                 if status not in DataBaseOnlineService.finished_status:
                     logger.error(f"{link} {status=} for {DataBaseOnlineService.finished_status=}")
                     logger.error(f"{HelperService.get_full_link(english_sport_name=english_sport_name, link=link)}")
-                if status == 'TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ.' or  "ОТКАЗ" in status:
+                if status == 'TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ.' or "ОТКАЗ" in status:
                     dct['status'] = "ОТМЕНЕН"
+                elif status == "ПОСЛЕ ОВЕРТАЙМА":
+                    dct['status'] = "ЗАВЕРШЕН"
                 logger.info(
                     f"{english_sport_name:10} {match_date}({counter}/{len(list_links_analysis_for_day)}) for {dct.get('link', 'NO_LINK')} {dct.get('status', 'NO_STATUS')}({dct.get('result', 'NO_RESULT')}<{dct.get('who_now_win', 'NO_who_now_win')}>)")
 
