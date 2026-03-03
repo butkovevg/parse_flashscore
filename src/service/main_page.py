@@ -189,6 +189,7 @@ class MainPageService:
 
                     res1 = score_home.text.strip() if score_home else "-"
                     res2 = score_away.text.strip() if score_away else "-"
+
                     res = f"{res1}:{res2}"
 
                     if match_id in list_links_aft_analysis:

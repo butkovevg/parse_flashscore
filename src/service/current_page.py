@@ -12,6 +12,7 @@ from src.model.tables import MainDBModel
 from src.service.browser import BrowserService
 from src.service.current_match import CurrentMatchService
 from src.service.database import get_session
+from src.service.helper import HelperService
 from src.service.input_data_for_parsing import InputDataForParsing
 from src.service.logger_handlers import get_logger
 from src.service.main_page import dict_link
@@ -118,7 +119,7 @@ class CurrentPageService:
             logger.error(main_db_model.link)
             self.session.rollback()
 
-    def get_current_match(self, link) -> ResponseModel:
+    def get_current_match(self, link: str, mode: str = "insert") -> ResponseModel:
         base_link = f"https://www.flashscorekz.com/match/{self.data4parsing.english_sport_name}/{link}"
         fragment_table = "#/standings/table/overall"
         full_link = f"{base_link}/{fragment_table}"
@@ -128,8 +129,20 @@ class CurrentPageService:
             logger.debug(f"browser.get({full_link})")
             time.sleep(randint(settings.PAUSE_SEC, settings.PAUSE_SEC + 5))
             current_db_model = CurrentMatchService(browser, self.data4parsing).get_current_match_model(link)
-            response_insert = self.insert(model=current_db_model)
-            if response_insert.status == StatusModel.SUCCESS:
+            if mode == "insert":
+                response: ResponseModel = self.insert(model=current_db_model)
+            elif mode == "update":
+                res = f"{current_db_model.score1}:{current_db_model.score2}"
+                who_now_win = HelperService.get_who_now_win(res)
+                dct_analysis_for_update = {
+                    "link": current_db_model.link,
+                    # "comment": "offline_analysis",
+                    "status": current_db_model.match_status,
+                    "result": res,
+                    "who_now_win": who_now_win,
+                }
+                return ResponseModel(status=StatusModel.SUCCESS, data=dct_analysis_for_update)
+            if response.status == StatusModel.SUCCESS:
                 return ResponseModel(status=StatusModel.SUCCESS, )
             else:
                 return ResponseModel(status=StatusModel.ERROR, )
