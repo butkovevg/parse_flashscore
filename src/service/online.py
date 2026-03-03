@@ -1,5 +1,6 @@
 import os
 import time
+from datetime import datetime, timedelta
 
 from sqlalchemy import Time, and_, cast, distinct, or_, select
 
@@ -25,6 +26,7 @@ class DataBaseOnlineService:
         'Завершен(отказ)',
         'ОТМЕНЕН',
         'ТЕХ. ПОРАЖЕНИЕ',
+        'ERROR_PARSING',
     )
 
     def __init__(self):
@@ -158,9 +160,10 @@ class DataBaseOnlineService:
             current_page_service = CurrentPageService(data4parsing=data4parsing)
             response: StatusModel = current_page_service.get_current_match(link=link, mode="update")
 
+            service = DataBaseOnlineService()
             counter += 1
             if response.status == StatusModel.SUCCESS:
-                service = DataBaseOnlineService()
+
                 dct = response.data
                 status = dct.get('status', 'NO_STATUS')
                 if status not in DataBaseOnlineService.finished_status:
@@ -172,11 +175,14 @@ class DataBaseOnlineService:
                     dct['status'] = "ЗАВЕРШЕН"
                 logger.info(
                     f"{english_sport_name:10} {match_date}({counter}/{len(list_links_analysis_for_day)}) for {dct.get('link', 'NO_LINK')} {dct.get('status', 'NO_STATUS')}({dct.get('result', 'NO_RESULT')}<{dct.get('who_now_win', 'NO_who_now_win')}>)")
-
-                service.update_analysis_db([dct])
             else:
-                logger.error(f"Error for {link}")
+                dct = {
+                    "link": link,
+                    "status": "ERROR_PARSING"
+                }
+                logger.error(f"Error for {link} {response}")
                 logger.error(f"{HelperService.get_full_link(english_sport_name=english_sport_name, link=link)}")
+            service.update_analysis_db([dct])
         return ResponseModel()
 
 
@@ -200,6 +206,7 @@ def logging_difference_list(list_bef_update, list_aft_update, eng_sport_name):
 
 if __name__ == "__main__":
     endpoint_name = "offline"
+    #endpoint_name = "online"
     logger.info(f' Initializing API {settings.TITLE}: {settings.VERSION}')
     logger.info(f' Visit endpoint: http://{settings.SERVER_HOST}:{settings.SERVER_PORT}/{endpoint_name}/')
     logger.info(f'Initializing file {os.path.basename(__file__)}')
@@ -247,7 +254,6 @@ if __name__ == "__main__":
             # Если ссылка не обновляется, то возможно полностью обновлять запись
 
     elif endpoint_name == "offline":
-        from datetime import datetime, timedelta
 
         # Вчерашняя дата
         yesterday = datetime.now() - timedelta(days=1)

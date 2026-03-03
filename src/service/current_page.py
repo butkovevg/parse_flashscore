@@ -143,11 +143,12 @@ class CurrentPageService:
             if response.status == StatusModel.SUCCESS:
                 return ResponseModel(status=StatusModel.SUCCESS, )
             else:
+                logger.error(f"{response} for {full_link}")
                 return ResponseModel(status=StatusModel.ERROR, )
         except ValueError as exc:
-            logger.debug(f"ERROR_ValueError {full_link}")
-            logger.debug(str(exc))
-            return ResponseModel(status=StatusModel.ERROR, )
+            msg_err = f"{str(exc)} {full_link}"
+            logger.error(msg_err)
+            return ResponseModel(status=StatusModel.ERROR, data=msg_err, details=full_link)
         except Exception as exc:
             logger.error(f"ERROR {full_link}")
             logger.error(repr(exc))
@@ -162,4 +163,4 @@ if __name__ == "__main__":
     day = 0
     data_for_parsing = InputDataForParsing(english_sport_name=sport_name, shift_day=day)
     current_page_service = CurrentPageService(data4parsing=data_for_parsing)
-    current_page_service.get_current_match(link="basketball")
+    current_page_service.get_current_match(link="vNkX3JsS")
