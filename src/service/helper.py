@@ -127,4 +127,4 @@ if __name__ == "__main__":
         "handball",
         "tennis",
     ]
-    logger.info(HelperService.get_full_link(english_sport_name="football", link="UZ73R5LF"))
+    logger.info(HelperService.get_full_link(english_sport_name="basketball", link="vNkX3JsS"))

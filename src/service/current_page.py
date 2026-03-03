@@ -162,4 +162,4 @@ if __name__ == "__main__":
     day = 0
     data_for_parsing = InputDataForParsing(english_sport_name=sport_name, shift_day=day)
     current_page_service = CurrentPageService(data4parsing=data_for_parsing)
-    current_page_service.get_current_match(link="WU3FGVsp")
+    current_page_service.get_current_match(link="basketball")
