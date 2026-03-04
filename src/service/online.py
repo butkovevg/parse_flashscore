@@ -171,7 +171,7 @@ class DataBaseOnlineService:
                     logger.error(f"{HelperService.get_full_link(english_sport_name=english_sport_name, link=link)}")
                 if status == 'TKP - ТОЛЬКО КОНЕЧНЫЙ РЕЗУЛЬТАТ.' or "ОТКАЗ" in status:
                     dct['status'] = "ОТМЕНЕН"
-                elif status == "ПОСЛЕ ОВЕРТАЙМА":
+                elif status in ('ПОСЛЕ ОВЕРТАЙМА', 'ПОСЛЕ ДОПОЛНИТЕЛЬНОГО ВРЕМЕНИ'):
                     dct['status'] = "ЗАВЕРШЕН"
                 logger.info(
                     f"{english_sport_name:10} {match_date}({counter}/{len(list_links_analysis_for_day)}) for {dct.get('link', 'NO_LINK')} {dct.get('status', 'NO_STATUS')}({dct.get('result', 'NO_RESULT')}<{dct.get('who_now_win', 'NO_who_now_win')}>)")
@@ -206,7 +206,7 @@ def logging_difference_list(list_bef_update, list_aft_update, eng_sport_name):
 
 if __name__ == "__main__":
     endpoint_name = "offline"
-    #endpoint_name = "online"
+    # endpoint_name = "online"
     logger.info(f' Initializing API {settings.TITLE}: {settings.VERSION}')
     logger.info(f' Visit endpoint: http://{settings.SERVER_HOST}:{settings.SERVER_PORT}/{endpoint_name}/')
     logger.info(f'Initializing file {os.path.basename(__file__)}')
