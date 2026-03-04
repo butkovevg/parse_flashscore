@@ -9,6 +9,25 @@ logger = get_logger(__name__)
 
 class HelperService:
     @staticmethod
+    def get_full_link(english_sport_name: str, link: str):
+        base_link = f"https://www.flashscorekz.com/match/{english_sport_name}/{link}"
+        fragment_table = "#/standings/table/overall"
+        full_link = f"{base_link}/{fragment_table}"
+        return full_link
+
+    @staticmethod
+    def get_day_name(date_str):
+        date_obj = datetime.datetime.strptime(date_str, "%d.%m.%Y")
+
+        # Номер дня недели (0 = понедельник, 6 = воскресенье)
+        weekday_num = date_obj.weekday()
+
+        # Название дня недели на русском
+        days_ru = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+        day_name = days_ru[weekday_num]
+        return day_name
+
+    @staticmethod
     def get_new_date(day: int) -> datetime.date:
         """
         Возвращает новую дату, сдвинутую на указанное количество дней.
@@ -101,4 +120,11 @@ if __name__ == "__main__":
     import os
 
     logger.info(f'Initializing test {os.path.basename(__file__)}')
-    logger.info(HelperService.get_who_now_win(result="19:"))
+    list_sport_name_rus_eng = [
+        "football",
+        "volleyball",
+        "basketball",
+        "handball",
+        "tennis",
+    ]
+    logger.info(HelperService.get_full_link(english_sport_name="basketball", link="vNkX3JsS"))

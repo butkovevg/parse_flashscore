@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Any
 
 from sqlalchemy import func
 
@@ -99,6 +100,74 @@ class FindDayForParsingService:
             logger.error(f"Подробности ошибки {str(exc)}")
         finally:
             self.session.close()
+
+    def for_stat(self, data: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+        """
+        Обрабатывает статистику по видам спорта.
+
+        Возвращает словарь с тремя наборами данных:
+        1. daily_totals: Суммы по дням (main, curr, anal).
+        2. sport_totals: Суммы по видам спорта за весь период.
+        3. percentages: Отношения curr/main и anal/curr в процентах по дням.
+        """
+        if not data:
+            return {"daily_totals": [], "sport_totals": {}, "percentages": []}
+
+        # 1. Расчет сумм по дням (data_for_stat_day)
+        daily_totals = []
+        for entry in data:
+            # sum(dict.values()) быстрее и читаемее ручного цикла
+            daily_totals.append({
+                "dt": entry["dt"],
+                "shift_day": entry["shift_day"],
+                "main": sum(entry["main"].values()),
+                "curr": sum(entry["curr"].values()),
+                "anal": sum(entry["anal"].values())
+            })
+        logger.info(f"Daily totals calculated: {daily_totals}")
+
+        # 2. Расчет сумм по видам спорта (dict_counter_for_stat_types_of_sports)
+        # Инициализируем нулями на основе ключей dct_types_of_sports
+        categories = ['main', 'curr', 'anal']
+        sport_totals = {
+            cat: {sport: 0 for sport in self.dct_types_of_sports}
+            for cat in categories
+        }
+
+        for entry in data:
+            for cat in categories:
+                for sport in self.dct_types_of_sports:
+                    # Используем .get(), чтобы избежать KeyError, если спорт вдруг отсутствует в entry
+                    sport_totals[cat][sport] += entry.get(cat, {}).get(sport, 0)
+
+        logger.info(f"Sport totals calculated: {sport_totals}")
+
+        # 3. Расчет процентов (percent_for_main_curr_anal)
+        percentages = []
+        for entry in data:
+            row = {
+                "dt": entry["dt"],
+                "shift_day": entry["shift_day"]
+            }
+            for sport in self.dct_types_of_sports:
+                main_val = entry["main"].get(sport, 0)
+                curr_val = entry["curr"].get(sport, 0)
+                anal_val = entry["anal"].get(sport, 0)
+
+                # Безопасный расчет процента
+                curr_to_main = round(curr_val * 100 / main_val) if main_val else 0
+                anal_to_curr = round(anal_val * 100 / curr_val) if curr_val else 0
+
+                row[sport] = f"{curr_to_main}/{anal_to_curr}"
+
+            percentages.append(row)
+        logger.info(f"Percentages calculated: {percentages}")
+
+        return {
+            "daily_totals": daily_totals,
+            "sport_totals": sport_totals,
+            "percentages": percentages
+        }
 
 
 if __name__ == '__main__':

@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.templating import Jinja2Templates
 from starlette.background import BackgroundTasks
 
+from src.model.day_or_shift import get_day_offset
 from src.service.analysis import InfoAnalysisDBService
 from src.service.background_tasks import run
 from src.service.find_day_for_parsing import FindDayForParsingService
@@ -50,12 +51,25 @@ async def update_favorites(analysis_id: int):
     return parsing_service.update_favorites(analysis_id=analysis_id)
 
 
+# @router.get("/time/{day}/")
+# async def get_time_value(request: Request, day: int):
+#     service = InfoAnalysisDBService(day)
+#     matches = service.get_match_today()
+#     return templates.TemplateResponse("analysis_time.html", {"request": request, "matches": matches, "day": day})
+
+
 @router.get("/time/{day}/")
-async def get_time_value(request: Request, day: int):
+async def get_time_value(
+        request: Request,
+        day: int = Depends(get_day_offset)
+):
     service = InfoAnalysisDBService(day)
     matches = service.get_match_today()
-    return templates.TemplateResponse("analysis_time.html", {"request": request, "matches": matches, "day": day})
 
+    return templates.TemplateResponse(
+        "analysis_time.html",
+        {"request": request, "matches": matches, "day": day}
+    )
 
 @router.get("/render/")
 async def test_render(request: Request):
@@ -80,11 +94,22 @@ async def get_value(request: Request, day: int = 0):
 async def find_day(request: Request):
     service = FindDayForParsingService()
     data = service.all()
-    list_sports = ['ВОЛЕЙБОЛ', 'ФУТБОЛ', 'БАСКЕТБОЛ', 'ГАНДБОЛ', 'ТЕННИС']
-
     return templates.TemplateResponse("find.html", {"request": request,
                                                     "data": data,
-                                                    "sports": list_sports})
+                                                    "sports": list(
+                                                        FindDayForParsingService.dct_types_of_sports.keys())})
+
+
+@router.get("/for_stat")
+async def for_stat(request: Request):
+    service = FindDayForParsingService()
+    data = service.all()
+    data_for_stat = service.for_stat(data)
+    return templates.TemplateResponse("for_stat.html", {"request": request,
+                                                        "data": data,
+                                                        "sports": list(
+                                                            FindDayForParsingService.dct_types_of_sports.keys()),
+                                                        "data_for_stat": data_for_stat})
 
 
 @router.patch("/update_comment/{link}")
@@ -93,3 +118,9 @@ async def update_comment(request: Request, link: str, comment: str | None = None
     database_online_service = DataBaseOnlineService()
     database_online_service.update_comment(link, comment)
     return {"message": "Comment updated successfully", "link": link, "new_comment": comment}
+
+
+@router.patch("/get_historical_analytics/{match_date}/")
+async def get_historical_analytics(request: Request, match_date: str):
+    database_online_service = DataBaseOnlineService()
+    return database_online_service.get_historical_analytics(match_date=match_date)

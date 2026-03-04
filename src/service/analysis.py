@@ -69,13 +69,13 @@ class AnalysisService:
             min_kf = 1.01
             if min_kf < float(record.kf1) < max_kf:
                 self.analysis_model.by_coefficient = 1
-                logger.info(msg)
+                logger.debug(msg)
             if min_kf < float(record.kf2) < max_kf:
                 if self.analysis_model.by_coefficient == 0:
                     self.analysis_model.by_coefficient = 2
                 else:
                     logger.error(f"Check low kf and {msg}")
-                logger.info(msg)
+                logger.debug(msg)
         except Exception as exc:
             logger.error(exc)
 
@@ -110,7 +110,8 @@ class AnalysisService:
                 else:
                     self.insert(analysis_model=self.analysis_model)
                     counter += 1
-            logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
+                    logger.info(f"{index}/{length_unprocessed_records}. in analyze={counter}")
+            logger.debug(f"{index}/{length_unprocessed_records}. in analyze={counter}")
 
     def is_save(self):
         set_who_must_win = {self.analysis_model.by_coefficient, self.analysis_model.by_series,
@@ -136,7 +137,7 @@ class AnalysisService:
             logger.debug(f'insert record: {analysis_model}')
         except Exception as exc:
             description_error = f"ERROR: {str(exc)} for {analysis_model}"
-            logger.error(description_error)
+            logger.debug(description_error)
             self.session.rollback()
 
     def update(self, current_db_model: CurrentDBModel, status: bool = True):
@@ -239,7 +240,7 @@ class InfoAnalysisDBService:
         new_time = self.current_time - timedelta(minutes=90)
         time_filter = new_time.strftime('%H:%M')
         query_all_record = self.query.filter(CurrentDBModel.match_time > time_filter)
-        # query_all_record = self.query.filter(AnalysisDBModel.comment.is_(None))
+        query_all_record = query_all_record.filter(AnalysisDBModel.comment.is_(None))
         query_all_record = query_all_record.order_by(CurrentDBModel.match_time)
         result = query_all_record.all()
         logger.info(f"get_match_today: {len(result)=}")

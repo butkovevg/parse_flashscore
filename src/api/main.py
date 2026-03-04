@@ -51,10 +51,14 @@ async def read_root(request: Request):
             "path": "",
             "methods": "",
             "url": f"http://{settings.SERVER_HOST}:{settings.SERVER_PORT}/analysis/0/",
+        },
+        {
+            "path": "",
+            "methods": "",
+            "url": f"http://{settings.SERVER_HOST}:{settings.SERVER_PORT}/analysis/for_stat",
         }
 
     ]
-
     return templates.TemplateResponse(
         "index.html", {"request": request, "routes": routes}
     )
